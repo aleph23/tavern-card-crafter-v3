@@ -477,13 +477,11 @@ const Index = () => {
         </div>
 
         <div className="space-y-6">
-          {/* AI助手面板 - 移到第一排 */}
-          <div className="w-full">
-            <AIAssistant 
-              aiSettings={aiSettings}
-              onInsertField={handleInsertField}
-            />
-          </div>
+          {/* AI助手面板 - 在同一个max-width容器内 */}
+          <AIAssistant 
+            aiSettings={aiSettings}
+            onInsertField={handleInsertField}
+          />
 
           {/* 角色信息编辑和预览 */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
