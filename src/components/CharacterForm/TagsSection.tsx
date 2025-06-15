@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,7 @@ interface TagsSectionProps {
 const TagsSection = ({ tags, updateField, aiSettings, characterData }: TagsSectionProps) => {
   const [newTag, setNewTag] = useState("");
   const [loading, setLoading] = useState(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
   const { toast } = useToast();
   const { t } = useLanguage();
 
@@ -60,6 +61,7 @@ const TagsSection = ({ tags, updateField, aiSettings, characterData }: TagsSecti
       return;
     }
 
+    abortControllerRef.current = new AbortController();
     setLoading(true);
     
     try {
@@ -76,13 +78,33 @@ const TagsSection = ({ tags, updateField, aiSettings, characterData }: TagsSecti
         description: t('tagsGenerated') || "标签已生成完成"
       });
     } catch (error) {
-      toast({
-        title: t('generateError') || "生成失败",
-        description: error instanceof Error ? error.message : t('unknownError') || "未知错误",
-        variant: "destructive"
-      });
+      if (error instanceof Error && error.name === 'AbortError') {
+        toast({
+          title: "已取消",
+          description: "AI生成已被用户取消"
+        });
+      } else {
+        toast({
+          title: t('generateError') || "生成失败",
+          description: error instanceof Error ? error.message : t('unknownError') || "未知错误",
+          variant: "destructive"
+        });
+      }
     } finally {
       setLoading(false);
+      abortControllerRef.current = null;
+    }
+  };
+
+  const cancelGeneration = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      setLoading(false);
+      abortControllerRef.current = null;
+      toast({
+        title: "已取消",
+        description: "AI生成已取消"
+      });
     }
   };
 
@@ -99,33 +121,35 @@ const TagsSection = ({ tags, updateField, aiSettings, characterData }: TagsSecti
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{t('tags')}</h3>
         <div className="flex gap-1">
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={handleAIGenerateTags}
-            disabled={loading}
-            className="h-8 px-2 text-xs"
-          >
-            {loading ? (
-              <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-            ) : (
+          {!loading && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleAIGenerateTags}
+              className="h-8 px-2 text-xs"
+            >
               <RefreshCcw className="w-3 h-3 mr-1" />
-            )}
-            重新生成
-          </Button>
+              重新生成
+            </Button>
+          )}
           <Button
             size="sm"
-            variant="outline"
-            onClick={handleAIGenerateTags}
-            disabled={loading}
+            variant={loading ? "destructive" : "outline"}
+            onClick={loading ? cancelGeneration : handleAIGenerateTags}
+            disabled={!loading && (!characterData.name || !characterData.description)}
             className="h-8 px-2 text-xs"
           >
             {loading ? (
-              <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+              <>
+                <X className="w-3 h-3 mr-1" />
+                取消
+              </>
             ) : (
-              <Sparkles className="w-3 h-3 mr-1" />
+              <>
+                <Sparkles className="w-3 h-3 mr-1" />
+                AI生成标签
+              </>
             )}
-            AI生成标签
           </Button>
           <Button
             size="sm"

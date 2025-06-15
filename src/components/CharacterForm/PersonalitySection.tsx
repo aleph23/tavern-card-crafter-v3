@@ -1,9 +1,9 @@
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Loader2, RefreshCcw, Trash2 } from "lucide-react";
+import { Sparkles, Loader2, RefreshCcw, Trash2, X } from "lucide-react";
 import { generateWithAI, generatePersonality, generateScenario, generateFirstMessage, generateMessageExample } from "@/utils/aiGenerator";
 import { AISettings } from "@/components/AISettings";
 import { useToast } from "@/hooks/use-toast";
@@ -16,6 +16,7 @@ interface PersonalitySectionProps {
 
 const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectionProps) => {
   const [loading, setLoading] = useState<{ [key: string]: boolean }>({});
+  const abortControllerRefs = useRef<{ [key: string]: AbortController | null }>({});
   const { toast } = useToast();
 
   const handleAIGenerate = async (field: string, promptGenerator: (data: any) => string) => {
@@ -37,6 +38,7 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
       return;
     }
 
+    abortControllerRefs.current[field] = new AbortController();
     setLoading(prev => ({ ...prev, [field]: true }));
     
     try {
@@ -48,13 +50,33 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
         description: `${field} 已生成完成`
       });
     } catch (error) {
-      toast({
-        title: "生成失败",
-        description: error instanceof Error ? error.message : "未知错误",
-        variant: "destructive"
-      });
+      if (error instanceof Error && error.name === 'AbortError') {
+        toast({
+          title: "已取消",
+          description: "AI生成已被用户取消"
+        });
+      } else {
+        toast({
+          title: "生成失败",
+          description: error instanceof Error ? error.message : "未知错误",
+          variant: "destructive"
+        });
+      }
     } finally {
       setLoading(prev => ({ ...prev, [field]: false }));
+      abortControllerRefs.current[field] = null;
+    }
+  };
+
+  const cancelGeneration = (field: string) => {
+    if (abortControllerRefs.current[field]) {
+      abortControllerRefs.current[field]!.abort();
+      setLoading(prev => ({ ...prev, [field]: false }));
+      abortControllerRefs.current[field] = null;
+      toast({
+        title: "已取消",
+        description: "AI生成已取消"
+      });
     }
   };
 
@@ -66,6 +88,56 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
     });
   };
 
+  const renderFieldButtons = (field: string, promptGenerator: (data: any) => string, dependencies?: string[]) => {
+    const isLoading = loading[field];
+    const canGenerate = dependencies ? dependencies.every(dep => data[dep]) : true;
+
+    return (
+      <div className="flex gap-1">
+        {!isLoading && (
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => handleAIGenerate(field, promptGenerator)}
+            disabled={!canGenerate}
+            className="h-8 px-2 text-xs"
+          >
+            <RefreshCcw className="w-3 h-3 mr-1" />
+            重新生成
+          </Button>
+        )}
+        <Button
+          size="sm"
+          variant={isLoading ? "destructive" : "outline"}
+          onClick={isLoading ? () => cancelGeneration(field) : () => handleAIGenerate(field, promptGenerator)}
+          disabled={!isLoading && !canGenerate}
+          className="h-8 px-2 text-xs"
+        >
+          {isLoading ? (
+            <>
+              <X className="w-3 h-3 mr-1" />
+              取消
+            </>
+          ) : (
+            <>
+              <Sparkles className="w-3 h-3 mr-1" />
+              AI生成
+            </>
+          )}
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => handleClearField(field)}
+          className="h-8 px-2 text-xs"
+        >
+          <Trash2 className="w-3 h-3 mr-1" />
+          清空
+        </Button>
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold text-gray-800 mb-4">性格设定</h3>
@@ -73,45 +145,7 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
       <div>
         <div className="flex items-center justify-between mb-2">
           <Label htmlFor="personality" className="text-sm font-medium text-gray-700">性格特征 *</Label>
-          <div className="flex gap-1">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => handleAIGenerate('personality', generatePersonality)}
-              disabled={loading.personality}
-              className="h-8 px-2 text-xs"
-            >
-              {loading.personality ? (
-                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-              ) : (
-                <RefreshCcw className="w-3 h-3 mr-1" />
-              )}
-              重新生成
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => handleAIGenerate('personality', generatePersonality)}
-              disabled={loading.personality}
-              className="h-8 px-2 text-xs"
-            >
-              {loading.personality ? (
-                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-              ) : (
-                <Sparkles className="w-3 h-3 mr-1" />
-              )}
-              AI生成
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => handleClearField('personality')}
-              className="h-8 px-2 text-xs"
-            >
-              <Trash2 className="w-3 h-3 mr-1" />
-              清空
-            </Button>
-          </div>
+          {renderFieldButtons('personality', generatePersonality, ['name', 'description'])}
         </div>
         <Textarea
           id="personality"
@@ -126,45 +160,7 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
       <div>
         <div className="flex items-center justify-between mb-2">
           <Label htmlFor="scenario" className="text-sm font-medium text-gray-700">场景设定 *</Label>
-          <div className="flex gap-1">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => handleAIGenerate('scenario', generateScenario)}
-              disabled={loading.scenario || !data.personality}
-              className="h-8 px-2 text-xs"
-            >
-              {loading.scenario ? (
-                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-              ) : (
-                <RefreshCcw className="w-3 h-3 mr-1" />
-              )}
-              重新生成
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => handleAIGenerate('scenario', generateScenario)}
-              disabled={loading.scenario || !data.personality}
-              className="h-8 px-2 text-xs"
-            >
-              {loading.scenario ? (
-                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-              ) : (
-                <Sparkles className="w-3 h-3 mr-1" />
-              )}
-              AI生成
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => handleClearField('scenario')}
-              className="h-8 px-2 text-xs"
-            >
-              <Trash2 className="w-3 h-3 mr-1" />
-              清空
-            </Button>
-          </div>
+          {renderFieldButtons('scenario', generateScenario, ['name', 'description', 'personality'])}
         </div>
         <Textarea
           id="scenario"
@@ -179,45 +175,7 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
       <div>
         <div className="flex items-center justify-between mb-2">
           <Label htmlFor="first_mes" className="text-sm font-medium text-gray-700">首条消息 *</Label>
-          <div className="flex gap-1">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => handleAIGenerate('first_mes', generateFirstMessage)}
-              disabled={loading.first_mes || !data.scenario}
-              className="h-8 px-2 text-xs"
-            >
-              {loading.first_mes ? (
-                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-              ) : (
-                <RefreshCcw className="w-3 h-3 mr-1" />
-              )}
-              重新生成
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => handleAIGenerate('first_mes', generateFirstMessage)}
-              disabled={loading.first_mes || !data.scenario}
-              className="h-8 px-2 text-xs"
-            >
-              {loading.first_mes ? (
-                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-              ) : (
-                <Sparkles className="w-3 h-3 mr-1" />
-              )}
-              AI生成
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => handleClearField('first_mes')}
-              className="h-8 px-2 text-xs"
-            >
-              <Trash2 className="w-3 h-3 mr-1" />
-              清空
-            </Button>
-          </div>
+          {renderFieldButtons('first_mes', generateFirstMessage, ['name', 'description', 'personality', 'scenario'])}
         </div>
         <Textarea
           id="first_mes"
@@ -232,45 +190,7 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
       <div>
         <div className="flex items-center justify-between mb-2">
           <Label htmlFor="mes_example" className="text-sm font-medium text-gray-700">对话示例</Label>
-          <div className="flex gap-1">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => handleAIGenerate('mes_example', generateMessageExample)}
-              disabled={loading.mes_example || !data.first_mes}
-              className="h-8 px-2 text-xs"
-            >
-              {loading.mes_example ? (
-                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-              ) : (
-                <RefreshCcw className="w-3 h-3 mr-1" />
-              )}
-              重新生成
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => handleAIGenerate('mes_example', generateMessageExample)}
-              disabled={loading.mes_example || !data.first_mes}
-              className="h-8 px-2 text-xs"
-            >
-              {loading.mes_example ? (
-                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-              ) : (
-                <Sparkles className="w-3 h-3 mr-1" />
-              )}
-              AI生成
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => handleClearField('mes_example')}
-              className="h-8 px-2 text-xs"
-            >
-              <Trash2 className="w-3 h-3 mr-1" />
-              清空
-            </Button>
-          </div>
+          {renderFieldButtons('mes_example', generateMessageExample, ['name', 'description', 'personality', 'first_mes'])}
         </div>
         <Textarea
           id="mes_example"

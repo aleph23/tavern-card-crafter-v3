@@ -1,9 +1,9 @@
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Loader2, RefreshCcw, Trash2 } from "lucide-react";
+import { Sparkles, Loader2, RefreshCcw, Trash2, X } from "lucide-react";
 import { generateWithAI, generateSystemPrompt, generatePostHistoryInstructions } from "@/utils/aiGenerator";
 import { AISettings } from "@/components/AISettings";
 import { useToast } from "@/hooks/use-toast";
@@ -16,6 +16,7 @@ interface PromptsSectionProps {
 
 const PromptsSection = ({ data, updateField, aiSettings }: PromptsSectionProps) => {
   const [loading, setLoading] = useState<{ [key: string]: boolean }>({});
+  const abortControllerRefs = useRef<{ [key: string]: AbortController | null }>({});
   const { toast } = useToast();
 
   const handleAIGenerate = async (field: string, promptGenerator: (data: any) => string) => {
@@ -37,6 +38,7 @@ const PromptsSection = ({ data, updateField, aiSettings }: PromptsSectionProps) 
       return;
     }
 
+    abortControllerRefs.current[field] = new AbortController();
     setLoading(prev => ({ ...prev, [field]: true }));
     
     try {
@@ -48,13 +50,33 @@ const PromptsSection = ({ data, updateField, aiSettings }: PromptsSectionProps) 
         description: `${field} 已生成完成`
       });
     } catch (error) {
-      toast({
-        title: "生成失败",
-        description: error instanceof Error ? error.message : "未知错误",
-        variant: "destructive"
-      });
+      if (error instanceof Error && error.name === 'AbortError') {
+        toast({
+          title: "已取消",
+          description: "AI生成已被用户取消"
+        });
+      } else {
+        toast({
+          title: "生成失败",
+          description: error instanceof Error ? error.message : "未知错误",
+          variant: "destructive"
+        });
+      }
     } finally {
       setLoading(prev => ({ ...prev, [field]: false }));
+      abortControllerRefs.current[field] = null;
+    }
+  };
+
+  const cancelGeneration = (field: string) => {
+    if (abortControllerRefs.current[field]) {
+      abortControllerRefs.current[field]!.abort();
+      setLoading(prev => ({ ...prev, [field]: false }));
+      abortControllerRefs.current[field] = null;
+      toast({
+        title: "已取消",
+        description: "AI生成已取消"
+      });
     }
   };
 
@@ -66,6 +88,56 @@ const PromptsSection = ({ data, updateField, aiSettings }: PromptsSectionProps) 
     });
   };
 
+  const renderFieldButtons = (field: string, promptGenerator: (data: any) => string) => {
+    const isLoading = loading[field];
+    const canGenerate = data.name && data.description && data.personality;
+
+    return (
+      <div className="flex gap-1">
+        {!isLoading && (
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => handleAIGenerate(field, promptGenerator)}
+            disabled={!canGenerate}
+            className="h-8 px-2 text-xs"
+          >
+            <RefreshCcw className="w-3 h-3 mr-1" />
+            重新生成
+          </Button>
+        )}
+        <Button
+          size="sm"
+          variant={isLoading ? "destructive" : "outline"}
+          onClick={isLoading ? () => cancelGeneration(field) : () => handleAIGenerate(field, promptGenerator)}
+          disabled={!isLoading && !canGenerate}
+          className="h-8 px-2 text-xs"
+        >
+          {isLoading ? (
+            <>
+              <X className="w-3 h-3 mr-1" />
+              取消
+            </>
+          ) : (
+            <>
+              <Sparkles className="w-3 h-3 mr-1" />
+              AI生成
+            </>
+          )}
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => handleClearField(field)}
+          className="h-8 px-2 text-xs"
+        >
+          <Trash2 className="w-3 h-3 mr-1" />
+          清空
+        </Button>
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold text-gray-800 mb-4">提示词设置</h3>
@@ -73,45 +145,7 @@ const PromptsSection = ({ data, updateField, aiSettings }: PromptsSectionProps) 
       <div>
         <div className="flex items-center justify-between mb-2">
           <Label htmlFor="system_prompt" className="text-sm font-medium text-gray-700">系统提示词</Label>
-          <div className="flex gap-1">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => handleAIGenerate('system_prompt', generateSystemPrompt)}
-              disabled={loading.system_prompt}
-              className="h-8 px-2 text-xs"
-            >
-              {loading.system_prompt ? (
-                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-              ) : (
-                <RefreshCcw className="w-3 h-3 mr-1" />
-              )}
-              重新生成
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => handleAIGenerate('system_prompt', generateSystemPrompt)}
-              disabled={loading.system_prompt}
-              className="h-8 px-2 text-xs"
-            >
-              {loading.system_prompt ? (
-                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-              ) : (
-                <Sparkles className="w-3 h-3 mr-1" />
-              )}
-              AI生成
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => handleClearField('system_prompt')}
-              className="h-8 px-2 text-xs"
-            >
-              <Trash2 className="w-3 h-3 mr-1" />
-              清空
-            </Button>
-          </div>
+          {renderFieldButtons('system_prompt', generateSystemPrompt)}
         </div>
         <Textarea
           id="system_prompt"
@@ -126,45 +160,7 @@ const PromptsSection = ({ data, updateField, aiSettings }: PromptsSectionProps) 
       <div>
         <div className="flex items-center justify-between mb-2">
           <Label htmlFor="post_history" className="text-sm font-medium text-gray-700">历史后指令</Label>
-          <div className="flex gap-1">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => handleAIGenerate('post_history_instructions', generatePostHistoryInstructions)}
-              disabled={loading.post_history_instructions}
-              className="h-8 px-2 text-xs"
-            >
-              {loading.post_history_instructions ? (
-                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-              ) : (
-                <RefreshCcw className="w-3 h-3 mr-1" />
-              )}
-              重新生成
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => handleAIGenerate('post_history_instructions', generatePostHistoryInstructions)}
-              disabled={loading.post_history_instructions}
-              className="h-8 px-2 text-xs"
-            >
-              {loading.post_history_instructions ? (
-                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-              ) : (
-                <Sparkles className="w-3 h-3 mr-1" />
-              )}
-              AI生成
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => handleClearField('post_history_instructions')}
-              className="h-8 px-2 text-xs"
-            >
-              <Trash2 className="w-3 h-3 mr-1" />
-              清空
-            </Button>
-          </div>
+          {renderFieldButtons('post_history_instructions', generatePostHistoryInstructions)}
         </div>
         <Textarea
           id="post_history"

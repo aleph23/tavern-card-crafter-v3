@@ -20,6 +20,7 @@ interface BasicInfoSectionProps {
 const BasicInfoSection = ({ data, updateField, characterImage, setCharacterImage, aiSettings }: BasicInfoSectionProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
   const { toast } = useToast();
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,6 +54,7 @@ const BasicInfoSection = ({ data, updateField, characterImage, setCharacterImage
       return;
     }
 
+    abortControllerRef.current = new AbortController();
     setLoading(true);
     
     try {
@@ -64,13 +66,33 @@ const BasicInfoSection = ({ data, updateField, characterImage, setCharacterImage
         description: "角色描述已生成完成"
       });
     } catch (error) {
-      toast({
-        title: "生成失败",
-        description: error instanceof Error ? error.message : "未知错误",
-        variant: "destructive"
-      });
+      if (error instanceof Error && error.name === 'AbortError') {
+        toast({
+          title: "已取消",
+          description: "AI生成已被用户取消"
+        });
+      } else {
+        toast({
+          title: "生成失败",
+          description: error instanceof Error ? error.message : "未知错误",
+          variant: "destructive"
+        });
+      }
     } finally {
       setLoading(false);
+      abortControllerRef.current = null;
+    }
+  };
+
+  const cancelGeneration = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      setLoading(false);
+      abortControllerRef.current = null;
+      toast({
+        title: "已取消",
+        description: "AI生成已取消"
+      });
     }
   };
 
@@ -156,33 +178,35 @@ const BasicInfoSection = ({ data, updateField, characterImage, setCharacterImage
         <div className="flex items-center justify-between mb-2">
           <Label htmlFor="description" className="text-sm font-medium text-gray-700">角色描述 *</Label>
           <div className="flex gap-1">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={handleAIGenerateDescription}
-              disabled={loading}
-              className="h-8 px-2 text-xs"
-            >
-              {loading ? (
-                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-              ) : (
+            {!loading && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleAIGenerateDescription}
+                className="h-8 px-2 text-xs"
+              >
                 <RefreshCcw className="w-3 h-3 mr-1" />
-              )}
-              重新生成
-            </Button>
+                重新生成
+              </Button>
+            )}
             <Button
               size="sm"
-              variant="outline"
-              onClick={handleAIGenerateDescription}
-              disabled={loading}
+              variant={loading ? "destructive" : "outline"}
+              onClick={loading ? cancelGeneration : handleAIGenerateDescription}
+              disabled={!loading && !data.name}
               className="h-8 px-2 text-xs"
             >
               {loading ? (
-                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                <>
+                  <X className="w-3 h-3 mr-1" />
+                  取消
+                </>
               ) : (
-                <Sparkles className="w-3 h-3 mr-1" />
+                <>
+                  <Sparkles className="w-3 h-3 mr-1" />
+                  AI生成
+                </>
               )}
-              AI生成
             </Button>
             <Button
               size="sm"
