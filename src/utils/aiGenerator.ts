@@ -22,6 +22,26 @@ export const estimateTokens = (text: string): number => {
   return Math.ceil(chineseChars * 1.5 + englishWords + otherChars * 0.5);
 };
 
+// 智能构建API URL
+const buildApiUrl = (baseUrl: string, endpoint: string = '/v1/chat/completions'): string => {
+  if (!baseUrl) return '';
+  
+  // 如果已经包含了完整的端点，直接返回
+  if (baseUrl.includes('/chat/completions') || baseUrl.includes('/api/tags')) {
+    return baseUrl;
+  }
+  
+  // 移除末尾的斜杠
+  const cleanUrl = baseUrl.replace(/\/+$/, '');
+  
+  // 智能添加端点
+  if (cleanUrl.includes('/v1')) {
+    return `${cleanUrl}${endpoint}`;
+  } else {
+    return `${cleanUrl}/v1${endpoint}`;
+  }
+};
+
 export const generateWithAI = async (
   settings: AISettings,
   prompt: string
@@ -38,6 +58,13 @@ export const generateWithAI = async (
   }
 
   try {
+    // 智能构建API地址
+    const apiUrl = buildApiUrl(settings.apiUrl);
+    
+    console.log('Generating with AI using URL:', apiUrl);
+    console.log('Provider:', settings.provider);
+    console.log('Model:', settings.model);
+
     // 使用统一的OpenAI兼容格式
     let headers: any = {
       'Content-Type': 'application/json',
@@ -55,18 +82,41 @@ export const generateWithAI = async (
       temperature: 0.7
     };
 
-    const response = await fetch(settings.apiUrl, {
+    console.log('Request body:', requestBody);
+
+    const response = await fetch(apiUrl, {
       method: 'POST',
       headers,
-      body: JSON.stringify(requestBody)
+      body: JSON.stringify(requestBody),
+      signal: AbortSignal.timeout(60000) // 60秒超时
     });
+
+    console.log('Response status:', response.status);
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`API请求失败: ${response.status} ${response.statusText} - ${errorText}`);
+      console.error('API Error Response:', errorText);
+      
+      let errorMessage = `API请求失败: ${response.status} ${response.statusText}`;
+      
+      try {
+        const errorData = JSON.parse(errorText);
+        if (errorData.error?.message) {
+          errorMessage += ` - ${errorData.error.message}`;
+        } else if (errorData.detail) {
+          errorMessage += ` - ${errorData.detail}`;
+        }
+      } catch {
+        if (errorText) {
+          errorMessage += ` - ${errorText}`;
+        }
+      }
+      
+      throw new Error(errorMessage);
     }
 
     const data = await response.json();
+    console.log('API Response:', data);
     
     // 使用统一的OpenAI兼容响应格式解析
     const content = data.choices?.[0]?.message?.content || "生成失败，请重试";
@@ -75,7 +125,19 @@ export const generateWithAI = async (
     return content.trim().replace(/^\s*\n+/, '');
   } catch (error) {
     console.error('AI生成错误:', error);
-    throw new Error(`生成失败: ${error instanceof Error ? error.message : '未知错误'}`);
+    
+    if (error instanceof Error) {
+      // 处理特定错误类型
+      if (error.name === 'TimeoutError') {
+        throw new Error('请求超时，请检查网络连接或API服务状态');
+      }
+      if (error.message.includes('Failed to fetch')) {
+        throw new Error('网络连接失败，请检查API地址是否正确或服务是否运行');
+      }
+      throw error;
+    }
+    
+    throw new Error(`生成失败: 未知错误`);
   }
 };
 
