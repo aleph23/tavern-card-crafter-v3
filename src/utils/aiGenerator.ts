@@ -48,6 +48,14 @@ export const generateWithAI = async (
   return data.choices[0]?.message?.content || "生成失败，请重试";
 };
 
+export const generateDescription = (data: CharacterData): string => {
+  return `根据以下角色名称生成详细的角色描述：
+
+角色名称：${data.name}
+
+请生成一个详细的角色描述，包括角色的外观、背景、身份、特征等。请用中文回答，内容要具体且生动。`;
+};
+
 export const generatePersonality = (data: CharacterData): string => {
   return `根据以下信息生成详细的角色性格特征：
 
@@ -123,4 +131,32 @@ export const generateTags = (data: CharacterData): string => {
 场景设定：${data.scenario}
 
 请生成5-10个相关标签，用逗号分隔。标签应该包括角色类型、性格特点、场景类型等。请用中文回答。`;
+};
+
+export const generateAlternateGreeting = (data: CharacterData): string => {
+  return `根据以下信息生成一个备用问候语：
+
+角色名称：${data.name}
+角色描述：${data.description}
+性格特征：${data.personality}
+场景设定：${data.scenario}
+首条消息：${data.first_mes}
+
+请生成一个与首条消息不同风格的备用问候语，体现角色的多面性。请用中文回答，要自然生动。`;
+};
+
+export const generateCharacterBookEntry = (data: CharacterData, context?: string): string => {
+  return `根据以下信息生成一个角色书条目：
+
+角色名称：${data.name}
+角色描述：${data.description}
+性格特征：${data.personality}
+场景设定：${data.scenario}
+${context ? `补充信息：${context}` : ''}
+
+请生成一个角色书条目，包含关键词和详细内容。格式如下：
+关键词: 相关的关键词（用逗号分隔）
+内容: 详细的背景信息或设定
+
+请用中文回答，内容要丰富且有用。`;
 };

@@ -3,17 +3,24 @@ import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Plus, X, Edit2, Check } from "lucide-react";
+import { Plus, X, Edit2, Check, Sparkles, Loader2 } from "lucide-react";
+import { generateWithAI, generateAlternateGreeting } from "@/utils/aiGenerator";
+import { AISettings } from "@/components/AISettings";
+import { useToast } from "@/hooks/use-toast";
 
 interface AlternateGreetingsProps {
   greetings: string[];
   updateField: (field: string, value: any) => void;
+  aiSettings: AISettings | null;
+  characterData: any;
 }
 
-const AlternateGreetings = ({ greetings, updateField }: AlternateGreetingsProps) => {
+const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData }: AlternateGreetingsProps) => {
   const [newGreeting, setNewGreeting] = useState("");
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingText, setEditingText] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
   const addGreeting = () => {
     if (newGreeting.trim()) {
@@ -46,9 +53,64 @@ const AlternateGreetings = ({ greetings, updateField }: AlternateGreetingsProps)
     setEditingText("");
   };
 
+  const handleAIGenerateGreeting = async () => {
+    if (!aiSettings?.apiKey) {
+      toast({
+        title: "配置错误",
+        description: "请先在AI设置中配置API密钥",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!characterData.name || !characterData.description) {
+      toast({
+        title: "信息不完整",
+        description: "请先填写角色名称和角色描述",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setLoading(true);
+    
+    try {
+      const prompt = generateAlternateGreeting(characterData);
+      const result = await generateWithAI(aiSettings, prompt);
+      updateField("alternate_greetings", [...greetings, result]);
+      toast({
+        title: "生成成功",
+        description: "备用问候语已生成完成"
+      });
+    } catch (error) {
+      toast({
+        title: "生成失败",
+        description: error instanceof Error ? error.message : "未知错误",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-gray-800 mb-4">备用问候语</h3>
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">备用问候语</h3>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={handleAIGenerateGreeting}
+          disabled={loading}
+        >
+          {loading ? (
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+          ) : (
+            <Sparkles className="w-4 h-4 mr-2" />
+          )}
+          AI生成问候语
+        </Button>
+      </div>
       
       <div className="form-group">
         <Label className="text-sm font-medium text-gray-700">添加新问候语</Label>

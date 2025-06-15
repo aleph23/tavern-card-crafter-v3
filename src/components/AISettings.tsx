@@ -76,8 +76,29 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
                 <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo</SelectItem>
                 <SelectItem value="gpt-4">GPT-4</SelectItem>
                 <SelectItem value="gpt-4-turbo">GPT-4 Turbo</SelectItem>
+                <SelectItem value="gpt-4o">GPT-4o</SelectItem>
+                <SelectItem value="gpt-4o-mini">GPT-4o Mini</SelectItem>
                 <SelectItem value="claude-3-sonnet">Claude 3 Sonnet</SelectItem>
                 <SelectItem value="claude-3-haiku">Claude 3 Haiku</SelectItem>
+                <SelectItem value="claude-3-opus">Claude 3 Opus</SelectItem>
+                <SelectItem value="claude-3-5-sonnet">Claude 3.5 Sonnet</SelectItem>
+                <SelectItem value="gemini-pro">Gemini Pro</SelectItem>
+                <SelectItem value="gemini-1.5-pro">Gemini 1.5 Pro</SelectItem>
+                <SelectItem value="deepseek-chat">DeepSeek Chat</SelectItem>
+                <SelectItem value="qwen-turbo">Qwen Turbo</SelectItem>
+                <SelectItem value="qwen-plus">Qwen Plus</SelectItem>
+                <SelectItem value="qwen-max">Qwen Max</SelectItem>
+                <SelectItem value="moonshot-v1-8k">Moonshot v1 8k</SelectItem>
+                <SelectItem value="moonshot-v1-32k">Moonshot v1 32k</SelectItem>
+                <SelectItem value="moonshot-v1-128k">Moonshot v1 128k</SelectItem>
+                <SelectItem value="yi-34b-chat">Yi 34B Chat</SelectItem>
+                <SelectItem value="yi-large">Yi Large</SelectItem>
+                <SelectItem value="baichuan2-turbo">Baichuan2 Turbo</SelectItem>
+                <SelectItem value="chatglm-turbo">ChatGLM Turbo</SelectItem>
+                <SelectItem value="llama-2-70b-chat">Llama 2 70B Chat</SelectItem>
+                <SelectItem value="llama-3-70b-instruct">Llama 3 70B Instruct</SelectItem>
+                <SelectItem value="mistral-7b-instruct">Mistral 7B Instruct</SelectItem>
+                <SelectItem value="mixtral-8x7b-instruct">Mixtral 8x7B Instruct</SelectItem>
               </SelectContent>
             </Select>
           </div>

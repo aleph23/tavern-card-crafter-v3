@@ -249,6 +249,7 @@ const Index = () => {
                       updateField={updateField}
                       characterImage={characterImage}
                       setCharacterImage={setCharacterImage}
+                      aiSettings={aiSettings}
                     />
                     
                     <PersonalitySection 
@@ -266,11 +267,15 @@ const Index = () => {
                     <AlternateGreetings 
                       greetings={characterData.data.alternate_greetings}
                       updateField={updateField}
+                      aiSettings={aiSettings}
+                      characterData={characterData.data}
                     />
                     
                     <CharacterBook 
                       entries={characterData.data.character_book?.entries || []}
                       updateField={updateField}
+                      aiSettings={aiSettings}
+                      characterData={characterData.data}
                     />
                     
                     <TagsSection 

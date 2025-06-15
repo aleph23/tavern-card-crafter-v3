@@ -3,18 +3,24 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Upload, X } from "lucide-react";
-import { useRef } from "react";
+import { Upload, X, Sparkles, Loader2 } from "lucide-react";
+import { useRef, useState } from "react";
+import { generateWithAI, generateDescription } from "@/utils/aiGenerator";
+import { AISettings } from "@/components/AISettings";
+import { useToast } from "@/hooks/use-toast";
 
 interface BasicInfoSectionProps {
   data: any;
   updateField: (field: string, value: any) => void;
   characterImage: string | null;
   setCharacterImage: (image: string | null) => void;
+  aiSettings: AISettings | null;
 }
 
-const BasicInfoSection = ({ data, updateField, characterImage, setCharacterImage }: BasicInfoSectionProps) => {
+const BasicInfoSection = ({ data, updateField, characterImage, setCharacterImage, aiSettings }: BasicInfoSectionProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -25,6 +31,46 @@ const BasicInfoSection = ({ data, updateField, characterImage, setCharacterImage
         setCharacterImage(result);
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  const handleAIGenerateDescription = async () => {
+    if (!aiSettings?.apiKey) {
+      toast({
+        title: "配置错误",
+        description: "请先在AI设置中配置API密钥",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!data.name) {
+      toast({
+        title: "信息不完整",
+        description: "请先填写角色名称",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setLoading(true);
+    
+    try {
+      const prompt = generateDescription(data);
+      const result = await generateWithAI(aiSettings, prompt);
+      updateField("description", result);
+      toast({
+        title: "生成成功",
+        description: "角色描述已生成完成"
+      });
+    } catch (error) {
+      toast({
+        title: "生成失败",
+        description: error instanceof Error ? error.message : "未知错误",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -99,7 +145,22 @@ const BasicInfoSection = ({ data, updateField, characterImage, setCharacterImage
 
       {/* 角色描述 */}
       <div className="form-group">
-        <Label htmlFor="description" className="text-sm font-medium text-gray-700">角色描述 *</Label>
+        <div className="flex items-center justify-between mb-2">
+          <Label htmlFor="description" className="text-sm font-medium text-gray-700">角色描述 *</Label>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleAIGenerateDescription}
+            disabled={loading}
+          >
+            {loading ? (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <Sparkles className="w-4 h-4 mr-2" />
+            )}
+            AI生成描述
+          </Button>
+        </div>
         <Textarea
           id="description"
           value={data.description}
