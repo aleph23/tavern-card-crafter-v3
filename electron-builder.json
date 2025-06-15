@@ -1,0 +1,29 @@
+
+{
+  "appId": "com.taverncard.crafter",
+  "productName": "Tavern Card Crafter",
+  "directories": {
+    "output": "dist-electron"
+  },
+  "files": [
+    "dist/**/*",
+    "electron/**/*",
+    "node_modules/**/*"
+  ],
+  "mac": {
+    "category": "public.app-category.productivity",
+    "target": "dmg"
+  },
+  "win": {
+    "target": "nsis",
+    "icon": "public/favicon.ico"
+  },
+  "linux": {
+    "target": "AppImage",
+    "category": "Office"
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true
+  }
+}
