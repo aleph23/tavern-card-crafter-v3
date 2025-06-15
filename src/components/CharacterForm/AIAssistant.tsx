@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Wand, RefreshCcw, ArrowRight } from "lucide-react";
+import { Wand, RefreshCcw, Download } from "lucide-react";
 import { generateWithAI } from "@/utils/aiGenerator";
 import { AISettings } from "@/components/AISettings";
 
@@ -24,7 +24,7 @@ interface ParsedCharacterData {
 
 interface AIAssistantProps {
   aiSettings: AISettings | null;
-  onInsertField: (field: string, value: string) => void;
+  onInsertField: (field: string, value: string | string[]) => void;
 }
 
 const AIAssistant = ({ aiSettings, onInsertField }: AIAssistantProps) => {
@@ -55,19 +55,31 @@ const AIAssistant = ({ aiSettings, onInsertField }: AIAssistantProps) => {
 
     setIsGenerating(true);
     try {
-      const prompt = `请将以下内容整理成角色卡格式的JSON数据。请严格按照以下JSON格式输出，如果某个字段无法从内容中提取，则留空：
+      const prompt = `请仔细分析以下内容，从中提取角色相关信息并整理成角色卡格式。内容可能来自文章、维基百科、小说片段或其他文本。请根据内容智能提取和推理角色信息：
 
 输入内容：
 ${inputText}
 
-请输出以下格式的JSON（只输出JSON，不要其他说明）：
+请严格按照以下JSON格式输出，如果某个字段无法从内容中直接提取，请根据上下文合理推理或留空。注意事项：
+1. name: 角色的主要名称
+2. description: 角色的外观、身材、服装等物理描述
+3. personality: 性格特征、行为模式、说话风格等
+4. scenario: 角色所在的世界背景、环境设定、时代背景等
+5. first_mes: 角色的开场白或第一次见面时会说的话（用第一人称）
+6. mes_example: 对话示例，展示角色的说话风格（格式：<START>\\n{{user}}: 用户话语\\n角色名: 角色回答）
+7. system_prompt: 系统提示词，指导AI如何扮演这个角色
+8. post_history_instructions: 历史后指令，对话中的额外指导
+9. tags: 相关标签数组，如["奇幻", "女性", "法师"]等
+10. creator_notes: 创作者备注或额外说明
+
+只输出JSON格式，不要其他说明：
 {
   "name": "角色名称",
   "description": "角色外观描述",
   "personality": "性格特征",
   "scenario": "场景设定",
   "first_mes": "首条消息/开场白",
-  "mes_example": "对话示例（格式：<START>\\n{{user}}: 用户话\\n角色名: 角色回答）",
+  "mes_example": "对话示例",
   "system_prompt": "系统提示词",
   "post_history_instructions": "历史后指令",
   "tags": ["标签1", "标签2"],
@@ -84,7 +96,7 @@ ${inputText}
           setParsedData(parsed);
           toast({
             title: "生成成功",
-            description: "角色信息已成功解析"
+            description: "角色信息已成功解析，可以一键插入到表单中"
           });
         } else {
           throw new Error("未找到有效的JSON格式");
@@ -109,12 +121,41 @@ ${inputText}
     }
   };
 
-  const insertField = (field: string, value: string) => {
-    if (value && value.trim()) {
-      onInsertField(field, value);
+  const insertAllFields = () => {
+    if (!parsedData) return;
+
+    let insertedCount = 0;
+    const fieldLabels: Record<string, string> = {
+      name: "角色名称",
+      description: "角色描述",
+      personality: "性格特征",
+      scenario: "场景设定",
+      first_mes: "首条消息",
+      mes_example: "对话示例",
+      system_prompt: "系统提示词",
+      post_history_instructions: "历史后指令",
+      tags: "标签",
+      creator_notes: "创作者备注"
+    };
+
+    // 插入所有有值的字段
+    Object.entries(parsedData).forEach(([key, value]) => {
+      if (value && (Array.isArray(value) ? value.length > 0 : value.trim())) {
+        onInsertField(key, value);
+        insertedCount++;
+      }
+    });
+
+    if (insertedCount > 0) {
       toast({
         title: "插入成功",
-        description: `已插入到${getFieldLabel(field)}字段`
+        description: `已成功插入 ${insertedCount} 个字段到角色卡表单中`
+      });
+    } else {
+      toast({
+        title: "没有可插入的数据",
+        description: "解析结果中没有有效的数据可以插入",
+        variant: "destructive"
       });
     }
   };
@@ -129,9 +170,18 @@ ${inputText}
       mes_example: "对话示例",
       system_prompt: "系统提示词",
       post_history_instructions: "历史后指令",
+      tags: "标签",
       creator_notes: "创作者备注"
     };
     return labels[field] || field;
+  };
+
+  const getPreviewText = (value: any) => {
+    if (Array.isArray(value)) {
+      return value.join(", ");
+    }
+    const text = value.toString();
+    return text.length > 150 ? `${text.substring(0, 150)}...` : text;
   };
 
   return (
@@ -140,17 +190,26 @@ ${inputText}
         <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-200">
           AI角色卡助手
         </CardTitle>
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          粘贴任意文本内容（文章、维基百科、小说片段等），AI将自动提取角色信息
+        </p>
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            粘贴角色信息内容
+            文本内容
           </label>
           <Textarea
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
-            placeholder="在此粘贴任意角色相关信息，AI将帮助您整理成角色卡格式..."
-            className="min-h-[120px]"
+            placeholder="在此粘贴任意包含角色信息的文本内容：
+• 角色介绍文章
+• 维基百科页面
+• 小说人物描述
+• 游戏角色资料
+• 动漫人物介绍
+等等..."
+            className="min-h-[200px] text-sm"
             showCounter={true}
             showTokens={true}
           />
@@ -163,13 +222,14 @@ ${inputText}
             className="flex-1"
           >
             <Wand className="w-4 h-4 mr-2" />
-            {isGenerating ? "生成中..." : "AI生成"}
+            {isGenerating ? "AI分析中..." : "AI分析生成"}
           </Button>
           {parsedData && (
             <Button
               onClick={generateCharacterData}
               disabled={isGenerating}
               variant="outline"
+              title="重新生成"
             >
               <RefreshCcw className="w-4 h-4" />
             </Button>
@@ -177,40 +237,38 @@ ${inputText}
         </div>
 
         {parsedData && (
-          <div className="space-y-3 border-t pt-4">
-            <h4 className="font-medium text-gray-800 dark:text-gray-200">解析结果</h4>
-            <div className="space-y-2 max-h-[400px] overflow-y-auto">
+          <div className="space-y-4 border-t pt-4">
+            <div className="flex items-center justify-between">
+              <h4 className="font-medium text-gray-800 dark:text-gray-200">AI解析结果</h4>
+              <Button
+                onClick={insertAllFields}
+                size="sm"
+                className="bg-green-600 hover:bg-green-700"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                一键插入全部
+              </Button>
+            </div>
+            
+            <div className="space-y-3 max-h-[400px] overflow-y-auto bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
               {Object.entries(parsedData).map(([key, value]) => {
                 if (!value || (Array.isArray(value) && value.length === 0)) return null;
                 
-                const displayValue = Array.isArray(value) ? value.join(", ") : value;
-                
                 return (
-                  <div key={key} className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium text-sm text-gray-700 dark:text-gray-300 mb-1">
-                          {getFieldLabel(key)}
-                        </div>
-                        <div className="text-sm text-gray-600 dark:text-gray-400 break-words">
-                          {displayValue.length > 100 
-                            ? `${displayValue.substring(0, 100)}...` 
-                            : displayValue
-                          }
-                        </div>
-                      </div>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => insertField(key, Array.isArray(value) ? value : value)}
-                        className="shrink-0"
-                      >
-                        <ArrowRight className="w-4 h-4" />
-                      </Button>
+                  <div key={key} className="border-b border-gray-200 dark:border-gray-700 pb-2 last:border-b-0">
+                    <div className="font-medium text-sm text-gray-700 dark:text-gray-300 mb-1">
+                      {getFieldLabel(key)}
+                    </div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400 break-words leading-relaxed">
+                      {getPreviewText(value)}
                     </div>
                   </div>
                 );
               })}
+            </div>
+            
+            <div className="text-xs text-gray-500 dark:text-gray-400 bg-blue-50 dark:bg-blue-900/20 p-2 rounded">
+              💡 点击"一键插入全部"将所有解析结果自动填入对应的表单字段中，您可以在左侧表单中进一步编辑和完善。
             </div>
           </div>
         )}
