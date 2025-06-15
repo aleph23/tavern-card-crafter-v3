@@ -7,6 +7,14 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useLanguage } from "@/contexts/LanguageContext";
 import AISettings, { AISettings as AISettingsType } from "@/components/AISettings";
 import Toolbar from "@/components/Toolbar";
+import BasicInfoSection from "@/components/CharacterForm/BasicInfoSection";
+import PersonalitySection from "@/components/CharacterForm/PersonalitySection";
+import PromptsSection from "@/components/CharacterForm/PromptsSection";
+import AlternateGreetings from "@/components/CharacterForm/AlternateGreetings";
+import CharacterBook from "@/components/CharacterForm/CharacterBook";
+import TagsSection from "@/components/CharacterForm/TagsSection";
+import MetadataSection from "@/components/CharacterForm/MetadataSection";
+import CharacterPreview from "@/components/CharacterPreview";
 
 interface CharacterBookEntry {
   keys: string[];
