@@ -342,6 +342,14 @@ const Index = () => {
       } else if (file.name.endsWith('.png')) {
         // 处理PNG文件
         parsedData = await extractPNGCharacterData(file);
+        
+        // 如果成功从PNG提取数据，同时将PNG图片设置为角色头像
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const result = e.target?.result as string;
+          setCharacterImage(result);
+        };
+        reader.readAsDataURL(file);
       } else {
         toast({
           title: t('hint') || "提示",
