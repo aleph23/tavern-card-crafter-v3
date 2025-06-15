@@ -120,102 +120,106 @@ const Index = () => {
     }));
   };
 
-  const handleFileImport = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
+  const extractPNGCharacterData = async (file: File): Promise<any> => {
+    return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = (e) => {
         try {
-          const content = e.target?.result as string;
-          let parsedData;
+          const arrayBuffer = e.target?.result as ArrayBuffer;
+          const uint8Array = new Uint8Array(arrayBuffer);
           
-          if (file.name.endsWith('.json')) {
-            parsedData = JSON.parse(content);
-          } else if (file.name.endsWith('.png')) {
-            // 处理PNG文件，从中提取角色卡数据
-            try {
-              // PNG文件通常将角色卡数据存储在tEXt块中
-              const base64Data = content.split(',')[1];
-              const binaryString = atob(base64Data);
-              const uint8Array = new Uint8Array(binaryString.length);
+          // 查找 tEXt 块中的角色卡数据
+          let foundData = null;
+          
+          // 遍历 PNG 数据寻找 tEXt 块
+          for (let i = 0; i < uint8Array.length - 8; i++) {
+            // 查找 tEXt 块标识符
+            if (uint8Array[i] === 0x74 && uint8Array[i+1] === 0x45 && 
+                uint8Array[i+2] === 0x58 && uint8Array[i+3] === 0x74) {
               
-              for (let i = 0; i < binaryString.length; i++) {
-                uint8Array[i] = binaryString.charCodeAt(i);
+              // 寻找 'chara' 关键字
+              const textStart = i + 4;
+              let keywordEnd = textStart;
+              
+              // 查找空字节终止符
+              while (keywordEnd < uint8Array.length && uint8Array[keywordEnd] !== 0) {
+                keywordEnd++;
               }
               
-              // 查找PNG文件中的tEXt块
-              let foundData = null;
+              const keyword = new TextDecoder().decode(uint8Array.slice(textStart, keywordEnd));
               
-              // 查找 "chara" 关键字的tEXt块
-              const charaKeyword = new TextEncoder().encode('chara');
-              for (let i = 0; i < uint8Array.length - charaKeyword.length - 4; i++) {
-                // 检查是否找到tEXt块标识符
-                if (uint8Array[i] === 0x74 && uint8Array[i+1] === 0x45 && 
-                    uint8Array[i+2] === 0x58 && uint8Array[i+3] === 0x74) {
-                  // 跳过tEXt标识符
-                  let pos = i + 4;
-                  
-                  // 查找关键字
-                  let keywordMatch = true;
-                  for (let j = 0; j < charaKeyword.length; j++) {
-                    if (uint8Array[pos + j] !== charaKeyword[j]) {
-                      keywordMatch = false;
-                      break;
-                    }
-                  }
-                  
-                  if (keywordMatch) {
-                    // 跳过关键字和null终止符
-                    pos += charaKeyword.length + 1;
-                    
-                    // 读取数据直到块结束
-                    let dataStart = pos;
-                    let dataEnd = dataStart;
-                    
-                    // 找到数据的结束位置
-                    while (dataEnd < uint8Array.length && uint8Array[dataEnd] !== 0) {
-                      dataEnd++;
-                    }
-                    
-                    // 提取base64编码的角色卡数据
-                    const encodedData = new TextDecoder().decode(uint8Array.slice(dataStart, dataEnd));
-                    
-                    try {
-                      // 解码base64数据
-                      const decodedData = atob(encodedData);
-                      foundData = JSON.parse(decodedData);
-                      break;
-                    } catch (decodeError) {
-                      // 如果解码失败，尝试直接解析
-                      try {
-                        foundData = JSON.parse(encodedData);
-                        break;
-                      } catch (parseError) {
-                        continue;
-                      }
-                    }
+              if (keyword === 'chara' || keyword === 'ccv3' || keyword === 'ccv2') {
+                // 找到角色卡数据
+                const dataStart = keywordEnd + 1;
+                let dataEnd = dataStart;
+                
+                // 查找数据结束
+                while (dataEnd < uint8Array.length && uint8Array[dataEnd] !== 0) {
+                  dataEnd++;
+                }
+                
+                const encodedData = new TextDecoder().decode(uint8Array.slice(dataStart, dataEnd));
+                
+                try {
+                  // 尝试解码 base64
+                  const decodedData = atob(encodedData);
+                  foundData = JSON.parse(decodedData);
+                  break;
+                } catch (e) {
+                  // 如果不是 base64，尝试直接解析
+                  try {
+                    foundData = JSON.parse(encodedData);
+                    break;
+                  } catch (e2) {
+                    continue;
                   }
                 }
               }
-              
-              // 如果没有找到tEXt块中的数据，尝试其他方法
-              if (!foundData) {
-                // 尝试查找JSON格式的字符串
-                const textDecoder = new TextDecoder('utf-8', { fatal: false });
-                const text = textDecoder.decode(uint8Array);
+            }
+          }
+          
+          // 如果没找到，尝试更宽泛的搜索
+          if (!foundData) {
+            const textContent = new TextDecoder('utf-8', { fatal: false }).decode(uint8Array);
+            
+            // 尝试查找 JSON 模式
+            const jsonPatterns = [
+              /"spec"\s*:\s*"chara_card_v[123]"/g,
+              /"name"\s*:\s*"[^"]*"/g,
+            ];
+            
+            for (const pattern of jsonPatterns) {
+              const matches = textContent.match(pattern);
+              if (matches) {
+                // 找到可能的起始位置，尝试提取完整的JSON
+                const startIndex = textContent.indexOf(matches[0]);
+                let braceCount = 0;
+                let jsonStart = -1;
+                let jsonEnd = -1;
                 
-                // 查找可能的JSON数据模式
-                const jsonPatterns = [
-                  /\{"spec":"chara_card_v[23]".*?\}\}/s,
-                  /\{"name":".*?".*?"description":".*?\}/s,
-                  /\{"data":\{.*?\}\}/s
-                ];
+                // 向后查找JSON的开始
+                for (let i = startIndex; i >= 0; i--) {
+                  if (textContent[i] === '{') {
+                    jsonStart = i;
+                    break;
+                  }
+                }
                 
-                for (const pattern of jsonPatterns) {
-                  const match = text.match(pattern);
-                  if (match) {
+                if (jsonStart !== -1) {
+                  // 向前查找JSON的结束
+                  for (let i = jsonStart; i < textContent.length; i++) {
+                    if (textContent[i] === '{') braceCount++;
+                    if (textContent[i] === '}') braceCount--;
+                    if (braceCount === 0) {
+                      jsonEnd = i + 1;
+                      break;
+                    }
+                  }
+                  
+                  if (jsonEnd !== -1) {
                     try {
-                      foundData = JSON.parse(match[0]);
+                      const jsonStr = textContent.substring(jsonStart, jsonEnd);
+                      foundData = JSON.parse(jsonStr);
                       break;
                     } catch (e) {
                       continue;
@@ -223,105 +227,124 @@ const Index = () => {
                   }
                 }
               }
-              
-              if (foundData) {
-                parsedData = foundData;
-              } else {
-                toast({
-                  title: t('hint') || "提示",
-                  description: "此PNG文件中未找到角色卡数据，请确保使用包含角色卡信息的PNG文件",
-                  variant: "destructive"
-                });
-                return;
-              }
-            } catch (pngError) {
-              console.error('PNG processing error:', pngError);
-              toast({
-                title: t('hint') || "提示",
-                description: "无法从PNG文件中提取角色卡数据，请尝试使用JSON格式文件",
-                variant: "destructive"
-              });
-              return;
             }
           }
-
-          // 兼容不同版本的角色卡格式
-          if (parsedData.spec === "chara_card_v3" || parsedData.spec_version === "3.0") {
-            setCharacterData(parsedData);
-          } else if (parsedData.spec === "chara_card_v2" || parsedData.data) {
-            // V2 格式转换为 V3
-            const v3Data: CharacterCardV3 = {
-              spec: "chara_card_v3",
-              spec_version: "3.0",
-              data: {
-                name: parsedData.data?.name || parsedData.name || "",
-                nickname: parsedData.data?.nickname,
-                description: parsedData.data?.description || parsedData.description || "",
-                personality: parsedData.data?.personality || parsedData.personality || "",
-                scenario: parsedData.data?.scenario || parsedData.scenario || "",
-                first_mes: parsedData.data?.first_mes || parsedData.first_mes || "",
-                mes_example: parsedData.data?.mes_example || parsedData.mes_example || "",
-                creator_notes: parsedData.data?.creator_notes || parsedData.creator_notes || "",
-                system_prompt: parsedData.data?.system_prompt || "",
-                post_history_instructions: parsedData.data?.post_history_instructions || "",
-                alternate_greetings: parsedData.data?.alternate_greetings || [],
-                character_book: parsedData.data?.character_book || { entries: [] },
-                tags: parsedData.data?.tags || [],
-                creator: parsedData.data?.creator || "",
-                character_version: parsedData.data?.character_version || "1.0",
-                creation_date: new Date().toISOString().split('T')[0],
-                modification_date: new Date().toISOString().split('T')[0],
-                extensions: parsedData.data?.extensions || {}
-              }
-            };
-            setCharacterData(v3Data);
+          
+          if (foundData) {
+            resolve(foundData);
           } else {
-            // V1 格式或其他格式
-            const v3Data: CharacterCardV3 = {
-              spec: "chara_card_v3",
-              spec_version: "3.0",
-              data: {
-                name: parsedData.name || "",
-                description: parsedData.description || "",
-                personality: parsedData.personality || "",
-                scenario: parsedData.scenario || "",
-                first_mes: parsedData.first_mes || "",
-                mes_example: parsedData.mes_example || "",
-                creator_notes: parsedData.creator_notes || "",
-                system_prompt: "",
-                post_history_instructions: "",
-                alternate_greetings: parsedData.alternate_greetings || [],
-                character_book: { entries: [] },
-                tags: parsedData.tags || [],
-                creator: parsedData.creator || "",
-                character_version: "1.0",
-                creation_date: new Date().toISOString().split('T')[0],
-                modification_date: new Date().toISOString().split('T')[0],
-                extensions: {}
-              }
-            };
-            setCharacterData(v3Data);
+            reject(new Error('No character data found in PNG'));
           }
-
-          toast({
-            title: t('importSuccess'),
-            description: t('importSuccessDesc'),
-          });
         } catch (error) {
-          console.error('Import error:', error);
-          toast({
-            title: t('importError'),
-            description: t('importErrorDesc'),
-            variant: "destructive"
-          });
+          reject(error);
         }
       };
       
-      if (file.name.endsWith('.png')) {
-        reader.readAsDataURL(file);
+      reader.onerror = () => reject(new Error('Failed to read file'));
+      reader.readAsArrayBuffer(file);
+    });
+  };
+
+  const handleFileImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      let parsedData;
+      
+      if (file.name.endsWith('.json')) {
+        // 处理JSON文件
+        const content = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target?.result as string);
+          reader.onerror = () => reject(new Error('Failed to read JSON file'));
+          reader.readAsText(file);
+        });
+        
+        parsedData = JSON.parse(content);
+      } else if (file.name.endsWith('.png')) {
+        // 处理PNG文件
+        parsedData = await extractPNGCharacterData(file);
       } else {
-        reader.readAsText(file);
+        toast({
+          title: t('hint') || "提示",
+          description: "请选择 JSON 或 PNG 格式的角色卡文件",
+          variant: "destructive"
+        });
+        return;
       }
+
+      // 兼容不同版本的角色卡格式
+      if (parsedData.spec === "chara_card_v3" || parsedData.spec_version === "3.0") {
+        setCharacterData(parsedData);
+      } else if (parsedData.spec === "chara_card_v2" || parsedData.data) {
+        // V2 格式转换为 V3
+        const v3Data: CharacterCardV3 = {
+          spec: "chara_card_v3",
+          spec_version: "3.0",
+          data: {
+            name: parsedData.data?.name || parsedData.name || "",
+            nickname: parsedData.data?.nickname,
+            description: parsedData.data?.description || parsedData.description || "",
+            personality: parsedData.data?.personality || parsedData.personality || "",
+            scenario: parsedData.data?.scenario || parsedData.scenario || "",
+            first_mes: parsedData.data?.first_mes || parsedData.first_mes || "",
+            mes_example: parsedData.data?.mes_example || parsedData.mes_example || "",
+            creator_notes: parsedData.data?.creator_notes || parsedData.creator_notes || "",
+            system_prompt: parsedData.data?.system_prompt || "",
+            post_history_instructions: parsedData.data?.post_history_instructions || "",
+            alternate_greetings: parsedData.data?.alternate_greetings || [],
+            character_book: parsedData.data?.character_book || { entries: [] },
+            tags: parsedData.data?.tags || [],
+            creator: parsedData.data?.creator || "",
+            character_version: parsedData.data?.character_version || "1.0",
+            creation_date: new Date().toISOString().split('T')[0],
+            modification_date: new Date().toISOString().split('T')[0],
+            extensions: parsedData.data?.extensions || {}
+          }
+        };
+        setCharacterData(v3Data);
+      } else {
+        // V1 格式或其他格式
+        const v3Data: CharacterCardV3 = {
+          spec: "chara_card_v3",
+          spec_version: "3.0",
+          data: {
+            name: parsedData.name || "",
+            description: parsedData.description || "",
+            personality: parsedData.personality || "",
+            scenario: parsedData.scenario || "",
+            first_mes: parsedData.first_mes || "",
+            mes_example: parsedData.mes_example || "",
+            creator_notes: parsedData.creator_notes || "",
+            system_prompt: "",
+            post_history_instructions: "",
+            alternate_greetings: parsedData.alternate_greetings || [],
+            character_book: { entries: [] },
+            tags: parsedData.tags || [],
+            creator: parsedData.creator || "",
+            character_version: "1.0",
+            creation_date: new Date().toISOString().split('T')[0],
+            modification_date: new Date().toISOString().split('T')[0],
+            extensions: {}
+          }
+        };
+        setCharacterData(v3Data);
+      }
+
+      toast({
+        title: t('importSuccess'),
+        description: t('importSuccessDesc'),
+      });
+    } catch (error) {
+      console.error('Import error:', error);
+      toast({
+        title: t('importError') || "导入失败",
+        description: file.name.endsWith('.png') 
+          ? "此PNG文件中未找到角色卡数据，请确保使用包含角色卡信息的PNG文件"
+          : t('importErrorDesc'),
+        variant: "destructive"
+      });
     }
   };
 
