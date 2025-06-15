@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,6 +15,7 @@ import CharacterBook from "@/components/CharacterForm/CharacterBook";
 import TagsSection from "@/components/CharacterForm/TagsSection";
 import MetadataSection from "@/components/CharacterForm/MetadataSection";
 import CharacterPreview from "@/components/CharacterPreview";
+import AIAssistant from "@/components/CharacterForm/AIAssistant";
 
 interface CharacterBookEntry {
   keys: string[];
@@ -119,6 +119,17 @@ const Index = () => {
         modification_date: new Date().toISOString().split('T')[0]
       }
     }));
+  };
+
+  const handleInsertField = (field: string, value: string | string[]) => {
+    if (field === 'tags' && Array.isArray(value)) {
+      // 合并现有标签和新标签，去重
+      const existingTags = characterData.data.tags || [];
+      const newTags = [...new Set([...existingTags, ...value])];
+      updateField('tags', newTags);
+    } else {
+      updateField(field, value);
+    }
   };
 
   const extractPNGCharacterData = async (file: File): Promise<any> => {
@@ -435,7 +446,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 dark:from-purple-900 dark:via-blue-900 dark:to-indigo-900 p-4">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         <div className="text-center mb-8">
           <div className="flex justify-end mb-4">
             <Toolbar />
@@ -465,72 +476,82 @@ const Index = () => {
           </div>
         </div>
 
-        <div className="space-y-6">
-          {/* 表单部分 - 调整宽度 */}
-          <Card className="shadow-lg border-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="text-2xl font-semibold text-gray-800 dark:text-gray-200">
-                {t('characterInfo')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ScrollArea className="h-[800px] custom-scrollbar pr-4">
-                <div className="space-y-8">
-                  <BasicInfoSection 
-                    data={characterData.data}
-                    updateField={updateField}
-                    characterImage={characterImage}
-                    setCharacterImage={setCharacterImage}
-                    aiSettings={aiSettings}
-                  />
-                  
-                  <PersonalitySection 
-                    data={characterData.data}
-                    updateField={updateField}
-                    aiSettings={aiSettings}
-                  />
-                  
-                  <PromptsSection 
-                    data={characterData.data}
-                    updateField={updateField}
-                    aiSettings={aiSettings}
-                  />
-                  
-                  <AlternateGreetings 
-                    greetings={characterData.data.alternate_greetings}
-                    updateField={updateField}
-                    aiSettings={aiSettings}
-                    characterData={characterData.data}
-                  />
-                  
-                  <CharacterBook 
-                    entries={characterData.data.character_book?.entries || []}
-                    updateField={updateField}
-                    aiSettings={aiSettings}
-                    characterData={characterData.data}
-                  />
-                  
-                  <TagsSection 
-                    tags={characterData.data.tags}
-                    updateField={updateField}
-                    aiSettings={aiSettings}
-                    characterData={characterData.data}
-                  />
-                  
-                  <MetadataSection 
-                    data={characterData.data}
-                    updateField={updateField}
-                  />
-                </div>
-              </ScrollArea>
-            </CardContent>
-          </Card>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* 左侧表单部分 - 调整为占2列 */}
+          <div className="lg:col-span-2 space-y-6">
+            <Card className="shadow-lg border-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle className="text-2xl font-semibold text-gray-800 dark:text-gray-200">
+                  {t('characterInfo')}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ScrollArea className="h-[800px] custom-scrollbar pr-4">
+                  <div className="space-y-8">
+                    <BasicInfoSection 
+                      data={characterData.data}
+                      updateField={updateField}
+                      characterImage={characterImage}
+                      setCharacterImage={setCharacterImage}
+                      aiSettings={aiSettings}
+                    />
+                    
+                    <PersonalitySection 
+                      data={characterData.data}
+                      updateField={updateField}
+                      aiSettings={aiSettings}
+                    />
+                    
+                    <PromptsSection 
+                      data={characterData.data}
+                      updateField={updateField}
+                      aiSettings={aiSettings}
+                    />
+                    
+                    <AlternateGreetings 
+                      greetings={characterData.data.alternate_greetings}
+                      updateField={updateField}
+                      aiSettings={aiSettings}
+                      characterData={characterData.data}
+                    />
+                    
+                    <CharacterBook 
+                      entries={characterData.data.character_book?.entries || []}
+                      updateField={updateField}
+                      aiSettings={aiSettings}
+                      characterData={characterData.data}
+                    />
+                    
+                    <TagsSection 
+                      tags={characterData.data.tags}
+                      updateField={updateField}
+                      aiSettings={aiSettings}
+                      characterData={characterData.data}
+                    />
+                    
+                    <MetadataSection 
+                      data={characterData.data}
+                      updateField={updateField}
+                    />
+                  </div>
+                </ScrollArea>
+              </CardContent>
+            </Card>
 
-          {/* 预览部分 - 调整宽度 */}
-          <CharacterPreview 
-            characterData={characterData}
-            characterImage={characterImage}
-          />
+            {/* 预览部分移到左侧下方 */}
+            <CharacterPreview 
+              characterData={characterData}
+              characterImage={characterImage}
+            />
+          </div>
+
+          {/* 右侧AI助手面板 */}
+          <div className="lg:col-span-1">
+            <AIAssistant 
+              aiSettings={aiSettings}
+              onInsertField={handleInsertField}
+            />
+          </div>
         </div>
       </div>
     </div>
