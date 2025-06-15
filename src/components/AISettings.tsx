@@ -145,6 +145,13 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
     const currentProvider = apiProviders.find(p => p.value === settings.provider);
     if (currentProvider && currentProvider.models.length > 0) {
       setAvailableModels(currentProvider.models);
+      // 如果当前模型不在可用模型列表中，自动选择第一个可用模型
+      if (!currentProvider.models.includes(settings.model)) {
+        setSettings(prev => ({
+          ...prev,
+          model: currentProvider.models[0]
+        }));
+      }
     } else {
       setAvailableModels(defaultModels);
     }
@@ -272,7 +279,7 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
   const testConnection = async () => {
     const currentProvider = apiProviders.find(p => p.value === settings.provider);
     
-    // 检查是否需要API密钥
+    // 检查是否需要API密钥 - 修复本地服务的密钥检查
     if (currentProvider?.requiresKey && !settings.apiKey) {
       toast({
         title: "配置缺失",
@@ -286,6 +293,26 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
       toast({
         title: "配置缺失",
         description: "请先填写API地址",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // 对于本地服务，如果没有获取到模型列表，建议先获取模型
+    if (['ollama', 'lmstudio'].includes(settings.provider) && 
+        availableModels.length === 0) {
+      toast({
+        title: "建议操作",
+        description: "建议先点击"获取模型"按钮获取可用模型列表",
+        variant: "default"
+      });
+    }
+
+    // 检查当前模型是否在可用模型列表中
+    if (availableModels.length > 0 && !availableModels.includes(settings.model)) {
+      toast({
+        title: "模型无效",
+        description: `当前模型"${settings.model}"不在可用模型列表中，请选择有效模型或先获取模型列表`,
         variant: "destructive"
       });
       return;
@@ -353,11 +380,20 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
         setConnectionStatus('error');
         setLastError(`${response.status}: ${errorMessage}`);
         
-        toast({
-          title: "连接失败 ❌",
-          description: `${errorMessage}`,
-          variant: "destructive"
-        });
+        // 针对本地服务的特殊提示
+        if (['ollama', 'lmstudio'].includes(settings.provider) && response.status === 400) {
+          toast({
+            title: "连接失败 ❌",
+            description: `${errorMessage}。建议先获取模型列表，确保使用有效的模型名称。`,
+            variant: "destructive"
+          });
+        } else {
+          toast({
+            title: "连接失败 ❌",
+            description: `${errorMessage}`,
+            variant: "destructive"
+          });
+        }
       }
     } catch (error: any) {
       console.error('Connection test error:', error);

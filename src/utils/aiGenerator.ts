@@ -63,7 +63,7 @@ export const generateWithAI = async (
   settings: AISettings,
   prompt: string
 ): Promise<string> => {
-  // 检查是否需要API密钥
+  // 修复本地服务的密钥检查逻辑 - 不再要求Ollama和LM Studio输入密钥
   const requiresKey = !['ollama', 'lmstudio'].includes(settings.provider);
   
   if (requiresKey && !settings.apiKey) {
@@ -129,6 +129,13 @@ export const generateWithAI = async (
         }
       }
       
+      // 针对本地服务的特殊错误提示
+      if (['ollama', 'lmstudio'].includes(settings.provider)) {
+        if (response.status === 400 || errorText.includes('model')) {
+          errorMessage = `模型"${settings.model}"不存在或未加载。请在AI设置中获取可用模型列表，或确保已下载/加载该模型。`;
+        }
+      }
+      
       throw new Error(errorMessage);
     }
 
@@ -150,7 +157,7 @@ export const generateWithAI = async (
       }
       if (error.message.includes('Failed to fetch')) {
         if (settings.provider === 'ollama') {
-          throw new Error('无法连接到Ollama服务，请确保Ollama已启动并运行在正确端口');
+          throw new Error('无法连接到Ollama服务，请确保Ollama已启动并运行在正确端口。可尝试执行: ollama serve');
         } else if (settings.provider === 'lmstudio') {
           throw new Error('无法连接到LM Studio服务，请确保LM Studio已启动本地服务器');
         }
