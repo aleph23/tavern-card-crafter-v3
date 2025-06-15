@@ -132,12 +132,37 @@ const Index = () => {
           if (file.name.endsWith('.json')) {
             parsedData = JSON.parse(content);
           } else if (file.name.endsWith('.png')) {
-            toast({
-              title: t('hint') || "提示",
-              description: t('pngExportHint'),
-              variant: "destructive"
-            });
-            return;
+            // 处理PNG文件，尝试从中提取角色卡数据
+            try {
+              // PNG文件中的角色卡数据通常存储在特定的文本块中
+              // 这里我们尝试在base64数据中查找JSON数据
+              const base64Data = content.split(',')[1];
+              const binaryString = atob(base64Data);
+              
+              // 查找可能的JSON数据标记
+              const jsonStart = binaryString.indexOf('{"spec"');
+              const jsonEnd = binaryString.lastIndexOf('}}') + 2;
+              
+              if (jsonStart !== -1 && jsonEnd > jsonStart) {
+                const jsonString = binaryString.substring(jsonStart, jsonEnd);
+                parsedData = JSON.parse(jsonString);
+              } else {
+                // 如果没有找到角色卡数据，提示用户
+                toast({
+                  title: t('hint') || "提示",
+                  description: "此PNG文件中未找到角色卡数据，请确保使用包含角色卡信息的PNG文件",
+                  variant: "destructive"
+                });
+                return;
+              }
+            } catch (pngError) {
+              toast({
+                title: t('hint') || "提示",
+                description: "无法从PNG文件中提取角色卡数据，请尝试使用JSON格式文件",
+                variant: "destructive"
+              });
+              return;
+            }
           }
 
           // 兼容不同版本的角色卡格式
@@ -210,7 +235,12 @@ const Index = () => {
           });
         }
       };
-      reader.readAsText(file);
+      
+      if (file.name.endsWith('.png')) {
+        reader.readAsDataURL(file);
+      } else {
+        reader.readAsText(file);
+      }
     }
   };
 
