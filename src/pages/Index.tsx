@@ -477,11 +477,18 @@ const Index = () => {
         </div>
 
         <div className="space-y-6">
-          {/* AI助手面板 - 在同一个max-width容器内 */}
-          <AIAssistant 
-            aiSettings={aiSettings}
-            onInsertField={handleInsertField}
-          />
+          {/* AI助手面板 - 使用与下方相同的布局约束 */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <AIAssistant 
+                aiSettings={aiSettings}
+                onInsertField={handleInsertField}
+              />
+            </div>
+            <div className="lg:col-span-1">
+              {/* 右侧空白区域保持一致 */}
+            </div>
+          </div>
 
           {/* 角色信息编辑和预览 */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
