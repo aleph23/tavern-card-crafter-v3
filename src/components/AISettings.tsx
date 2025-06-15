@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,20 +31,15 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
       value: "openai",
       url: "https://api.openai.com/v1/chat/completions",
       models: ["gpt-4o", "gpt-4o-mini", "gpt-4-turbo", "gpt-4", "gpt-3.5-turbo"],
+      requiresKey: true,
       tips: "需要海外网络环境和有效的OpenAI API密钥"
-    },
-    {
-      name: "Anthropic Claude",
-      value: "anthropic",
-      url: "https://api.anthropic.com/v1/messages",
-      models: ["claude-3-5-sonnet-20241022", "claude-3-5-haiku-20241022", "claude-3-opus-20240229", "claude-3-sonnet-20240229"],
-      tips: "Claude API，需要海外网络环境"
     },
     {
       name: "DeepSeek 深度求索",
       value: "deepseek",
       url: "https://api.deepseek.com/v1/chat/completions",
       models: ["deepseek-chat", "deepseek-coder"],
+      requiresKey: true,
       tips: "国内可直接访问，性价比高"
     },
     {
@@ -51,6 +47,7 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
       value: "moonshot", 
       url: "https://api.moonshot.cn/v1/chat/completions",
       models: ["moonshot-v1-8k", "moonshot-v1-32k", "moonshot-v1-128k"],
+      requiresKey: true,
       tips: "国内API，支持长上下文"
     },
     {
@@ -58,91 +55,48 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
       value: "zhipu",
       url: "https://open.bigmodel.cn/api/paas/v4/chat/completions", 
       models: ["glm-4-plus", "glm-4-0520", "glm-4", "glm-4-air", "glm-4-airx", "glm-4-flash"],
+      requiresKey: true,
       tips: "智谱清言API，国内服务"
-    },
-    {
-      name: "阿里云 通义千问",
-      value: "qwen",
-      url: "https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation",
-      models: ["qwen-plus", "qwen-turbo", "qwen-max", "qwen-max-longcontext"],
-      tips: "阿里云API，需要阿里云账号"
-    },
-    {
-      name: "百度 文心一言",
-      value: "ernie",
-      url: "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/completions",
-      models: ["ernie-4.0-8k", "ernie-3.5-8k", "ernie-turbo-8k"],
-      tips: "百度API，需要百度云账号和access_token"
     },
     {
       name: "零一万物 Yi",
       value: "yi",
       url: "https://api.lingyiwanwu.com/v1/chat/completions",
       models: ["yi-large", "yi-medium", "yi-spark", "yi-large-rag"],
+      requiresKey: true,
       tips: "零一万物API"
-    },
-    {
-      name: "字节跳动 豆包",
-      value: "doubao",
-      url: "https://ark.cn-beijing.volces.com/api/v3/chat/completions",
-      models: ["doubao-lite-4k", "doubao-lite-32k", "doubao-lite-128k", "doubao-pro-4k", "doubao-pro-32k", "doubao-pro-128k"],
-      tips: "字节跳动API，需要配置正确的endpoint"
-    },
-    {
-      name: "腾讯 混元",
-      value: "hunyuan",
-      url: "https://hunyuan.tencentcloudapi.com/v1/chat/completions",
-      models: ["hunyuan-lite", "hunyuan-standard", "hunyuan-pro"],
-      tips: "腾讯云API"
-    },
-    {
-      name: "讯飞星火",
-      value: "spark",
-      url: "https://spark-api-open.xf-yun.com/v1/chat/completions",
-      models: ["spark-lite", "spark-pro", "spark-pro-128k", "spark-max"],
-      tips: "讯飞API"
-    },
-    {
-      name: "MiniMax",
-      value: "minimax",
-      url: "https://api.minimax.chat/v1/text/chatcompletion_pro",
-      models: ["abab6.5s-chat", "abab6.5-chat", "abab5.5s-chat", "abab5.5-chat"],
-      tips: "MiniMax API"
     },
     {
       name: "Ollama (本地)",
       value: "ollama",
-      url: "http://localhost:11434/api/chat",
+      url: "http://localhost:11434/v1/chat/completions",
       models: ["llama3.2", "llama3.1", "qwen2.5", "deepseek-coder", "codegemma", "mistral"],
-      tips: "本地Ollama服务，需要先下载模型：ollama pull 模型名"
+      requiresKey: false,
+      tips: "本地Ollama服务，无需API密钥。需要先下载模型：ollama pull 模型名"
     },
     {
       name: "LM Studio (本地)",
       value: "lmstudio",
       url: "http://localhost:1234/v1/chat/completions",
       models: ["local-model"],
-      tips: "LM Studio本地服务，需要先加载模型"
+      requiresKey: false,
+      tips: "LM Studio本地服务，无需API密钥，需要先加载模型"
     },
     {
       name: "OneAPI/New API",
       value: "oneapi",
       url: "http://localhost:3000/v1/chat/completions",
       models: ["gpt-3.5-turbo", "gpt-4", "claude-3-sonnet"],
+      requiresKey: true,
       tips: "OneAPI统一接口，支持多种模型代理"
     },
     {
-      name: "FastGPT",
-      value: "fastgpt",
-      url: "https://api.fastgpt.in/api/v1/chat/completions",
-      models: ["gpt-3.5-turbo", "gpt-4"],
-      tips: "FastGPT代理服务"
-    },
-    {
-      name: "自定义接口",
+      name: "自定义 OpenAI 兼容接口",
       value: "custom",
       url: "",
-      models: [],
-      tips: "请手动配置API地址和模型名称"
+      models: ["gpt-3.5-turbo", "gpt-4"],
+      requiresKey: true,
+      tips: "自定义OpenAI兼容接口，请手动配置API地址和模型名称"
     }
   ];
 
@@ -164,13 +118,10 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
   // 默认模型列表（当无法获取模型列表时使用）
   const defaultModels = [
     "gpt-4o", "gpt-4o-mini", "gpt-4-turbo", "gpt-4", "gpt-3.5-turbo",
-    "claude-3-5-sonnet-20241022", "claude-3-5-haiku-20241022", "claude-3-opus-20240229",
     "deepseek-chat", "deepseek-coder",
     "moonshot-v1-8k", "moonshot-v1-32k", "moonshot-v1-128k",
     "glm-4-plus", "glm-4", "glm-4-air", "glm-4-flash",
-    "qwen-plus", "qwen-turbo", "qwen-max",
-    "ernie-4.0-8k", "ernie-3.5-8k", "ernie-turbo-8k",
-    "yi-large", "yi-medium", "doubao-pro-32k", "hunyuan-pro"
+    "yi-large", "yi-medium", "llama3.2", "llama3.1", "qwen2.5"
   ];
 
   useEffect(() => {
@@ -189,7 +140,9 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
         ...prev,
         provider: providerValue,
         apiUrl: provider.url,
-        model: provider.models[0] || prev.model
+        model: provider.models[0] || prev.model,
+        // 如果是不需要密钥的提供商，清空密钥
+        apiKey: provider.requiresKey ? prev.apiKey : ""
       }));
       setAvailableModels(provider.models.length > 0 ? provider.models : defaultModels);
     }
@@ -218,6 +171,9 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
         if (error.includes('quota') || error.includes('insufficient')) {
           return "API额度不足，请检查账户余额";
         }
+        if (error.includes('Failed to fetch')) {
+          return "网络连接失败，请检查网络或API地址是否正确";
+        }
         return error;
       }
       
@@ -232,10 +188,22 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
   };
 
   const testConnection = async () => {
-    if (!settings.apiKey || !settings.apiUrl) {
+    const currentProvider = apiProviders.find(p => p.value === settings.provider);
+    
+    // 检查是否需要API密钥
+    if (currentProvider?.requiresKey && !settings.apiKey) {
       toast({
         title: "配置缺失",
-        description: "请先填写API密钥和API地址",
+        description: "请先填写API密钥",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!settings.apiUrl) {
+      toast({
+        title: "配置缺失",
+        description: "请先填写API地址",
         variant: "destructive"
       });
       return;
@@ -246,67 +214,24 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
     setLastError("");
 
     try {
-      let requestBody: any;
+      // 使用统一的OpenAI兼容格式
       let headers: any = {
         'Content-Type': 'application/json',
       };
 
-      // 根据不同的API提供商构造请求
-      switch (settings.provider) {
-        case 'anthropic':
-          headers['x-api-key'] = settings.apiKey;
-          headers['anthropic-version'] = '2023-06-01';
-          requestBody = {
-            model: settings.model,
-            max_tokens: 10,
-            messages: [{ role: 'user', content: 'test' }]
-          };
-          break;
-        case 'qwen':
-          headers['Authorization'] = `Bearer ${settings.apiKey}`;
-          requestBody = {
-            model: settings.model,
-            input: { messages: [{ role: 'user', content: 'test' }] },
-            parameters: { max_tokens: 10 }
-          };
-          break;
-        case 'ernie':
-          // 百度API需要access_token
-          const urlWithToken = settings.apiUrl.includes('?') 
-            ? `${settings.apiUrl}&access_token=${settings.apiKey}`
-            : `${settings.apiUrl}?access_token=${settings.apiKey}`;
-          requestBody = {
-            messages: [{ role: 'user', content: 'test' }],
-            max_output_tokens: 10
-          };
-          break;
-        case 'ollama':
-          requestBody = {
-            model: settings.model,
-            messages: [{ role: 'user', content: 'test' }],
-            stream: false,
-            options: { num_predict: 10 }
-          };
-          break;
-        default:
-          // OpenAI兼容格式
-          headers['Authorization'] = `Bearer ${settings.apiKey}`;
-          requestBody = {
-            model: settings.model,
-            messages: [{ role: 'user', content: 'test' }],
-            max_tokens: 10,
-            temperature: 0.1
-          };
+      // 只有需要密钥的提供商才添加Authorization头
+      if (currentProvider?.requiresKey && settings.apiKey) {
+        headers['Authorization'] = `Bearer ${settings.apiKey}`;
       }
 
-      let apiUrl = settings.apiUrl;
-      if (settings.provider === 'ernie' && !apiUrl.includes('access_token')) {
-        apiUrl = apiUrl.includes('?') 
-          ? `${apiUrl}&access_token=${settings.apiKey}`
-          : `${apiUrl}?access_token=${settings.apiKey}`;
-      }
+      const requestBody = {
+        model: settings.model,
+        messages: [{ role: 'user', content: 'test' }],
+        max_tokens: 10,
+        temperature: 0.1
+      };
 
-      const response = await fetch(apiUrl, {
+      const response = await fetch(settings.apiUrl, {
         method: 'POST',
         headers,
         body: JSON.stringify(requestBody),
@@ -342,7 +267,7 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
     } catch (error: any) {
       const errorMessage = error.name === 'TimeoutError' 
         ? "请求超时，请检查网络连接或API地址"
-        : error.message || "网络连接错误";
+        : parseApiError(error.message || "网络连接错误");
         
       setConnectionStatus('error');
       setLastError(errorMessage);
@@ -357,10 +282,22 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
   };
 
   const fetchModels = async () => {
-    if (!settings.apiKey || !settings.apiUrl) {
+    const currentProvider = apiProviders.find(p => p.value === settings.provider);
+    
+    // 检查是否需要API密钥
+    if (currentProvider?.requiresKey && !settings.apiKey) {
       toast({
         title: "配置缺失",
-        description: "请先填写API密钥和API地址",
+        description: "请先填写API密钥",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!settings.apiUrl) {
+      toast({
+        title: "配置缺失",
+        description: "请先填写API地址",
         variant: "destructive"
       });
       return;
@@ -372,23 +309,14 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
       let modelsUrl = settings.apiUrl.replace('/chat/completions', '/models');
       let headers: any = {};
 
-      switch (settings.provider) {
-        case 'anthropic':
-        case 'qwen':
-        case 'ernie':
-          // 这些提供商不提供模型列表API或格式特殊，使用预设
-          const provider = apiProviders.find(p => p.value === settings.provider);
-          setAvailableModels(provider?.models || defaultModels);
-          toast({
-            title: "使用预设模型",
-            description: "该提供商使用预设模型列表",
-          });
-          return;
-        case 'ollama':
-          modelsUrl = settings.apiUrl.replace('/api/chat', '/api/tags');
-          break;
-        default:
-          headers['Authorization'] = `Bearer ${settings.apiKey}`;
+      // 只有需要密钥的提供商才添加Authorization头
+      if (currentProvider?.requiresKey && settings.apiKey) {
+        headers['Authorization'] = `Bearer ${settings.apiKey}`;
+      }
+
+      // 特殊处理Ollama
+      if (settings.provider === 'ollama') {
+        modelsUrl = settings.apiUrl.replace('/v1/chat/completions', '/api/tags');
       }
 
       const response = await fetch(modelsUrl, { headers });
@@ -410,24 +338,24 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
             description: `成功获取 ${modelIds.length} 个模型`,
           });
         } else {
-          setAvailableModels(defaultModels);
+          setAvailableModels(currentProvider?.models || defaultModels);
           toast({
-            title: "使用默认列表",
-            description: "无法解析模型数据，使用默认模型列表",
+            title: "使用预设列表",
+            description: "无法解析模型数据，使用预设模型列表",
           });
         }
       } else {
-        setAvailableModels(defaultModels);
+        setAvailableModels(currentProvider?.models || defaultModels);
         toast({
           title: "获取失败",
-          description: "无法获取模型列表，使用默认模型列表",
+          description: "无法获取模型列表，使用预设模型列表",
         });
       }
     } catch (error) {
-      setAvailableModels(defaultModels);
+      setAvailableModels(currentProvider?.models || defaultModels);
       toast({
         title: "获取失败",
-        description: "无法连接到API服务器，使用默认模型列表",
+        description: "无法连接到API服务器，使用预设模型列表",
       });
     } finally {
       setIsLoadingModels(false);
@@ -435,10 +363,22 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
   };
 
   const handleSave = () => {
-    if (!settings.apiKey || !settings.apiUrl) {
+    const currentProvider = apiProviders.find(p => p.value === settings.provider);
+    
+    // 检查必要字段
+    if (currentProvider?.requiresKey && !settings.apiKey) {
       toast({
         title: "配置缺失",
-        description: "请填写完整的API信息",
+        description: "请填写API密钥",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!settings.apiUrl) {
+      toast({
+        title: "配置缺失",
+        description: "请填写API地址",
         variant: "destructive"
       });
       return;
@@ -506,16 +446,18 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
             )}
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="apiKey">API密钥</Label>
-            <Input
-              id="apiKey"
-              type="password"
-              value={settings.apiKey}
-              onChange={(e) => setSettings(prev => ({ ...prev, apiKey: e.target.value }))}
-              placeholder="输入您的API密钥..."
-            />
-          </div>
+          {currentProvider?.requiresKey && (
+            <div className="space-y-2">
+              <Label htmlFor="apiKey">API密钥</Label>
+              <Input
+                id="apiKey"
+                type="password"
+                value={settings.apiKey}
+                onChange={(e) => setSettings(prev => ({ ...prev, apiKey: e.target.value }))}
+                placeholder="输入您的API密钥..."
+              />
+            </div>
+          )}
           
           <div className="space-y-2">
             <Label htmlFor="apiUrl">API地址</Label>
@@ -530,7 +472,7 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
           <div className="flex gap-2">
             <Button 
               onClick={testConnection} 
-              disabled={isTestingConnection || !settings.apiKey || !settings.apiUrl}
+              disabled={isTestingConnection || !settings.apiUrl || (currentProvider?.requiresKey && !settings.apiKey)}
               variant="outline"
               size="sm"
               className="flex-1"
@@ -540,7 +482,7 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
             </Button>
             <Button 
               onClick={fetchModels} 
-              disabled={isLoadingModels || !settings.apiKey || !settings.apiUrl}
+              disabled={isLoadingModels || !settings.apiUrl || (currentProvider?.requiresKey && !settings.apiKey)}
               variant="outline"
               size="sm"
               className="flex-1"
@@ -570,7 +512,7 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
                 <SelectValue placeholder="选择模型" />
               </SelectTrigger>
               <SelectContent>
-                {availableModels.map((model) => (
+                {availableModels.filter(model => model && model.trim() !== '').map((model) => (
                   <SelectItem key={model} value={model}>
                     {model}
                   </SelectItem>

@@ -26,84 +26,35 @@ export const generateWithAI = async (
   settings: AISettings,
   prompt: string
 ): Promise<string> => {
-  if (!settings.apiKey) {
+  // 检查是否需要API密钥
+  const requiresKey = !['ollama', 'lmstudio'].includes(settings.provider);
+  
+  if (requiresKey && !settings.apiKey) {
     throw new Error("请先在AI设置中配置API密钥");
   }
 
-  let requestBody: any;
-  let headers: any = {
-    'Content-Type': 'application/json',
-  };
-
-  // 根据不同的API提供商构造请求
-  switch (settings.provider) {
-    case 'anthropic':
-      headers['x-api-key'] = settings.apiKey;
-      headers['anthropic-version'] = '2023-06-01';
-      requestBody = {
-        model: settings.model,
-        max_tokens: 1000,
-        messages: [{ role: 'user', content: prompt }]
-      };
-      break;
-    
-    case 'qwen':
-      headers['Authorization'] = `Bearer ${settings.apiKey}`;
-      requestBody = {
-        model: settings.model,
-        input: {
-          messages: [{ role: 'user', content: prompt }]
-        },
-        parameters: {
-          max_tokens: 1000,
-          temperature: 0.7
-        }
-      };
-      break;
-    
-    case 'ernie':
-      // 百度API需要access_token，这里简化处理
-      requestBody = {
-        messages: [{ role: 'user', content: prompt }],
-        max_output_tokens: 1000,
-        temperature: 0.7
-      };
-      break;
-    
-    case 'ollama':
-      requestBody = {
-        model: settings.model,
-        messages: [{ role: 'user', content: prompt }],
-        stream: false,
-        options: {
-          num_predict: 1000,
-          temperature: 0.7
-        }
-      };
-      break;
-    
-    case 'zhipu':
-      headers['Authorization'] = `Bearer ${settings.apiKey}`;
-      requestBody = {
-        model: settings.model,
-        messages: [{ role: 'user', content: prompt }],
-        max_tokens: 1000,
-        temperature: 0.7
-      };
-      break;
-    
-    default:
-      // OpenAI兼容格式 (包括 deepseek, moonshot, yi, lmstudio 等)
-      headers['Authorization'] = `Bearer ${settings.apiKey}`;
-      requestBody = {
-        model: settings.model,
-        messages: [{ role: 'user', content: prompt }],
-        max_tokens: 1000,
-        temperature: 0.7
-      };
+  if (!settings.apiUrl) {
+    throw new Error("请先在AI设置中配置API地址");
   }
 
   try {
+    // 使用统一的OpenAI兼容格式
+    let headers: any = {
+      'Content-Type': 'application/json',
+    };
+
+    // 只有需要密钥的服务才添加Authorization头
+    if (requiresKey && settings.apiKey) {
+      headers['Authorization'] = `Bearer ${settings.apiKey}`;
+    }
+
+    const requestBody = {
+      model: settings.model,
+      messages: [{ role: 'user', content: prompt }],
+      max_tokens: 1000,
+      temperature: 0.7
+    };
+
     const response = await fetch(settings.apiUrl, {
       method: 'POST',
       headers,
@@ -116,27 +67,9 @@ export const generateWithAI = async (
     }
 
     const data = await response.json();
-    let content = "";
-
-    // 根据不同的API提供商解析响应
-    switch (settings.provider) {
-      case 'anthropic':
-        content = data.content?.[0]?.text || "生成失败，请重试";
-        break;
-      case 'qwen':
-        content = data.output?.choices?.[0]?.message?.content || 
-                 data.output?.text || "生成失败，请重试";
-        break;
-      case 'ernie':
-        content = data.result || "生成失败，请重试";
-        break;
-      case 'ollama':
-        content = data.message?.content || "生成失败，请重试";
-        break;
-      default:
-        // OpenAI兼容格式
-        content = data.choices?.[0]?.message?.content || "生成失败，请重试";
-    }
+    
+    // 使用统一的OpenAI兼容响应格式解析
+    const content = data.choices?.[0]?.message?.content || "生成失败，请重试";
     
     // 清理生成内容的格式问题
     return content.trim().replace(/^\s*\n+/, '');
