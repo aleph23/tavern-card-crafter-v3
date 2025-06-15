@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Upload } from "lucide-react";
+import { Upload, Bot, User, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AISettings, { AISettings as AISettingsType } from "@/components/AISettings";
 import Toolbar from "@/components/Toolbar";
 import BasicInfoSection from "@/components/CharacterForm/BasicInfoSection";
@@ -59,6 +60,7 @@ const Index = () => {
   const { toast } = useToast();
   const { t } = useLanguage();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [activeTab, setActiveTab] = useState("assistant");
   const [aiSettings, setAISettings] = useState<AISettingsType | null>(null);
 
   const [characterData, setCharacterData] = useState<CharacterCardV3>({
@@ -471,92 +473,142 @@ const Index = () => {
               <Upload className="w-4 h-4 mr-2" />
               {t('importCard')}
             </Button>
-            <AISettings 
-              onSettingsChange={handleAISettingsChange} 
+            <AISettings
+              onSettingsChange={handleAISettingsChange}
               currentSettings={aiSettings}
             />
           </div>
         </div>
 
-        <div className="space-y-6">
-          {/* AI助手面板 - 居中显示 */}
-          <div className="flex justify-center">
-            <div className="w-full max-w-4xl">
-              <AIAssistant 
-                aiSettings={aiSettings}
-                onInsertField={handleInsertField}
-              />
+        {/* 全屏侧边栏选项卡布局 */}
+        <div className="flex h-[calc(100vh-180px)] bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm rounded-lg overflow-hidden shadow-lg">
+          {/* 左侧边栏 */}
+          <div className="w-56 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-r border-gray-200 dark:border-gray-700 flex flex-col">
+            <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+              <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">功能面板</h2>
             </div>
+            <nav className="flex-1 p-2">
+              <div className="space-y-1">
+                <button
+                  onClick={() => setActiveTab("assistant")}
+                  className={`w-full flex items-center gap-3 px-3 py-3 text-left rounded-lg transition-all duration-200 ${
+                    activeTab === "assistant"
+                      ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-md"
+                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                  }`}
+                >
+                  <Bot className="w-5 h-5" />
+                  <span className="font-medium">AI角色卡助手</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab("editor")}
+                  className={`w-full flex items-center gap-3 px-3 py-3 text-left rounded-lg transition-all duration-200 ${
+                    activeTab === "editor"
+                      ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-md"
+                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                  }`}
+                >
+                  <User className="w-5 h-5" />
+                  <span className="font-medium">角色信息编辑</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab("preview")}
+                  className={`w-full flex items-center gap-3 px-3 py-3 text-left rounded-lg transition-all duration-200 ${
+                    activeTab === "preview"
+                      ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-md"
+                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                  }`}
+                >
+                  <FileText className="w-5 h-5" />
+                  <span className="font-medium">JSON 预览</span>
+                </button>
+              </div>
+            </nav>
           </div>
 
-          {/* 角色信息编辑和预览 - 居中显示 */}
-          <div className="flex justify-center">
-            <div className="w-full max-w-4xl space-y-6">
-              <Card className="shadow-lg border-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
-                <CardHeader>
-                  <CardTitle className="text-2xl font-semibold text-gray-800 dark:text-gray-200">
+          {/* 右侧内容区域 */}
+          <div className="flex-1 flex flex-col">
+            {/* AI助手面板 */}
+            {activeTab === "assistant" && (
+              <div className="flex-1 p-6 min-h-0 overflow-auto">
+                <AIAssistant
+                  aiSettings={aiSettings}
+                  onInsertField={handleInsertField}
+                />
+              </div>
+            )}
+
+            {/* 角色信息编辑面板 */}
+            {activeTab === "editor" && (
+              <div className="flex-1 flex flex-col min-h-0">
+                <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+                  <h1 className="text-2xl font-semibold text-gray-800 dark:text-gray-200">
                     {t('characterInfo')}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ScrollArea className="h-[800px] custom-scrollbar pr-4">
-                    <div className="space-y-8">
-                      <BasicInfoSection 
+                  </h1>
+                </div>
+                <div className="flex-1 min-h-0">
+                  <ScrollArea className="h-full">
+                    <div className="p-6 space-y-8">
+                      <BasicInfoSection
                         data={characterData.data}
                         updateField={updateField}
                         characterImage={characterImage}
                         setCharacterImage={setCharacterImage}
                         aiSettings={aiSettings}
                       />
-                      
-                      <PersonalitySection 
+
+                      <PersonalitySection
                         data={characterData.data}
                         updateField={updateField}
                         aiSettings={aiSettings}
                       />
-                      
-                      <PromptsSection 
+
+                      <PromptsSection
                         data={characterData.data}
                         updateField={updateField}
                         aiSettings={aiSettings}
                       />
-                      
-                      <AlternateGreetings 
+
+                      <AlternateGreetings
                         greetings={characterData.data.alternate_greetings}
                         updateField={updateField}
                         aiSettings={aiSettings}
                         characterData={characterData.data}
                       />
-                      
-                      <CharacterBook 
+
+                      <CharacterBook
                         entries={characterData.data.character_book?.entries || []}
                         updateField={updateField}
                         aiSettings={aiSettings}
                         characterData={characterData.data}
                       />
-                      
-                      <TagsSection 
+
+                      <TagsSection
                         tags={characterData.data.tags}
                         updateField={updateField}
                         aiSettings={aiSettings}
                         characterData={characterData.data}
                       />
-                      
-                      <MetadataSection 
+
+                      <MetadataSection
                         data={characterData.data}
                         updateField={updateField}
                       />
                     </div>
                   </ScrollArea>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
+            )}
 
-              {/* 预览部分 */}
-              <CharacterPreview 
-                characterData={characterData}
-                characterImage={characterImage}
-              />
-            </div>
+            {/* JSON预览面板 */}
+            {activeTab === "preview" && (
+              <div className="flex-1 p-6 min-h-0 overflow-auto">
+                <CharacterPreview
+                  characterData={characterData}
+                  characterImage={characterImage}
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>

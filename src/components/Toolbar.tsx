@@ -16,7 +16,7 @@ const Toolbar = () => {
   return (
     <div className="flex items-center gap-2">
       <LocalDeploymentPanel />
-      
+
       <Button
         variant="outline"
         size="sm"
@@ -26,7 +26,7 @@ const Toolbar = () => {
         <Globe className="h-4 w-4" />
         {language === 'zh' ? 'EN' : '中文'}
       </Button>
-      
+
       <Button
         variant="outline"
         size="sm"

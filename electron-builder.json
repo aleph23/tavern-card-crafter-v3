@@ -8,7 +8,13 @@
   "files": [
     "dist/**/*",
     "electron/**/*",
-    "node_modules/**/*"
+    "package.json"
+  ],
+  "extraResources": [
+    {
+      "from": "public",
+      "to": "public"
+    }
   ],
   "mac": {
     "category": "public.app-category.productivity",
@@ -16,7 +22,7 @@
   },
   "win": {
     "target": "nsis",
-    "icon": "public/favicon.ico"
+    "forceCodeSigning": false
   },
   "linux": {
     "target": "AppImage",

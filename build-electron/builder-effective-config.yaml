@@ -1,0 +1,26 @@
+directories:
+  output: build-electron
+  buildResources: build
+appId: com.taverncard.crafter
+productName: Tavern Card Crafter
+files:
+  - filter:
+      - dist/**/*
+      - electron/**/*
+      - package.json
+extraResources:
+  - from: public
+    to: public
+mac:
+  category: public.app-category.productivity
+  target: dmg
+win:
+  target: nsis
+  forceCodeSigning: false
+linux:
+  target: AppImage
+  category: Office
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+electronVersion: 36.4.0
