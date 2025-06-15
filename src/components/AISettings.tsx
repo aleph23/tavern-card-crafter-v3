@@ -303,7 +303,7 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
         availableModels.length === 0) {
       toast({
         title: "建议操作",
-        description: "建议先点击"获取模型"按钮获取可用模型列表",
+        description: "建议先点击获取模型按钮获取可用模型列表",
         variant: "default"
       });
     }
