@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Wand, RefreshCcw, Download } from "lucide-react";
+import { Wand, RefreshCcw, Download, X } from "lucide-react";
 import { generateWithAI } from "@/utils/aiGenerator";
 import { AISettings } from "@/components/AISettings";
 
@@ -42,6 +42,7 @@ const AIAssistant = ({ aiSettings, onInsertField }: AIAssistantProps) => {
   const [characterType, setCharacterType] = useState("general");
   const [parsedData, setParsedData] = useState<ParsedCharacterData | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const getPromptByType = (type: string, content: string) => {
     // 限制输入内容长度，避免提示词过长
@@ -132,7 +133,10 @@ ${truncatedContent}
       return;
     }
 
+    // 创建新的 AbortController
+    abortControllerRef.current = new AbortController();
     setIsGenerating(true);
+    
     try {
       const prompt = getPromptByType(characterType, inputText);
       console.log('Generated prompt length:', prompt.length);
@@ -177,14 +181,35 @@ ${truncatedContent}
         });
       }
     } catch (error) {
-      console.error('生成失败:', error);
-      toast({
-        title: "生成失败",
-        description: error instanceof Error ? error.message : "未知错误，请检查AI设置或网络连接",
-        variant: "destructive"
-      });
+      // 检查是否是用户主动取消
+      if (error instanceof Error && error.name === 'AbortError') {
+        toast({
+          title: "已取消",
+          description: "AI生成已被用户取消"
+        });
+      } else {
+        console.error('生成失败:', error);
+        toast({
+          title: "生成失败",
+          description: error instanceof Error ? error.message : "未知错误，请检查AI设置或网络连接",
+          variant: "destructive"
+        });
+      }
     } finally {
       setIsGenerating(false);
+      abortControllerRef.current = null;
+    }
+  };
+
+  const cancelGeneration = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      setIsGenerating(false);
+      abortControllerRef.current = null;
+      toast({
+        title: "已取消",
+        description: "AI生成已取消"
+      });
     }
   };
 
@@ -296,14 +321,26 @@ ${truncatedContent}
         </div>
 
         <div className="flex gap-2">
-          <Button
-            onClick={generateCharacterData}
-            disabled={isGenerating || !inputText.trim()}
-            className="flex-1"
-          >
-            <Wand className="w-4 h-4 mr-2" />
-            {isGenerating ? "AI分析中..." : `AI分析生成 (${selectedType?.label})`}
-          </Button>
+          {!isGenerating ? (
+            <Button
+              onClick={generateCharacterData}
+              disabled={!inputText.trim()}
+              className="flex-1"
+            >
+              <Wand className="w-4 h-4 mr-2" />
+              {`AI分析生成 (${selectedType?.label})`}
+            </Button>
+          ) : (
+            <Button
+              onClick={cancelGeneration}
+              variant="destructive"
+              className="flex-1"
+            >
+              <X className="w-4 h-4 mr-2" />
+              取消生成
+            </Button>
+          )}
+          
           {parsedData && (
             <Button
               onClick={generateCharacterData}
@@ -311,7 +348,7 @@ ${truncatedContent}
               variant="outline"
               title="重新生成"
             >
-              <RefreshCcw className="w-4 h-4" />
+              <RefreshCcw className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
             </Button>
           )}
         </div>
