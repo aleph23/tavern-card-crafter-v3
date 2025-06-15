@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,7 +28,7 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
     {
       name: "OpenAI 官方",
       value: "openai",
-      url: "https://api.openai.com/v1/chat/completions",
+      url: "https://api.openai.com",
       modelsUrl: "https://api.openai.com/v1/models",
       models: ["gpt-4o", "gpt-4o-mini", "gpt-4-turbo", "gpt-4", "gpt-3.5-turbo"],
       requiresKey: true,
@@ -38,7 +37,7 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
     {
       name: "DeepSeek 深度求索",
       value: "deepseek",
-      url: "https://api.deepseek.com/v1/chat/completions",
+      url: "https://api.deepseek.com",
       modelsUrl: "https://api.deepseek.com/v1/models",
       models: ["deepseek-chat", "deepseek-coder"],
       requiresKey: true,
@@ -47,7 +46,7 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
     {
       name: "月之暗面 Moonshot",
       value: "moonshot", 
-      url: "https://api.moonshot.cn/v1/chat/completions",
+      url: "https://api.moonshot.cn",
       modelsUrl: "https://api.moonshot.cn/v1/models",
       models: ["moonshot-v1-8k", "moonshot-v1-32k", "moonshot-v1-128k"],
       requiresKey: true,
@@ -56,7 +55,7 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
     {
       name: "智谱 GLM",
       value: "zhipu",
-      url: "https://open.bigmodel.cn/api/paas/v4/chat/completions", 
+      url: "https://open.bigmodel.cn/api/paas/v4",
       modelsUrl: "https://open.bigmodel.cn/api/paas/v4/models",
       models: ["glm-4-plus", "glm-4-0520", "glm-4", "glm-4-air", "glm-4-airx", "glm-4-flash"],
       requiresKey: true,
@@ -65,7 +64,7 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
     {
       name: "零一万物 Yi",
       value: "yi",
-      url: "https://api.lingyiwanwu.com/v1/chat/completions",
+      url: "https://api.lingyiwanwu.com",
       modelsUrl: "https://api.lingyiwanwu.com/v1/models",
       models: ["yi-large", "yi-medium", "yi-spark", "yi-large-rag"],
       requiresKey: true,
@@ -74,7 +73,7 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
     {
       name: "OpenRouter",
       value: "openrouter",
-      url: "https://openrouter.ai/api/v1/chat/completions",
+      url: "https://openrouter.ai/api",
       modelsUrl: "https://openrouter.ai/api/v1/models",
       models: ["openai/gpt-4o", "anthropic/claude-3.5-sonnet", "google/gemini-2.0-flash-exp", "deepseek/deepseek-r1-distill-qwen-7b"],
       requiresKey: true,
@@ -83,29 +82,29 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
     {
       name: "Ollama (本地)",
       value: "ollama",
-      url: "http://localhost:11434/v1/chat/completions",
+      url: "http://localhost:11434",
       modelsUrl: "http://localhost:11434/api/tags",
       models: ["llama3.2", "llama3.1", "qwen2.5", "deepseek-coder", "codegemma", "mistral"],
       requiresKey: false,
-      tips: "本地Ollama服务，无需API密钥。需要先下载模型：ollama pull 模型名"
+      tips: "本地Ollama服务，无需API密钥。需要先下载模型：ollama pull 模型名。默认端口11434"
     },
     {
       name: "LM Studio (本地)",
       value: "lmstudio",
-      url: "http://localhost:1234/v1/chat/completions",
+      url: "http://localhost:1234",
       modelsUrl: "http://localhost:1234/v1/models",
       models: ["local-model"],
       requiresKey: false,
-      tips: "LM Studio本地服务，无需API密钥，需要先加载模型"
+      tips: "LM Studio本地服务，无需API密钥，需要先加载模型。默认端口1234"
     },
     {
       name: "OneAPI/New API",
       value: "oneapi",
-      url: "http://localhost:3000/v1/chat/completions",
+      url: "http://localhost:3000",
       modelsUrl: "http://localhost:3000/v1/models",
       models: ["gpt-3.5-turbo", "gpt-4", "claude-3-sonnet"],
       requiresKey: true,
-      tips: "OneAPI统一接口，支持多种模型代理"
+      tips: "OneAPI统一接口，支持多种模型代理。默认端口3000"
     },
     {
       name: "自定义 OpenAI 兼容接口",
@@ -166,23 +165,65 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
     }
   };
 
-  // 智能构建API URL
-  const buildApiUrl = (baseUrl: string, endpoint: string = '/v1/chat/completions'): string => {
+  // 智能构建API URL - 针对不同提供商的特殊处理
+  const buildApiUrl = (baseUrl: string, provider: string = settings.provider): string => {
     if (!baseUrl) return '';
-    
-    // 如果已经包含了完整的端点，直接返回
-    if (baseUrl.includes('/chat/completions') || baseUrl.includes('/api/tags')) {
-      return baseUrl;
-    }
     
     // 移除末尾的斜杠
     const cleanUrl = baseUrl.replace(/\/+$/, '');
     
+    // Ollama特殊处理
+    if (provider === 'ollama') {
+      if (baseUrl.includes('/v1/chat/completions')) {
+        return cleanUrl;
+      }
+      return `${cleanUrl}/v1/chat/completions`;
+    }
+    
+    // 智谱GLM特殊处理
+    if (provider === 'zhipu') {
+      if (baseUrl.includes('/chat/completions')) {
+        return cleanUrl;
+      }
+      return `${cleanUrl}/chat/completions`;
+    }
+    
+    // 其他提供商的标准处理
+    if (baseUrl.includes('/chat/completions')) {
+      return cleanUrl;
+    }
+    
     // 智能添加端点
     if (cleanUrl.includes('/v1')) {
-      return `${cleanUrl}${endpoint}`;
+      return `${cleanUrl}/chat/completions`;
     } else {
-      return `${cleanUrl}/v1${endpoint}`;
+      return `${cleanUrl}/v1/chat/completions`;
+    }
+  };
+
+  // 构建模型API地址
+  const buildModelsUrl = (baseUrl: string, provider: string = settings.provider): string => {
+    if (!baseUrl) return '';
+    
+    const cleanUrl = baseUrl.replace(/\/+$/, '');
+    
+    // Ollama特殊处理
+    if (provider === 'ollama') {
+      if (baseUrl.includes('/api/tags')) {
+        return cleanUrl;
+      }
+      return `${cleanUrl}/api/tags`;
+    }
+    
+    // 其他提供商
+    if (baseUrl.includes('/models')) {
+      return cleanUrl;
+    }
+    
+    if (cleanUrl.includes('/v1')) {
+      return `${cleanUrl}/models`;
+    } else {
+      return `${cleanUrl}/v1/models`;
     }
   };
 
@@ -255,7 +296,11 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
     setLastError("");
 
     try {
-      const apiUrl = buildApiUrl(settings.apiUrl);
+      const apiUrl = buildApiUrl(settings.apiUrl, settings.provider);
+      
+      console.log('Testing connection to:', apiUrl);
+      console.log('Provider:', settings.provider);
+      console.log('Model:', settings.model);
       
       // 使用统一的OpenAI兼容格式
       let headers: any = {
@@ -274,7 +319,7 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
         temperature: 0.1
       };
 
-      console.log('Testing connection to:', apiUrl);
+      console.log('Request headers:', headers);
       console.log('Request body:', requestBody);
 
       const response = await fetch(apiUrl, {
@@ -317,9 +362,23 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
     } catch (error: any) {
       console.error('Connection test error:', error);
       
-      const errorMessage = error.name === 'TimeoutError' 
-        ? "请求超时，请检查网络连接或API地址"
-        : parseApiError(error.message || "网络连接错误");
+      let errorMessage = "网络连接错误";
+      
+      if (error.name === 'TimeoutError') {
+        errorMessage = "请求超时，请检查网络连接或API地址";
+      } else if (error.message?.includes('Failed to fetch')) {
+        if (settings.provider === 'ollama') {
+          errorMessage = "无法连接到Ollama服务。请确保：\n1. Ollama已启动 (ollama serve)\n2. 服务运行在正确端口 (默认11434)\n3. 防火墙允许访问";
+        } else if (settings.provider === 'lmstudio') {
+          errorMessage = "无法连接到LM Studio服务。请确保：\n1. LM Studio已启动\n2. 已启用本地服务器\n3. 服务运行在正确端口 (默认1234)";
+        } else {
+          errorMessage = "网络连接失败，请检查API地址是否正确或服务是否运行";
+        }
+      } else if (error.message?.includes('CORS')) {
+        errorMessage = "跨域请求被阻止，请检查API服务的CORS配置";
+      } else if (error.message) {
+        errorMessage = parseApiError(error.message);
+      }
         
       setConnectionStatus('error');
       setLastError(errorMessage);
@@ -358,18 +417,10 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
     setIsLoadingModels(true);
 
     try {
-      let modelsUrl = '';
+      const modelsUrl = currentProvider?.modelsUrl || buildModelsUrl(settings.apiUrl, settings.provider);
       
-      if (currentProvider?.modelsUrl) {
-        modelsUrl = currentProvider.modelsUrl;
-      } else {
-        // 智能构建模型API地址
-        if (settings.provider === 'ollama') {
-          modelsUrl = settings.apiUrl.replace('/v1/chat/completions', '/api/tags');
-        } else {
-          modelsUrl = buildApiUrl(settings.apiUrl, '/v1/models');
-        }
-      }
+      console.log('Fetching models from:', modelsUrl);
+      console.log('Provider:', settings.provider);
       
       let headers: any = {};
 
@@ -378,15 +429,17 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
         headers['Authorization'] = `Bearer ${settings.apiKey}`;
       }
 
-      console.log('Fetching models from:', modelsUrl);
-
       const response = await fetch(modelsUrl, { 
         headers,
         signal: AbortSignal.timeout(15000) // 15秒超时
       });
 
+      console.log('Models response status:', response.status);
+
       if (response.ok) {
         const data = await response.json();
+        console.log('Models data:', data);
+        
         let modelIds: string[] = [];
 
         if (settings.provider === 'ollama' && data.models) {
@@ -420,9 +473,15 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
     } catch (error: any) {
       console.error('Models fetch error:', error);
       setAvailableModels(currentProvider?.models || defaultModels);
+      
+      let errorMessage = "无法连接到API服务器，使用预设模型列表";
+      if (settings.provider === 'ollama') {
+        errorMessage = "无法连接到Ollama服务获取模型列表，请确保Ollama已启动";
+      }
+      
       toast({
         title: "获取失败",
-        description: "无法连接到API服务器，使用预设模型列表",
+        description: errorMessage,
       });
     } finally {
       setIsLoadingModels(false);
@@ -454,7 +513,7 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
     // 确保API地址格式正确
     const finalSettings = {
       ...settings,
-      apiUrl: buildApiUrl(settings.apiUrl)
+      apiUrl: buildApiUrl(settings.apiUrl, settings.provider)
     };
 
     localStorage.setItem('ai-settings', JSON.stringify(finalSettings));

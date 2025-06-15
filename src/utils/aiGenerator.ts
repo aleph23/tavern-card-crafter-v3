@@ -1,3 +1,4 @@
+
 import { AISettings } from "@/components/AISettings";
 
 export interface CharacterData {
@@ -22,23 +23,39 @@ export const estimateTokens = (text: string): number => {
   return Math.ceil(chineseChars * 1.5 + englishWords + otherChars * 0.5);
 };
 
-// 智能构建API URL
-const buildApiUrl = (baseUrl: string, endpoint: string = '/v1/chat/completions'): string => {
+// 智能构建API URL - 与AISettings组件保持一致
+const buildApiUrl = (baseUrl: string, provider: string): string => {
   if (!baseUrl) return '';
-  
-  // 如果已经包含了完整的端点，直接返回
-  if (baseUrl.includes('/chat/completions') || baseUrl.includes('/api/tags')) {
-    return baseUrl;
-  }
   
   // 移除末尾的斜杠
   const cleanUrl = baseUrl.replace(/\/+$/, '');
   
+  // Ollama特殊处理
+  if (provider === 'ollama') {
+    if (baseUrl.includes('/v1/chat/completions')) {
+      return cleanUrl;
+    }
+    return `${cleanUrl}/v1/chat/completions`;
+  }
+  
+  // 智谱GLM特殊处理
+  if (provider === 'zhipu') {
+    if (baseUrl.includes('/chat/completions')) {
+      return cleanUrl;
+    }
+    return `${cleanUrl}/chat/completions`;
+  }
+  
+  // 其他提供商的标准处理
+  if (baseUrl.includes('/chat/completions')) {
+    return cleanUrl;
+  }
+  
   // 智能添加端点
   if (cleanUrl.includes('/v1')) {
-    return `${cleanUrl}${endpoint}`;
+    return `${cleanUrl}/chat/completions`;
   } else {
-    return `${cleanUrl}/v1${endpoint}`;
+    return `${cleanUrl}/v1/chat/completions`;
   }
 };
 
@@ -59,7 +76,7 @@ export const generateWithAI = async (
 
   try {
     // 智能构建API地址
-    const apiUrl = buildApiUrl(settings.apiUrl);
+    const apiUrl = buildApiUrl(settings.apiUrl, settings.provider);
     
     console.log('Generating with AI using URL:', apiUrl);
     console.log('Provider:', settings.provider);
@@ -132,6 +149,11 @@ export const generateWithAI = async (
         throw new Error('请求超时，请检查网络连接或API服务状态');
       }
       if (error.message.includes('Failed to fetch')) {
+        if (settings.provider === 'ollama') {
+          throw new Error('无法连接到Ollama服务，请确保Ollama已启动并运行在正确端口');
+        } else if (settings.provider === 'lmstudio') {
+          throw new Error('无法连接到LM Studio服务，请确保LM Studio已启动本地服务器');
+        }
         throw new Error('网络连接失败，请检查API地址是否正确或服务是否运行');
       }
       throw error;
