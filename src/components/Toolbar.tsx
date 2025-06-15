@@ -1,40 +1,47 @@
 
+import { Globe, Moon, Sun, Server } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "@/contexts/ThemeContext";
-import { Globe, Sun, Moon } from "lucide-react";
+import LocalDeploymentPanel from "./LocalDeploymentPanel";
 
 const Toolbar = () => {
-  const { language, setLanguage, t } = useLanguage();
+  const { language, setLanguage } = useLanguage();
   const { theme, toggleTheme } = useTheme();
+
+  const toggleLanguage = () => {
+    setLanguage(language === 'zh' ? 'en' : 'zh');
+  };
 
   return (
     <div className="flex items-center gap-2">
+      <LocalDeploymentPanel />
+      
       <Button
-        onClick={() => setLanguage(language === 'zh' ? 'en' : 'zh')}
         variant="outline"
         size="sm"
-        className="flex items-center gap-2"
+        onClick={toggleLanguage}
+        className="gap-2"
       >
-        <Globe className="w-4 h-4" />
+        <Globe className="h-4 w-4" />
         {language === 'zh' ? 'EN' : '中文'}
       </Button>
       
       <Button
-        onClick={toggleTheme}
         variant="outline"
         size="sm"
-        className="flex items-center gap-2"
+        onClick={toggleTheme}
+        className="gap-2"
       >
         {theme === 'light' ? (
           <>
-            <Moon className="w-4 h-4" />
-            {t('darkMode')}
+            <Moon className="h-4 w-4" />
+            {language === 'zh' ? '暗色' : 'Dark'}
           </>
         ) : (
           <>
-            <Sun className="w-4 h-4" />
-            {t('lightMode')}
+            <Sun className="h-4 w-4" />
+            {language === 'zh' ? '亮色' : 'Light'}
           </>
         )}
       </Button>
