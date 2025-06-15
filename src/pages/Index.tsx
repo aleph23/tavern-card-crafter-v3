@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -128,114 +129,170 @@ const Index = () => {
           const arrayBuffer = e.target?.result as ArrayBuffer;
           const uint8Array = new Uint8Array(arrayBuffer);
           
-          // 查找 tEXt 块中的角色卡数据
+          console.log('PNG file size:', uint8Array.length);
+          
+          // 方法1: 查找PNG tEXt块
           let foundData = null;
           
-          // 遍历 PNG 数据寻找 tEXt 块
-          for (let i = 0; i < uint8Array.length - 8; i++) {
-            // 查找 tEXt 块标识符
-            if (uint8Array[i] === 0x74 && uint8Array[i+1] === 0x45 && 
-                uint8Array[i+2] === 0x58 && uint8Array[i+3] === 0x74) {
+          // PNG tEXt块查找
+          for (let i = 8; i < uint8Array.length - 8; i++) {
+            // 读取块长度
+            const chunkLength = (uint8Array[i] << 24) | (uint8Array[i+1] << 16) | (uint8Array[i+2] << 8) | uint8Array[i+3];
+            
+            // 检查是否是tEXt块 (0x74455874)
+            if (uint8Array[i+4] === 0x74 && uint8Array[i+5] === 0x45 && 
+                uint8Array[i+6] === 0x58 && uint8Array[i+7] === 0x74) {
               
-              // 寻找 'chara' 关键字
-              const textStart = i + 4;
-              let keywordEnd = textStart;
+              console.log('Found tEXt chunk at:', i, 'length:', chunkLength);
               
-              // 查找空字节终止符
-              while (keywordEnd < uint8Array.length && uint8Array[keywordEnd] !== 0) {
-                keywordEnd++;
-              }
+              const textStart = i + 8;
+              const textEnd = textStart + chunkLength;
               
-              const keyword = new TextDecoder().decode(uint8Array.slice(textStart, keywordEnd));
-              
-              if (keyword === 'chara' || keyword === 'ccv3' || keyword === 'ccv2') {
-                // 找到角色卡数据
-                const dataStart = keywordEnd + 1;
-                let dataEnd = dataStart;
-                
-                // 查找数据结束
-                while (dataEnd < uint8Array.length && uint8Array[dataEnd] !== 0) {
-                  dataEnd++;
-                }
-                
-                const encodedData = new TextDecoder().decode(uint8Array.slice(dataStart, dataEnd));
-                
+              if (textEnd <= uint8Array.length) {
                 try {
-                  // 尝试解码 base64
-                  const decodedData = atob(encodedData);
-                  foundData = JSON.parse(decodedData);
-                  break;
-                } catch (e) {
-                  // 如果不是 base64，尝试直接解析
-                  try {
-                    foundData = JSON.parse(encodedData);
-                    break;
-                  } catch (e2) {
-                    continue;
+                  // 查找关键字结束位置（null字节）
+                  let keyEnd = textStart;
+                  while (keyEnd < textEnd && uint8Array[keyEnd] !== 0) {
+                    keyEnd++;
                   }
+                  
+                  const keyword = new TextDecoder('utf-8').decode(uint8Array.slice(textStart, keyEnd));
+                  console.log('tEXt keyword:', keyword);
+                  
+                  // 检查是否是角色卡相关的关键字
+                  if (keyword === 'chara' || keyword === 'ccv3' || keyword === 'ccv2' || keyword === 'Comment') {
+                    const dataStart = keyEnd + 1;
+                    const textData = new TextDecoder('utf-8').decode(uint8Array.slice(dataStart, textEnd));
+                    
+                    console.log('Found potential character data, length:', textData.length);
+                    
+                    // 尝试base64解码
+                    try {
+                      const decoded = atob(textData);
+                      const parsed = JSON.parse(decoded);
+                      console.log('Successfully parsed base64 JSON');
+                      foundData = parsed;
+                      break;
+                    } catch (e) {
+                      // 尝试直接JSON解析
+                      try {
+                        const parsed = JSON.parse(textData);
+                        console.log('Successfully parsed direct JSON');
+                        foundData = parsed;
+                        break;
+                      } catch (e2) {
+                        console.log('Failed to parse as JSON');
+                      }
+                    }
+                  }
+                } catch (e) {
+                  console.log('Error processing tEXt chunk:', e);
                 }
               }
+              
+              // 跳到下一个块
+              i += 8 + chunkLength + 4 - 1; // -1因为for循环会+1
             }
           }
           
-          // 如果没找到，尝试更宽泛的搜索
+          // 方法2: 如果tEXt块方法失败，尝试字符串搜索
           if (!foundData) {
-            const textContent = new TextDecoder('utf-8', { fatal: false }).decode(uint8Array);
+            console.log('tEXt method failed, trying string search...');
             
-            // 尝试查找 JSON 模式
+            // 转换为字符串进行搜索
+            const decoder = new TextDecoder('utf-8', { fatal: false });
+            const fullText = decoder.decode(uint8Array);
+            
+            // 查找可能的JSON起始位置
             const jsonPatterns = [
               /"spec"\s*:\s*"chara_card_v[123]"/g,
-              /"name"\s*:\s*"[^"]*"/g,
+              /"name"\s*:\s*"/g,
+              /\{\s*"name"\s*:/g,
+              /\{\s*"char_name"\s*:/g
             ];
             
             for (const pattern of jsonPatterns) {
-              const matches = textContent.match(pattern);
-              if (matches) {
-                // 找到可能的起始位置，尝试提取完整的JSON
-                const startIndex = textContent.indexOf(matches[0]);
-                let braceCount = 0;
-                let jsonStart = -1;
-                let jsonEnd = -1;
+              const matches = [...fullText.matchAll(pattern)];
+              console.log(`Pattern ${pattern.source} found ${matches.length} matches`);
+              
+              for (const match of matches) {
+                if (!match.index) continue;
                 
-                // 向后查找JSON的开始
-                for (let i = startIndex; i >= 0; i--) {
-                  if (textContent[i] === '{') {
-                    jsonStart = i;
-                    break;
-                  }
+                // 向后查找JSON开始的大括号
+                let jsonStart = match.index;
+                while (jsonStart > 0 && fullText[jsonStart] !== '{') {
+                  jsonStart--;
                 }
                 
-                if (jsonStart !== -1) {
-                  // 向前查找JSON的结束
-                  for (let i = jsonStart; i < textContent.length; i++) {
-                    if (textContent[i] === '{') braceCount++;
-                    if (textContent[i] === '}') braceCount--;
-                    if (braceCount === 0) {
+                if (jsonStart >= 0) {
+                  // 向前查找JSON结束
+                  let braceCount = 0;
+                  let jsonEnd = -1;
+                  
+                  for (let i = jsonStart; i < fullText.length; i++) {
+                    if (fullText[i] === '{') braceCount++;
+                    if (fullText[i] === '}') braceCount--;
+                    if (braceCount === 0 && i > jsonStart) {
                       jsonEnd = i + 1;
                       break;
                     }
                   }
                   
-                  if (jsonEnd !== -1) {
+                  if (jsonEnd > jsonStart) {
                     try {
-                      const jsonStr = textContent.substring(jsonStart, jsonEnd);
-                      foundData = JSON.parse(jsonStr);
+                      const jsonStr = fullText.substring(jsonStart, jsonEnd);
+                      const parsed = JSON.parse(jsonStr);
+                      console.log('Successfully parsed JSON from string search');
+                      foundData = parsed;
                       break;
                     } catch (e) {
-                      continue;
+                      console.log('Failed to parse extracted JSON');
                     }
                   }
                 }
+              }
+              
+              if (foundData) break;
+            }
+          }
+          
+          // 方法3: 查找base64编码的数据
+          if (!foundData) {
+            console.log('String search failed, trying base64 search...');
+            
+            const decoder = new TextDecoder('utf-8', { fatal: false });
+            const fullText = decoder.decode(uint8Array);
+            
+            // 查找长的base64字符串
+            const base64Pattern = /[A-Za-z0-9+/]{100,}={0,2}/g;
+            const base64Matches = [...fullText.matchAll(base64Pattern)];
+            
+            console.log(`Found ${base64Matches.length} potential base64 strings`);
+            
+            for (const match of base64Matches) {
+              try {
+                const decoded = atob(match[0]);
+                if (decoded.includes('"name"') || decoded.includes('"char_name"') || decoded.includes('chara_card')) {
+                  const parsed = JSON.parse(decoded);
+                  console.log('Successfully parsed base64 character data');
+                  foundData = parsed;
+                  break;
+                }
+              } catch (e) {
+                // 继续尝试下一个
               }
             }
           }
           
           if (foundData) {
+            console.log('Character data found:', foundData);
             resolve(foundData);
           } else {
+            console.log('No character data found in PNG');
             reject(new Error('No character data found in PNG'));
           }
         } catch (error) {
+          console.error('PNG parsing error:', error);
           reject(error);
         }
       };
