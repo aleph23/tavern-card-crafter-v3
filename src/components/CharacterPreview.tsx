@@ -79,7 +79,7 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
   const { totalChars, totalTokens } = calculateTotalStats();
 
   return (
-    <Card className="shadow-lg border-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm h-fit sticky top-4">
+    <Card className="shadow-lg border-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
       <CardHeader className="pb-4">
         <CardTitle className="text-xl font-semibold text-gray-800 dark:text-gray-200 flex items-start justify-between flex-col gap-3">
           <span>{t('jsonPreview')}</span>

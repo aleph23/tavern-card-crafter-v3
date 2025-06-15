@@ -246,76 +246,72 @@ const Index = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* 表单部分 - 占2/3宽度 */}
-          <div className="lg:col-span-2">
-            <Card className="shadow-lg border-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-2xl font-semibold text-gray-800 dark:text-gray-200">
-                  {t('characterInfo')}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ScrollArea className="h-[800px] custom-scrollbar pr-4">
-                  <div className="space-y-8">
-                    <BasicInfoSection 
-                      data={characterData.data}
-                      updateField={updateField}
-                      characterImage={characterImage}
-                      setCharacterImage={setCharacterImage}
-                      aiSettings={aiSettings}
-                    />
-                    
-                    <PersonalitySection 
-                      data={characterData.data}
-                      updateField={updateField}
-                      aiSettings={aiSettings}
-                    />
-                    
-                    <PromptsSection 
-                      data={characterData.data}
-                      updateField={updateField}
-                      aiSettings={aiSettings}
-                    />
-                    
-                    <AlternateGreetings 
-                      greetings={characterData.data.alternate_greetings}
-                      updateField={updateField}
-                      aiSettings={aiSettings}
-                      characterData={characterData.data}
-                    />
-                    
-                    <CharacterBook 
-                      entries={characterData.data.character_book?.entries || []}
-                      updateField={updateField}
-                      aiSettings={aiSettings}
-                      characterData={characterData.data}
-                    />
-                    
-                    <TagsSection 
-                      tags={characterData.data.tags}
-                      updateField={updateField}
-                      aiSettings={aiSettings}
-                      characterData={characterData.data}
-                    />
-                    
-                    <MetadataSection 
-                      data={characterData.data}
-                      updateField={updateField}
-                    />
-                  </div>
-                </ScrollArea>
-              </CardContent>
-            </Card>
-          </div>
+        <div className="space-y-6">
+          {/* 表单部分 - 全宽度 */}
+          <Card className="shadow-lg border-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
+            <CardHeader>
+              <CardTitle className="text-2xl font-semibold text-gray-800 dark:text-gray-200">
+                {t('characterInfo')}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ScrollArea className="h-[800px] custom-scrollbar pr-4">
+                <div className="space-y-8">
+                  <BasicInfoSection 
+                    data={characterData.data}
+                    updateField={updateField}
+                    characterImage={characterImage}
+                    setCharacterImage={setCharacterImage}
+                    aiSettings={aiSettings}
+                  />
+                  
+                  <PersonalitySection 
+                    data={characterData.data}
+                    updateField={updateField}
+                    aiSettings={aiSettings}
+                  />
+                  
+                  <PromptsSection 
+                    data={characterData.data}
+                    updateField={updateField}
+                    aiSettings={aiSettings}
+                  />
+                  
+                  <AlternateGreetings 
+                    greetings={characterData.data.alternate_greetings}
+                    updateField={updateField}
+                    aiSettings={aiSettings}
+                    characterData={characterData.data}
+                  />
+                  
+                  <CharacterBook 
+                    entries={characterData.data.character_book?.entries || []}
+                    updateField={updateField}
+                    aiSettings={aiSettings}
+                    characterData={characterData.data}
+                  />
+                  
+                  <TagsSection 
+                    tags={characterData.data.tags}
+                    updateField={updateField}
+                    aiSettings={aiSettings}
+                    characterData={characterData.data}
+                  />
+                  
+                  <MetadataSection 
+                    data={characterData.data}
+                    updateField={updateField}
+                  />
+                </div>
+              </ScrollArea>
+            </CardContent>
+          </Card>
 
-          {/* 预览部分 - 占1/3宽度 */}
-          <div className="lg:col-span-1">
-            <CharacterPreview 
-              characterData={characterData}
-              characterImage={characterImage}
-            />
-          </div>
+          {/* 预览部分 - 全宽度，位于底部 */}
+          <CharacterPreview 
+            characterData={characterData}
+            characterImage={characterImage}
+          />
         </div>
       </div>
     </div>
