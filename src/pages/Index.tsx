@@ -1,9 +1,10 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import AISettings, { AISettings as AISettingsType } from "@/components/AISettings";
 
 import BasicInfoSection from "@/components/CharacterForm/BasicInfoSection";
 import PersonalitySection from "@/components/CharacterForm/PersonalitySection";
@@ -55,6 +56,7 @@ interface CharacterCardV3 {
 const Index = () => {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [aiSettings, setAISettings] = useState<AISettingsType | null>(null);
 
   const [characterData, setCharacterData] = useState<CharacterCardV3>({
     spec: "chara_card_v3",
@@ -83,6 +85,18 @@ const Index = () => {
   });
 
   const [characterImage, setCharacterImage] = useState<string | null>(null);
+
+  useEffect(() => {
+    // 加载保存的AI设置
+    const savedSettings = localStorage.getItem('ai-settings');
+    if (savedSettings) {
+      try {
+        setAISettings(JSON.parse(savedSettings));
+      } catch (error) {
+        console.error('Failed to load AI settings:', error);
+      }
+    }
+  }, []);
 
   const updateField = (field: string, value: any) => {
     setCharacterData(prev => ({
@@ -199,7 +213,7 @@ const Index = () => {
           <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-4">
             创建专业的 SillyTavern V3 格式角色卡，支持 V1/V2/V3 格式导入导出
           </p>
-          <div className="flex justify-center">
+          <div className="flex justify-center gap-4">
             <input
               type="file"
               ref={fileInputRef}
@@ -211,6 +225,10 @@ const Index = () => {
               <Upload className="w-4 h-4 mr-2" />
               导入角色卡
             </Button>
+            <AISettings 
+              onSettingsChange={setAISettings} 
+              currentSettings={aiSettings}
+            />
           </div>
         </div>
 
@@ -236,11 +254,13 @@ const Index = () => {
                     <PersonalitySection 
                       data={characterData.data}
                       updateField={updateField}
+                      aiSettings={aiSettings}
                     />
                     
                     <PromptsSection 
                       data={characterData.data}
                       updateField={updateField}
+                      aiSettings={aiSettings}
                     />
                     
                     <AlternateGreetings 
@@ -256,6 +276,8 @@ const Index = () => {
                     <TagsSection 
                       tags={characterData.data.tags}
                       updateField={updateField}
+                      aiSettings={aiSettings}
+                      characterData={characterData.data}
                     />
                     
                     <MetadataSection 
