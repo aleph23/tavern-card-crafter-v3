@@ -1,4 +1,3 @@
-
 import { useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -143,7 +142,7 @@ ${truncatedContent}
       console.log('Generated prompt length:', prompt.length);
       console.log('Prompt preview:', prompt.substring(0, 200) + '...');
       
-      const result = await generateWithAI(aiSettings, prompt, abortControllerRef.current.signal);
+      const result = await generateWithAI(aiSettings, prompt);
       console.log('AI result:', result);
       
       // 更强健的JSON解析
@@ -322,30 +321,28 @@ ${truncatedContent}
         </div>
 
         <div className="flex gap-2">
-          {!isGenerating ? (
-            <Button
-              onClick={generateCharacterData}
-              disabled={!inputText.trim()}
-              className="flex-1"
-            >
-              <Wand className="w-4 h-4 mr-2" />
-              {`AI分析生成 (${selectedType?.label})`}
-            </Button>
-          ) : (
-            <Button
-              onClick={cancelGeneration}
-              variant="destructive"
-              className="flex-1"
-            >
-              <X className="w-4 h-4 mr-2" />
-              取消生成
-            </Button>
-          )}
+          <Button
+            onClick={isGenerating ? cancelGeneration : generateCharacterData}
+            disabled={!isGenerating && !inputText.trim()}
+            variant={isGenerating ? "destructive" : "default"}
+            className="flex-1"
+          >
+            {isGenerating ? (
+              <>
+                <X className="w-4 h-4 mr-2" />
+                取消生成
+              </>
+            ) : (
+              <>
+                <Wand className="w-4 h-4 mr-2" />
+                {`AI分析生成 (${selectedType?.label})`}
+              </>
+            )}
+          </Button>
           
-          {parsedData && (
+          {parsedData && !isGenerating && (
             <Button
               onClick={generateCharacterData}
-              disabled={isGenerating}
               variant="outline"
               title="重新生成"
             >
