@@ -167,6 +167,7 @@ const BasicInfoSection = ({ data, updateField, characterImage, setCharacterImage
           onChange={(e) => updateField("description", e.target.value)}
           placeholder="详细描述角色的外观、背景、特征等..."
           className="mt-1 min-h-[120px] w-full max-w-none"
+          showCounter={true}
         />
       </div>
     </div>

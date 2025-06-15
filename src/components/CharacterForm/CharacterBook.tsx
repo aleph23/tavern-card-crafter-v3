@@ -163,6 +163,7 @@ const CharacterBook = ({ entries, updateField, aiSettings, characterData }: Char
             onChange={(e) => setNewEntryContent(e.target.value)}
             placeholder="条目内容..."
             className="min-h-[80px]"
+            showCounter={true}
           />
           <Button onClick={addBookEntry} size="sm">
             <Plus className="w-4 h-4 mr-2" />
@@ -186,7 +187,10 @@ const CharacterBook = ({ entries, updateField, aiSettings, characterData }: Char
               <div className="text-sm font-medium text-gray-700 mb-1">
                 关键词: {entry.keys.join(', ')}
               </div>
-              <p className="text-sm text-gray-600">{entry.content}</p>
+              <p className="text-sm text-gray-600 mb-2">{entry.content}</p>
+              <div className="text-xs text-gray-400">
+                字符: {entry.content.length} | Token: {Math.ceil(entry.content.length * 0.75)}
+              </div>
             </div>
           </div>
         ))}

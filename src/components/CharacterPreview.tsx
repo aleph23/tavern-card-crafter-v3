@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Copy, Download, ImageIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { estimateTokens } from "@/utils/aiGenerator";
 
 interface CharacterPreviewProps {
   characterData: any;
@@ -48,6 +49,33 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
     });
   };
 
+  // 计算总字符数和token数
+  const calculateTotalStats = () => {
+    const data = characterData.data;
+    let totalChars = 0;
+    let totalTokens = 0;
+
+    const fields = [
+      data.name, data.nickname, data.description, data.personality,
+      data.scenario, data.first_mes, data.mes_example, data.creator_notes,
+      data.system_prompt, data.post_history_instructions,
+      ...(data.alternate_greetings || []),
+      ...(data.tags || []).join(', '),
+      ...(data.character_book?.entries || []).map((entry: any) => entry.content).join(' ')
+    ];
+
+    fields.forEach(field => {
+      if (field && typeof field === 'string') {
+        totalChars += field.length;
+        totalTokens += estimateTokens(field);
+      }
+    });
+
+    return { totalChars, totalTokens };
+  };
+
+  const { totalChars, totalTokens } = calculateTotalStats();
+
   return (
     <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm h-fit sticky top-4">
       <CardHeader className="pb-4">
@@ -68,6 +96,10 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
             </Button>
           </div>
         </CardTitle>
+        <div className="text-sm text-gray-600 mt-2 flex gap-4">
+          <span>总字符: {totalChars}</span>
+          <span>总Token: {totalTokens}</span>
+        </div>
       </CardHeader>
       <CardContent>
         <ScrollArea className="h-[600px] custom-scrollbar">

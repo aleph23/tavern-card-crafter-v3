@@ -85,6 +85,7 @@ const PromptsSection = ({ data, updateField, aiSettings }: PromptsSectionProps) 
           onChange={(e) => updateField("system_prompt", e.target.value)}
           placeholder="给 AI 的系统级指令..."
           className="mt-1 min-h-[100px]"
+          showCounter={true}
         />
       </div>
 
@@ -111,6 +112,7 @@ const PromptsSection = ({ data, updateField, aiSettings }: PromptsSectionProps) 
           onChange={(e) => updateField("post_history_instructions", e.target.value)}
           placeholder="在聊天历史后出现的指令..."
           className="mt-1 min-h-[100px]"
+          showCounter={true}
         />
       </div>
 
@@ -122,6 +124,7 @@ const PromptsSection = ({ data, updateField, aiSettings }: PromptsSectionProps) 
           onChange={(e) => updateField("creator_notes", e.target.value)}
           placeholder="给其他用户的关于角色的说明..."
           className="mt-1 min-h-[100px]"
+          showCounter={true}
         />
       </div>
     </div>

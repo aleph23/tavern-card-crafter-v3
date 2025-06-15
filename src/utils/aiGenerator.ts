@@ -1,3 +1,4 @@
+
 import { AISettings } from "@/components/AISettings";
 
 export interface CharacterData {
@@ -11,6 +12,16 @@ export interface CharacterData {
   post_history_instructions?: string;
   tags?: string[];
 }
+
+// Token计算函数（粗略估算）
+export const estimateTokens = (text: string): number => {
+  // 中文字符按1.5个token计算，英文单词按平均4个字符计算
+  const chineseChars = (text.match(/[\u4e00-\u9fff]/g) || []).length;
+  const englishWords = (text.match(/[a-zA-Z]+/g) || []).length;
+  const otherChars = text.length - chineseChars - (text.match(/[a-zA-Z]/g) || []).length;
+  
+  return Math.ceil(chineseChars * 1.5 + englishWords + otherChars * 0.5);
+};
 
 export const generateWithAI = async (
   settings: AISettings,
@@ -44,7 +55,10 @@ export const generateWithAI = async (
   }
 
   const data = await response.json();
-  return data.choices[0]?.message?.content || "生成失败，请重试";
+  const content = data.choices[0]?.message?.content || "生成失败，请重试";
+  
+  // 清理生成内容的格式问题
+  return content.trim().replace(/^\s*\n+/, '');
 };
 
 export const generateDescription = (data: CharacterData): string => {
@@ -56,13 +70,13 @@ export const generateDescription = (data: CharacterData): string => {
 角色名称：${data.name}
 现有描述：${existingDescription}
 
-请在现有描述的基础上，补充角色的外观细节、身体特征、服装风格等描述性内容。只输出角色描述内容，不要包含角色名称和其他信息。请用中文回答。`;
+请在现有描述的基础上，补充角色的外观细节、身体特征、服装风格等描述性内容。只输出角色描述内容，不要包含角色名称和其他信息。请直接输出描述内容，不要添加总结或额外说明。请用中文回答。`;
   } else {
     return `根据角色名称生成详细的角色外观描述：
 
 角色名称：${data.name}
 
-请生成一个详细的角色外观描述，包括角色的身体特征、面部特征、服装风格、气质等。只输出角色描述内容，不要包含角色名称、背景故事或其他信息。请用中文回答。`;
+请生成一个详细的角色外观描述，包括角色的身体特征、面部特征、服装风格、气质等。只输出角色描述内容，不要包含角色名称、背景故事或其他信息。请直接输出描述内容，不要添加总结或额外说明。请用中文回答。`;
   }
 };
 
@@ -72,7 +86,7 @@ export const generatePersonality = (data: CharacterData): string => {
 角色名称：${data.name}
 角色描述：${data.description}
 
-请生成一个详细的性格描述，包括角色的行为模式、习惯、情感特征等。请用中文回答，内容要具体且符合角色设定。`;
+请生成一个详细的性格描述，包括角色的行为模式、习惯、情感特征等。请直接输出性格特征描述，不要包含总结段落或额外说明。请用中文回答，内容要具体且符合角色设定。`;
 };
 
 export const generateScenario = (data: CharacterData): string => {
@@ -82,7 +96,7 @@ export const generateScenario = (data: CharacterData): string => {
 角色描述：${data.description}
 性格特征：${data.personality}
 
-请生成一个详细的场景设定，描述角色所处的环境、背景和情境。请用中文回答，内容要具体且符合角色设定。`;
+请生成一个详细的场景设定，描述角色所处的环境、背景和情境。请直接输出场景描述，不要包含总结段落或额外说明。请用中文回答，内容要具体且符合角色设定。`;
 };
 
 export const generateFirstMessage = (data: CharacterData): string => {
@@ -172,9 +186,14 @@ export const generateCharacterBookEntry = (data: CharacterData, context?: string
 场景设定：${data.scenario}
 ${context ? `补充信息：${context}` : ''}
 
-请生成一个角色书条目，包含关键词和详细内容。格式如下：
-关键词: 相关的关键词（用逗号分隔）
-内容: 详细的背景信息或设定
+请生成一个角色书条目，用于补充角色的背景设定或特殊情况说明。
 
-请用中文回答，内容要丰富且有用。`;
+关键词要求：使用2-3个相关的核心关键词，用逗号分隔
+内容要求：生成具体的设定内容，如角色的特殊技能、重要经历、人际关系或物品等背景信息
+
+格式如下：
+关键词: 核心关键词1,核心关键词2
+内容: 详细的设定内容描述
+
+请用中文回答，内容要丰富且有助于角色扮演。`;
 };
