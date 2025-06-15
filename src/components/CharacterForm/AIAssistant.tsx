@@ -1,3 +1,4 @@
+
 import { useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -142,7 +143,7 @@ ${truncatedContent}
       console.log('Generated prompt length:', prompt.length);
       console.log('Prompt preview:', prompt.substring(0, 200) + '...');
       
-      const result = await generateWithAI(aiSettings, prompt);
+      const result = await generateWithAI(aiSettings, prompt, abortControllerRef.current.signal);
       console.log('AI result:', result);
       
       // 更强健的JSON解析
@@ -348,7 +349,7 @@ ${truncatedContent}
               variant="outline"
               title="重新生成"
             >
-              <RefreshCcw className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
+              <RefreshCcw className="w-4 h-4" />
             </Button>
           )}
         </div>
