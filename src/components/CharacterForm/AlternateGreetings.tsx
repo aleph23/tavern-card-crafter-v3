@@ -50,7 +50,7 @@ const AlternateGreetings = ({ greetings, updateField }: AlternateGreetingsProps)
     <div className="space-y-4">
       <h3 className="text-lg font-semibold text-gray-800 mb-4">备用问候语</h3>
       
-      <div>
+      <div className="form-group">
         <Label className="text-sm font-medium text-gray-700">添加新问候语</Label>
         <div className="flex gap-2 mt-1">
           <Textarea
@@ -68,8 +68,11 @@ const AlternateGreetings = ({ greetings, updateField }: AlternateGreetingsProps)
       <div className="space-y-3">
         {greetings.map((greeting, index) => (
           <div key={index} className="p-4 bg-gray-50 rounded-lg relative">
+            <div className="absolute top-2 left-2 bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full">
+              问候语 {index + 1}
+            </div>
             {editingIndex === index ? (
-              <div className="space-y-2">
+              <div className="space-y-2 pt-6">
                 <Textarea
                   value={editingText}
                   onChange={(e) => setEditingText(e.target.value)}
@@ -105,7 +108,7 @@ const AlternateGreetings = ({ greetings, updateField }: AlternateGreetingsProps)
                     <X className="w-4 h-4" />
                   </Button>
                 </div>
-                <p className="text-sm pr-16 whitespace-pre-wrap">{greeting}</p>
+                <p className="text-sm pr-16 pt-6 whitespace-pre-wrap">{greeting}</p>
               </>
             )}
           </div>
