@@ -1,4 +1,3 @@
-
 import { AISettings } from "@/components/AISettings";
 
 export interface CharacterData {
@@ -49,11 +48,22 @@ export const generateWithAI = async (
 };
 
 export const generateDescription = (data: CharacterData): string => {
-  return `根据以下角色名称生成详细的角色描述：
+  const existingDescription = data.description.trim();
+  
+  if (existingDescription) {
+    return `根据以下角色信息，完善和丰富角色描述，保持现有内容的基础上进行扩展：
+
+角色名称：${data.name}
+现有描述：${existingDescription}
+
+请在现有描述的基础上，补充角色的外观细节、身体特征、服装风格等描述性内容。只输出角色描述内容，不要包含角色名称和其他信息。请用中文回答。`;
+  } else {
+    return `根据角色名称生成详细的角色外观描述：
 
 角色名称：${data.name}
 
-请生成一个详细的角色描述，包括角色的外观、背景、身份、特征等。请用中文回答，内容要具体且生动。`;
+请生成一个详细的角色外观描述，包括角色的身体特征、面部特征、服装风格、气质等。只输出角色描述内容，不要包含角色名称、背景故事或其他信息。请用中文回答。`;
+  }
 };
 
 export const generatePersonality = (data: CharacterData): string => {
@@ -94,11 +104,19 @@ export const generateMessageExample = (data: CharacterData): string => {
 性格特征：${data.personality}
 场景设定：${data.scenario}
 
-请生成几段示例对话，展示角色的说话方式和风格。格式如下：
+请生成3-4段标准格式的对话示例，每个对话示例都必须以 <START> 开头。格式如下：
+
+<START>
+{{user}}: 用户的话
+${data.name}: 角色的回答
 {{user}}: 用户的话
 ${data.name}: 角色的回答
 
-请用中文回答，要符合角色性格。`;
+<START>
+{{user}}: 用户的话
+${data.name}: 角色的回答
+
+请确保每个对话示例都以 <START> 宏开头，展示角色的说话方式和风格。请用中文回答，要符合角色性格。`;
 };
 
 export const generateSystemPrompt = (data: CharacterData): string => {
