@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,7 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingText, setEditingText] = useState("");
   const [loading, setLoading] = useState(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
   const { toast } = useToast();
   const { t } = useLanguage();
 
@@ -74,6 +75,7 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
       return;
     }
 
+    abortControllerRef.current = new AbortController();
     setLoading(true);
     
     try {
@@ -85,13 +87,33 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
         description: t('alternateGreetingGenerated') || "备用问候语已生成完成"
       });
     } catch (error) {
-      toast({
-        title: t('generateError') || "生成失败",
-        description: error instanceof Error ? error.message : t('unknownError') || "未知错误",
-        variant: "destructive"
-      });
+      if (error instanceof Error && error.name === 'AbortError') {
+        toast({
+          title: "已取消",
+          description: "AI生成已被用户取消"
+        });
+      } else {
+        toast({
+          title: t('generateError') || "生成失败",
+          description: error instanceof Error ? error.message : t('unknownError') || "未知错误",
+          variant: "destructive"
+        });
+      }
     } finally {
       setLoading(false);
+      abortControllerRef.current = null;
+    }
+  };
+
+  const cancelGeneration = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      setLoading(false);
+      abortControllerRef.current = null;
+      toast({
+        title: "已取消",
+        description: "AI生成已取消"
+      });
     }
   };
 
@@ -108,33 +130,35 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">{t('alternateGreetings')}</h3>
         <div className="flex gap-1">
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={handleAIGenerateGreeting}
-            disabled={loading}
-            className="h-8 px-2 text-xs"
-          >
-            {loading ? (
-              <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-            ) : (
+          {!loading && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleAIGenerateGreeting}
+              className="h-8 px-2 text-xs"
+            >
               <RefreshCcw className="w-3 h-3 mr-1" />
-            )}
-            重新生成
-          </Button>
+              重新生成
+            </Button>
+          )}
           <Button
             size="sm"
-            variant="outline"
-            onClick={handleAIGenerateGreeting}
-            disabled={loading}
+            variant={loading ? "destructive" : "outline"}
+            onClick={loading ? cancelGeneration : handleAIGenerateGreeting}
+            disabled={!loading && (!characterData.name || !characterData.description)}
             className="h-8 px-2 text-xs"
           >
             {loading ? (
-              <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+              <>
+                <X className="w-3 h-3 mr-1" />
+                取消
+              </>
             ) : (
-              <Sparkles className="w-3 h-3 mr-1" />
+              <>
+                <Sparkles className="w-3 h-3 mr-1" />
+                AI生成
+              </>
             )}
-            AI生成
           </Button>
           <Button
             size="sm"
