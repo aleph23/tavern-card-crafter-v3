@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Plus, X, Edit2, Check, Sparkles, Loader2 } from "lucide-react";
+import { Plus, X, Edit2, Check, Sparkles, Loader2, RefreshCcw, Trash2 } from "lucide-react";
 import { generateWithAI, generateAlternateGreeting } from "@/utils/aiGenerator";
 import { AISettings } from "@/components/AISettings";
 import { useToast } from "@/hooks/use-toast";
@@ -56,7 +56,7 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
   };
 
   const handleAIGenerateGreeting = async () => {
-    if (!aiSettings?.apiKey) {
+    if (!aiSettings?.apiKey && !['ollama', 'lmstudio'].includes(aiSettings?.provider?.toLowerCase() || '')) {
       toast({
         title: t('configError') || "配置错误",
         description: t('configApiKey') || "请先在AI设置中配置API密钥",
@@ -95,23 +95,57 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
     }
   };
 
+  const handleClearAll = () => {
+    updateField("alternate_greetings", []);
+    toast({
+      title: "已清空",
+      description: "所有备选问候语已清空"
+    });
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">{t('alternateGreetings')}</h3>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={handleAIGenerateGreeting}
-          disabled={loading}
-        >
-          {loading ? (
-            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-          ) : (
-            <Sparkles className="w-4 h-4 mr-2" />
-          )}
-          {t('aiGenerateGreeting') || 'AI生成问候语'}
-        </Button>
+        <div className="flex gap-1">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleAIGenerateGreeting}
+            disabled={loading}
+            className="h-8 px-2 text-xs"
+          >
+            {loading ? (
+              <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+            ) : (
+              <RefreshCcw className="w-3 h-3 mr-1" />
+            )}
+            重新生成
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleAIGenerateGreeting}
+            disabled={loading}
+            className="h-8 px-2 text-xs"
+          >
+            {loading ? (
+              <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+            ) : (
+              <Sparkles className="w-3 h-3 mr-1" />
+            )}
+            AI生成
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleClearAll}
+            className="h-8 px-2 text-xs"
+          >
+            <Trash2 className="w-3 h-3 mr-1" />
+            清空
+          </Button>
+        </div>
       </div>
       
       <div className="form-group">

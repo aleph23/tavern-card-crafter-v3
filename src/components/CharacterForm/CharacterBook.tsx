@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Plus, X, Sparkles, Loader2 } from "lucide-react";
+import { Plus, X, Sparkles, Loader2, RefreshCcw, Trash2 } from "lucide-react";
 import { generateWithAI, generateCharacterBookEntry } from "@/utils/aiGenerator";
 import { AISettings } from "@/components/AISettings";
 import { useToast } from "@/hooks/use-toast";
@@ -55,7 +55,7 @@ const CharacterBook = ({ entries, updateField, aiSettings, characterData }: Char
   };
 
   const handleAIGenerateEntry = async () => {
-    if (!aiSettings?.apiKey) {
+    if (!aiSettings?.apiKey && !['ollama', 'lmstudio'].includes(aiSettings?.provider?.toLowerCase() || '')) {
       toast({
         title: "配置错误",
         description: "请先在AI设置中配置API密钥",
@@ -131,23 +131,57 @@ const CharacterBook = ({ entries, updateField, aiSettings, characterData }: Char
     }
   };
 
+  const handleClearAll = () => {
+    updateField("character_book", { entries: [] });
+    toast({
+      title: "已清空",
+      description: "所有角色书条目已清空"
+    });
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-gray-800 mb-4">角色书</h3>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={handleAIGenerateEntry}
-          disabled={loading}
-        >
-          {loading ? (
-            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-          ) : (
-            <Sparkles className="w-4 h-4 mr-2" />
-          )}
-          AI生成条目
-        </Button>
+        <div className="flex gap-1">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleAIGenerateEntry}
+            disabled={loading}
+            className="h-8 px-2 text-xs"
+          >
+            {loading ? (
+              <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+            ) : (
+              <RefreshCcw className="w-3 h-3 mr-1" />
+            )}
+            重新生成
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleAIGenerateEntry}
+            disabled={loading}
+            className="h-8 px-2 text-xs"
+          >
+            {loading ? (
+              <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+            ) : (
+              <Sparkles className="w-3 h-3 mr-1" />
+            )}
+            AI生成条目
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleClearAll}
+            className="h-8 px-2 text-xs"
+          >
+            <Trash2 className="w-3 h-3 mr-1" />
+            清空
+          </Button>
+        </div>
       </div>
       
       <div>
