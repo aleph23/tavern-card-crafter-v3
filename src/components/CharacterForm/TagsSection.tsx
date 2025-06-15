@@ -8,6 +8,7 @@ import { X, Plus, Sparkles, Loader2 } from "lucide-react";
 import { generateWithAI, generateTags } from "@/utils/aiGenerator";
 import { AISettings } from "@/components/AISettings";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface TagsSectionProps {
   tags: string[];
@@ -20,6 +21,7 @@ const TagsSection = ({ tags, updateField, aiSettings, characterData }: TagsSecti
   const [newTag, setNewTag] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const addTag = () => {
     if (newTag.trim() && !tags.includes(newTag.trim())) {
@@ -42,8 +44,8 @@ const TagsSection = ({ tags, updateField, aiSettings, characterData }: TagsSecti
   const handleAIGenerateTags = async () => {
     if (!aiSettings?.apiKey) {
       toast({
-        title: "配置错误",
-        description: "请先在AI设置中配置API密钥",
+        title: t('configError') || "配置错误",
+        description: t('configApiKey') || "请先在AI设置中配置API密钥",
         variant: "destructive"
       });
       return;
@@ -51,8 +53,8 @@ const TagsSection = ({ tags, updateField, aiSettings, characterData }: TagsSecti
 
     if (!characterData.name || !characterData.description) {
       toast({
-        title: "信息不完整",
-        description: "请先填写角色名称和角色描述",
+        title: t('incompleteInfo') || "信息不完整",
+        description: t('fillNameDesc') || "请先填写角色名称和角色描述",
         variant: "destructive"
       });
       return;
@@ -70,13 +72,13 @@ const TagsSection = ({ tags, updateField, aiSettings, characterData }: TagsSecti
       
       updateField("tags", uniqueTags);
       toast({
-        title: "生成成功",
-        description: "标签已生成完成"
+        title: t('generateSuccess') || "生成成功",
+        description: t('tagsGenerated') || "标签已生成完成"
       });
     } catch (error) {
       toast({
-        title: "生成失败",
-        description: error instanceof Error ? error.message : "未知错误",
+        title: t('generateError') || "生成失败",
+        description: error instanceof Error ? error.message : t('unknownError') || "未知错误",
         variant: "destructive"
       });
     } finally {
@@ -87,7 +89,7 @@ const TagsSection = ({ tags, updateField, aiSettings, characterData }: TagsSecti
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-800">标签</h3>
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{t('tags')}</h3>
         <Button
           size="sm"
           variant="outline"
@@ -99,7 +101,7 @@ const TagsSection = ({ tags, updateField, aiSettings, characterData }: TagsSecti
           ) : (
             <Sparkles className="w-4 h-4 mr-2" />
           )}
-          AI生成标签
+          {t('aiGenerateTags') || 'AI生成标签'}
         </Button>
       </div>
       
@@ -108,10 +110,10 @@ const TagsSection = ({ tags, updateField, aiSettings, characterData }: TagsSecti
           value={newTag}
           onChange={(e) => setNewTag(e.target.value)}
           onKeyPress={handleKeyPress}
-          placeholder="输入标签..."
+          placeholder={t('enterTag') || "输入标签..."}
           className="flex-1"
         />
-        <Button onClick={addTag} size="sm">
+        <Button onClick={addTag} size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground">
           <Plus className="w-4 h-4" />
         </Button>
       </div>

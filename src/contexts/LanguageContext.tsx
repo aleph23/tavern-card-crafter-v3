@@ -19,6 +19,8 @@ const translations = {
     copy: '复制',
     exportJson: '导出 JSON',
     exportPng: '导出 PNG',
+    save: '保存',
+    cancel: '取消',
     
     // 表单标题
     characterInfo: '角色信息编辑',
@@ -64,6 +66,36 @@ const translations = {
     // AI 生成
     aiGenerate: 'AI 生成',
     generating: '生成中...',
+    generateSuccess: '生成成功',
+    generateError: '生成失败',
+    configError: '配置错误',
+    configApiKey: '请先在AI设置中配置API密钥',
+    incompleteInfo: '信息不完整',
+    fillNameDesc: '请先填写角色名称和角色描述',
+    unknownError: '未知错误',
+    
+    // 备选问候语
+    addNewGreeting: '添加新问候语',
+    addAlternateGreetingPlaceholder: '添加备用问候语...',
+    aiGenerateGreeting: 'AI生成问候语',
+    alternateGreetingGenerated: '备用问候语已生成完成',
+    greeting: '问候语',
+    
+    // 标签
+    enterTag: '输入标签...',
+    aiGenerateTags: 'AI生成标签',
+    tagsGenerated: '标签已生成完成',
+    
+    // 角色书
+    addNewEntry: '添加新条目',
+    addEntry: '添加条目',
+    aiGenerateEntry: 'AI生成条目',
+    entryGenerated: '角色书条目已生成完成',
+    entry: '条目',
+    keywords: '关键词',
+    content: '内容',
+    insertionOrder: '插入顺序',
+    enabled: '启用',
     
     // 主题切换
     lightMode: '浅色模式',
@@ -80,6 +112,8 @@ const translations = {
     copy: 'Copy',
     exportJson: 'Export JSON',
     exportPng: 'Export PNG',
+    save: 'Save',
+    cancel: 'Cancel',
     
     // Form titles
     characterInfo: 'Character Information Editor',
@@ -125,6 +159,36 @@ const translations = {
     // AI Generation
     aiGenerate: 'AI Generate',
     generating: 'Generating...',
+    generateSuccess: 'Generation Successful',
+    generateError: 'Generation Failed',
+    configError: 'Configuration Error',
+    configApiKey: 'Please configure API key in AI settings first',
+    incompleteInfo: 'Incomplete Information',
+    fillNameDesc: 'Please fill in character name and description first',
+    unknownError: 'Unknown Error',
+    
+    // Alternate Greetings
+    addNewGreeting: 'Add New Greeting',
+    addAlternateGreetingPlaceholder: 'Add alternate greeting...',
+    aiGenerateGreeting: 'AI Generate Greeting',
+    alternateGreetingGenerated: 'Alternate greeting has been generated',
+    greeting: 'Greeting',
+    
+    // Tags
+    enterTag: 'Enter tag...',
+    aiGenerateTags: 'AI Generate Tags',
+    tagsGenerated: 'Tags have been generated',
+    
+    // Character Book
+    addNewEntry: 'Add New Entry',
+    addEntry: 'Add Entry',
+    aiGenerateEntry: 'AI Generate Entry',
+    entryGenerated: 'Character book entry has been generated',
+    entry: 'Entry',
+    keywords: 'Keywords',
+    content: 'Content',
+    insertionOrder: 'Insertion Order',
+    enabled: 'Enabled',
     
     // Theme toggle
     lightMode: 'Light Mode',

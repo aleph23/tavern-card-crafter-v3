@@ -7,6 +7,7 @@ import { Plus, X, Edit2, Check, Sparkles, Loader2 } from "lucide-react";
 import { generateWithAI, generateAlternateGreeting } from "@/utils/aiGenerator";
 import { AISettings } from "@/components/AISettings";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface AlternateGreetingsProps {
   greetings: string[];
@@ -21,6 +22,7 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
   const [editingText, setEditingText] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const addGreeting = () => {
     if (newGreeting.trim()) {
@@ -56,8 +58,8 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
   const handleAIGenerateGreeting = async () => {
     if (!aiSettings?.apiKey) {
       toast({
-        title: "配置错误",
-        description: "请先在AI设置中配置API密钥",
+        title: t('configError') || "配置错误",
+        description: t('configApiKey') || "请先在AI设置中配置API密钥",
         variant: "destructive"
       });
       return;
@@ -65,8 +67,8 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
 
     if (!characterData.name || !characterData.description) {
       toast({
-        title: "信息不完整",
-        description: "请先填写角色名称和角色描述",
+        title: t('incompleteInfo') || "信息不完整",
+        description: t('fillNameDesc') || "请先填写角色名称和角色描述",
         variant: "destructive"
       });
       return;
@@ -79,13 +81,13 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
       const result = await generateWithAI(aiSettings, prompt);
       updateField("alternate_greetings", [...greetings, result]);
       toast({
-        title: "生成成功",
-        description: "备用问候语已生成完成"
+        title: t('generateSuccess') || "生成成功",
+        description: t('alternateGreetingGenerated') || "备用问候语已生成完成"
       });
     } catch (error) {
       toast({
-        title: "生成失败",
-        description: error instanceof Error ? error.message : "未知错误",
+        title: t('generateError') || "生成失败",
+        description: error instanceof Error ? error.message : t('unknownError') || "未知错误",
         variant: "destructive"
       });
     } finally {
@@ -96,7 +98,7 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">备用问候语</h3>
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">{t('alternateGreetings')}</h3>
         <Button
           size="sm"
           variant="outline"
@@ -108,20 +110,20 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
           ) : (
             <Sparkles className="w-4 h-4 mr-2" />
           )}
-          AI生成问候语
+          {t('aiGenerateGreeting') || 'AI生成问候语'}
         </Button>
       </div>
       
       <div className="form-group">
-        <Label className="text-sm font-medium text-gray-700">添加新问候语</Label>
+        <Label className="text-sm font-medium text-gray-700 dark:text-gray-200">{t('addNewGreeting') || '添加新问候语'}</Label>
         <div className="flex gap-2 mt-1">
           <Textarea
             value={newGreeting}
             onChange={(e) => setNewGreeting(e.target.value)}
-            placeholder="添加备用问候语..."
+            placeholder={t('addAlternateGreetingPlaceholder') || "添加备用问候语..."}
             className="min-h-[60px]"
           />
-          <Button onClick={addGreeting} size="sm" className="self-end">
+          <Button onClick={addGreeting} size="sm" className="self-end bg-primary hover:bg-primary/90 text-primary-foreground">
             <Plus className="w-4 h-4" />
           </Button>
         </div>
@@ -129,9 +131,9 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
 
       <div className="space-y-3">
         {greetings.map((greeting, index) => (
-          <div key={index} className="p-4 bg-gray-50 rounded-lg relative">
-            <div className="absolute top-2 left-2 bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full">
-              问候语 {index + 1}
+          <div key={index} className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg relative">
+            <div className="absolute top-2 left-2 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs font-medium px-2 py-1 rounded-full">
+              {t('greeting') || '问候语'} {index + 1}
             </div>
             {editingIndex === index ? (
               <div className="space-y-2 pt-6">
@@ -143,10 +145,10 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
                 <div className="flex gap-2">
                   <Button onClick={saveEdit} size="sm" variant="default">
                     <Check className="w-4 h-4 mr-1" />
-                    保存
+                    {t('save') || '保存'}
                   </Button>
                   <Button onClick={cancelEdit} size="sm" variant="outline">
-                    取消
+                    {t('cancel') || '取消'}
                   </Button>
                 </div>
               </div>
@@ -170,7 +172,7 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
                     <X className="w-4 h-4" />
                   </Button>
                 </div>
-                <p className="text-sm pr-16 pt-6 whitespace-pre-wrap">{greeting}</p>
+                <p className="text-sm pr-16 pt-6 whitespace-pre-wrap text-gray-700 dark:text-gray-200">{greeting}</p>
               </>
             )}
           </div>
