@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -45,74 +44,73 @@ const AIAssistant = ({ aiSettings, onInsertField }: AIAssistantProps) => {
   const [isGenerating, setIsGenerating] = useState(false);
 
   const getPromptByType = (type: string, content: string) => {
-    const baseInstructions = `请根据以下内容生成详细的角色卡信息。要求：
-1. 信息要丰富详细，不要过于简短
-2. 描述要生动具体，包含细节
-3. 对话示例要体现角色的独特说话风格
-4. 系统提示词要详细指导AI如何扮演该角色
-5. 即使原文信息有限，也要合理推理和扩展
+    // 限制输入内容长度，避免提示词过长
+    const truncatedContent = content.length > 2000 ? content.substring(0, 2000) + "..." : content;
+    
+    const baseInstructions = `请根据以下内容生成角色卡信息。
 
 输入内容：
-${content}
+${truncatedContent}
 
-请严格按照以下JSON格式输出：`;
+请严格按照JSON格式输出，不要添加任何其他文字：`;
+
+    const jsonFormat = `
+{
+  "name": "角色名称",
+  "description": "详细的角色外观描述",
+  "personality": "详细的性格特征描述",
+  "scenario": "详细的场景设定描述",
+  "first_mes": "角色的开场白",
+  "mes_example": "对话示例，格式：<START>\\n{{user}}: 用户话语\\n角色名: 角色回答",
+  "system_prompt": "系统提示词，指导AI如何扮演这个角色",
+  "post_history_instructions": "历史后指令",
+  "tags": ["相关标签"],
+  "creator_notes": "创作者备注"
+}`;
 
     const typeSpecificPrompts = {
       general: `${baseInstructions}
 
-根据内容智能分析角色类型并提取信息。无论是什么类型的内容，都要尽可能详细地生成各个字段。`,
+根据内容智能分析并提取角色信息。${jsonFormat}`,
 
       anime: `${baseInstructions}
 
-这是一个动漫角色，请按照动漫角色的特点生成：
-- description: 详细描述外观、服装、身材特征，包括发色、眼色、身高等
-- personality: 详细的性格特征，包括说话习惯、行为模式、情感表达方式
-- scenario: 角色所在的动漫世界背景，包括时代、地点、社会环境
-- first_mes: 符合动漫角色风格的开场白，要有个性
-- mes_example: 多个对话示例，展现角色的说话风格和性格特点`,
+这是动漫角色，请生成：
+- description: 详细描述外观、服装、身材特征
+- personality: 详细的性格特征和说话习惯
+- scenario: 动漫世界背景设定
+- first_mes: 符合动漫角色风格的开场白
+- mes_example: 体现角色说话风格的对话示例${jsonFormat}`,
 
       game: `${baseInstructions}
 
-这是一个游戏角色，请按照游戏角色的特点生成：
-- description: 详细的角色外观、装备、特殊能力的描述
-- personality: 角色的性格特征、战斗风格、价值观念
-- scenario: 游戏世界的背景设定，包括世界观、时代背景、角色定位
+这是游戏角色，请生成：
+- description: 角色外观、装备、特殊能力描述
+- personality: 性格特征、战斗风格、价值观念
+- scenario: 游戏世界背景设定
 - first_mes: 符合游戏角色身份的开场白
-- mes_example: 包含战斗、日常对话等多种场景的对话示例`,
+- mes_example: 包含多种场景的对话示例${jsonFormat}`,
 
       novel: `${baseInstructions}
 
-这是一个小说角色，请按照文学角色的特点生成：
-- description: 细致的外貌描写，符合文学作品的描述风格
-- personality: 深层的心理特征、性格复杂性、内心矛盾
-- scenario: 小说的时代背景、社会环境、角色所处的具体情境
-- first_mes: 富有文学色彩的开场白，体现角色的教养和背景
-- mes_example: 体现角色思想深度和语言特色的对话`,
+这是小说角色，请生成：
+- description: 细致的外貌描写
+- personality: 深层心理特征、性格复杂性
+- scenario: 小说时代背景、环境设定
+- first_mes: 富有文学色彩的开场白
+- mes_example: 体现角色思想深度的对话${jsonFormat}`,
 
       historical: `${baseInstructions}
 
-这是一个历史人物，请按照历史人物的特点生成：
-- description: 基于史料的外貌描述，包括时代特征的服饰
-- personality: 基于历史记录的性格特征、处世哲学、领导风格
-- scenario: 详细的历史背景，包括时代、政治环境、社会状况
-- first_mes: 符合历史人物身份和时代背景的开场白
-- mes_example: 体现历史人物智慧和时代特色的对话示例`
+这是历史人物，请生成：
+- description: 基于史料的外貌和服饰描述
+- personality: 基于历史记录的性格特征
+- scenario: 详细的历史背景环境
+- first_mes: 符合历史人物身份的开场白
+- mes_example: 体现历史人物智慧的对话${jsonFormat}`
     };
 
-    return typeSpecificPrompts[type as keyof typeof typeSpecificPrompts] + `
-
-{
-  "name": "角色名称",
-  "description": "详细的角色外观描述（至少200字）",
-  "personality": "详细的性格特征描述（至少200字）",
-  "scenario": "详细的场景设定描述（至少150字）",
-  "first_mes": "角色的开场白/首条消息（至少50字）",
-  "mes_example": "详细的对话示例，格式：<START>\\n{{user}}: 用户话语\\n角色名: 角色回答（包含多轮对话）",
-  "system_prompt": "详细的系统提示词，指导AI如何扮演这个角色（至少100字）",
-  "post_history_instructions": "历史后指令，对话中的额外指导",
-  "tags": ["相关标签数组"],
-  "creator_notes": "创作者备注或额外说明"
-}`;
+    return typeSpecificPrompts[type as keyof typeof typeSpecificPrompts] || typeSpecificPrompts.general;
   };
 
   const generateCharacterData = async () => {
@@ -137,26 +135,44 @@ ${content}
     setIsGenerating(true);
     try {
       const prompt = getPromptByType(characterType, inputText);
-      const result = await generateWithAI(aiSettings, prompt);
+      console.log('Generated prompt length:', prompt.length);
+      console.log('Prompt preview:', prompt.substring(0, 200) + '...');
       
-      // 尝试解析JSON
+      const result = await generateWithAI(aiSettings, prompt);
+      console.log('AI result:', result);
+      
+      // 更强健的JSON解析
       try {
-        const jsonMatch = result.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          const parsed = JSON.parse(jsonMatch[0]);
-          setParsedData(parsed);
+        // 首先尝试直接解析整个结果
+        let jsonData;
+        try {
+          jsonData = JSON.parse(result);
+        } catch {
+          // 如果失败，尝试提取JSON部分
+          const jsonMatch = result.match(/\{[\s\S]*\}/);
+          if (jsonMatch) {
+            jsonData = JSON.parse(jsonMatch[0]);
+          } else {
+            throw new Error("未找到有效的JSON格式");
+          }
+        }
+        
+        // 验证解析结果是否包含基本字段
+        if (typeof jsonData === 'object' && jsonData !== null) {
+          setParsedData(jsonData);
           toast({
             title: "生成成功",
             description: "角色信息已成功解析，可以一键插入到表单中"
           });
         } else {
-          throw new Error("未找到有效的JSON格式");
+          throw new Error("解析结果格式不正确");
         }
       } catch (parseError) {
         console.error('JSON解析失败:', parseError);
+        console.error('原始结果:', result);
         toast({
           title: "解析失败",
-          description: "生成的内容格式有误，请重试",
+          description: "生成的内容格式有误，请重试或检查AI设置",
           variant: "destructive"
         });
       }
@@ -164,7 +180,7 @@ ${content}
       console.error('生成失败:', error);
       toast({
         title: "生成失败",
-        description: error instanceof Error ? error.message : "未知错误",
+        description: error instanceof Error ? error.message : "未知错误，请检查AI设置或网络连接",
         variant: "destructive"
       });
     } finally {
@@ -314,7 +330,7 @@ ${content}
               </Button>
             </div>
             
-            <div className="space-y-3 max-h-[400px] overflow-y-auto bg-gray-50 dark:bg-gray-800 rounded-lg p-3 custom-scrollbar">
+            <div className="space-y-3 max-h-[400px] overflow-y-auto bg-gray-50 dark:bg-gray-800 rounded-lg p-3 scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-300 dark:scrollbar-track-gray-700 dark:scrollbar-thumb-gray-600 hover:scrollbar-thumb-gray-400 dark:hover:scrollbar-thumb-gray-500">
               {Object.entries(parsedData).map(([key, value]) => {
                 if (!value || (Array.isArray(value) && value.length === 0)) return null;
                 
