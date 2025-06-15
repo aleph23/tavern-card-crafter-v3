@@ -91,12 +91,21 @@ const Index = () => {
     const savedSettings = localStorage.getItem('ai-settings');
     if (savedSettings) {
       try {
-        setAISettings(JSON.parse(savedSettings));
+        const parsedSettings = JSON.parse(savedSettings);
+        setAISettings(parsedSettings);
       } catch (error) {
         console.error('Failed to load AI settings:', error);
       }
     }
   }, []);
+
+  const handleAISettingsChange = (newSettings: AISettingsType) => {
+    setAISettings(newSettings);
+    toast({
+      title: "设置已更新",
+      description: "AI设置已成功更新并保存",
+    });
+  };
 
   const updateField = (field: string, value: any) => {
     setCharacterData(prev => ({
@@ -226,7 +235,7 @@ const Index = () => {
               导入角色卡
             </Button>
             <AISettings 
-              onSettingsChange={setAISettings} 
+              onSettingsChange={handleAISettingsChange} 
               currentSettings={aiSettings}
             />
           </div>
