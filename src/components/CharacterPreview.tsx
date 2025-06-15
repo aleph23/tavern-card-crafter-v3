@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -152,6 +153,27 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
 
   const { totalChars, totalTokens } = calculateTotalStats();
 
+  // JSON语法高亮函数
+  const syntaxHighlight = (json: string) => {
+    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, (match) => {
+      let cls = 'text-yellow-300'; // 默认颜色 - 数字和其他
+      if (/^"/.test(match)) {
+        if (/:$/.test(match)) {
+          cls = 'text-blue-300 font-semibold'; // 键名 - 蓝色加粗
+        } else {
+          cls = 'text-green-300'; // 字符串值 - 绿色
+        }
+      } else if (/true|false/.test(match)) {
+        cls = 'text-purple-300'; // 布尔值 - 紫色
+      } else if (/null/.test(match)) {
+        cls = 'text-red-300'; // null值 - 红色
+      }
+      return `<span class="${cls}">${match}</span>`;
+    });
+  };
+
+  const highlightedJson = syntaxHighlight(JSON.stringify(characterData, null, 2));
+
   return (
     <Card className="shadow-lg border-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
       <CardHeader className="pb-4">
@@ -179,9 +201,12 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
       </CardHeader>
       <CardContent>
         <ScrollArea className="h-[600px] custom-scrollbar">
-          <pre className="bg-gray-900 dark:bg-gray-800 text-green-400 p-4 rounded-lg text-sm font-mono whitespace-pre-wrap break-all">
-            {JSON.stringify(characterData, null, 2)}
-          </pre>
+          <div className="bg-gray-900 dark:bg-gray-800 p-4 rounded-lg text-sm font-mono whitespace-pre-wrap break-all">
+            <div 
+              className="text-gray-300"
+              dangerouslySetInnerHTML={{ __html: highlightedJson }}
+            />
+          </div>
         </ScrollArea>
       </CardContent>
     </Card>
