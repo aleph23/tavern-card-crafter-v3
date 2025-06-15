@@ -1,4 +1,3 @@
-
 import { AISettings } from "@/components/AISettings";
 
 export interface CharacterData {
@@ -63,9 +62,11 @@ export const generateWithAI = async (
   settings: AISettings,
   prompt: string
 ): Promise<string> => {
-  // 修复本地服务的密钥检查逻辑 - 不再要求Ollama和LM Studio输入密钥
-  const requiresKey = !['ollama', 'lmstudio'].includes(settings.provider);
+  // 明定定义不需要密钥的本地服务
+  const localServices = ['ollama', 'lmstudio'];
+  const requiresKey = !localServices.includes(settings.provider.toLowerCase());
   
+  // 只有非本地服务才检查密钥
   if (requiresKey && !settings.apiKey) {
     throw new Error("请先在AI设置中配置API密钥");
   }
@@ -81,6 +82,7 @@ export const generateWithAI = async (
     console.log('Generating with AI using URL:', apiUrl);
     console.log('Provider:', settings.provider);
     console.log('Model:', settings.model);
+    console.log('Requires API key:', requiresKey);
 
     // 使用统一的OpenAI兼容格式
     let headers: any = {
@@ -130,7 +132,7 @@ export const generateWithAI = async (
       }
       
       // 针对本地服务的特殊错误提示
-      if (['ollama', 'lmstudio'].includes(settings.provider)) {
+      if (localServices.includes(settings.provider.toLowerCase())) {
         if (response.status === 400 || errorText.includes('model')) {
           errorMessage = `模型"${settings.model}"不存在或未加载。请在AI设置中获取可用模型列表，或确保已下载/加载该模型。`;
         }
@@ -142,8 +144,36 @@ export const generateWithAI = async (
     const data = await response.json();
     console.log('API Response:', data);
     
-    // 使用统一的OpenAI兼容响应格式解析
-    const content = data.choices?.[0]?.message?.content || "生成失败，请重试";
+    // 改进的响应内容解析 - 处理空响应和多种响应格式
+    let content = '';
+    
+    if (data.choices && data.choices.length > 0) {
+      const choice = data.choices[0];
+      if (choice.message && choice.message.content) {
+        content = choice.message.content;
+      } else if (choice.delta && choice.delta.content) {
+        content = choice.delta.content;
+      } else if (choice.text) {
+        content = choice.text;
+      }
+    }
+    
+    // 如果仍然没有内容，尝试其他可能的响应格式
+    if (!content) {
+      if (data.response) {
+        content = data.response;
+      } else if (data.text) {
+        content = data.text;
+      } else if (data.content) {
+        content = data.content;
+      }
+    }
+    
+    // 检查是否获取到有效内容
+    if (!content || content.trim() === '') {
+      console.error('Empty response received:', data);
+      throw new Error("API返回空响应，可能是配额不足或模型过载，请稍后重试或更换模型");
+    }
     
     // 清理生成内容的格式问题
     return content.trim().replace(/^\s*\n+/, '');
