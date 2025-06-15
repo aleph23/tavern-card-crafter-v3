@@ -132,22 +132,101 @@ const Index = () => {
           if (file.name.endsWith('.json')) {
             parsedData = JSON.parse(content);
           } else if (file.name.endsWith('.png')) {
-            // 处理PNG文件，尝试从中提取角色卡数据
+            // 处理PNG文件，从中提取角色卡数据
             try {
-              // PNG文件中的角色卡数据通常存储在特定的文本块中
-              // 这里我们尝试在base64数据中查找JSON数据
+              // PNG文件通常将角色卡数据存储在tEXt块中
               const base64Data = content.split(',')[1];
               const binaryString = atob(base64Data);
+              const uint8Array = new Uint8Array(binaryString.length);
               
-              // 查找可能的JSON数据标记
-              const jsonStart = binaryString.indexOf('{"spec"');
-              const jsonEnd = binaryString.lastIndexOf('}}') + 2;
+              for (let i = 0; i < binaryString.length; i++) {
+                uint8Array[i] = binaryString.charCodeAt(i);
+              }
               
-              if (jsonStart !== -1 && jsonEnd > jsonStart) {
-                const jsonString = binaryString.substring(jsonStart, jsonEnd);
-                parsedData = JSON.parse(jsonString);
+              // 查找PNG文件中的tEXt块
+              let foundData = null;
+              
+              // 查找 "chara" 关键字的tEXt块
+              const charaKeyword = new TextEncoder().encode('chara');
+              for (let i = 0; i < uint8Array.length - charaKeyword.length - 4; i++) {
+                // 检查是否找到tEXt块标识符
+                if (uint8Array[i] === 0x74 && uint8Array[i+1] === 0x45 && 
+                    uint8Array[i+2] === 0x58 && uint8Array[i+3] === 0x74) {
+                  // 跳过tEXt标识符
+                  let pos = i + 4;
+                  
+                  // 查找关键字
+                  let keywordMatch = true;
+                  for (let j = 0; j < charaKeyword.length; j++) {
+                    if (uint8Array[pos + j] !== charaKeyword[j]) {
+                      keywordMatch = false;
+                      break;
+                    }
+                  }
+                  
+                  if (keywordMatch) {
+                    // 跳过关键字和null终止符
+                    pos += charaKeyword.length + 1;
+                    
+                    // 读取数据直到块结束
+                    let dataStart = pos;
+                    let dataEnd = dataStart;
+                    
+                    // 找到数据的结束位置
+                    while (dataEnd < uint8Array.length && uint8Array[dataEnd] !== 0) {
+                      dataEnd++;
+                    }
+                    
+                    // 提取base64编码的角色卡数据
+                    const encodedData = new TextDecoder().decode(uint8Array.slice(dataStart, dataEnd));
+                    
+                    try {
+                      // 解码base64数据
+                      const decodedData = atob(encodedData);
+                      foundData = JSON.parse(decodedData);
+                      break;
+                    } catch (decodeError) {
+                      // 如果解码失败，尝试直接解析
+                      try {
+                        foundData = JSON.parse(encodedData);
+                        break;
+                      } catch (parseError) {
+                        continue;
+                      }
+                    }
+                  }
+                }
+              }
+              
+              // 如果没有找到tEXt块中的数据，尝试其他方法
+              if (!foundData) {
+                // 尝试查找JSON格式的字符串
+                const textDecoder = new TextDecoder('utf-8', { fatal: false });
+                const text = textDecoder.decode(uint8Array);
+                
+                // 查找可能的JSON数据模式
+                const jsonPatterns = [
+                  /\{"spec":"chara_card_v[23]".*?\}\}/s,
+                  /\{"name":".*?".*?"description":".*?\}/s,
+                  /\{"data":\{.*?\}\}/s
+                ];
+                
+                for (const pattern of jsonPatterns) {
+                  const match = text.match(pattern);
+                  if (match) {
+                    try {
+                      foundData = JSON.parse(match[0]);
+                      break;
+                    } catch (e) {
+                      continue;
+                    }
+                  }
+                }
+              }
+              
+              if (foundData) {
+                parsedData = foundData;
               } else {
-                // 如果没有找到角色卡数据，提示用户
                 toast({
                   title: t('hint') || "提示",
                   description: "此PNG文件中未找到角色卡数据，请确保使用包含角色卡信息的PNG文件",
@@ -156,6 +235,7 @@ const Index = () => {
                 return;
               }
             } catch (pngError) {
+              console.error('PNG processing error:', pngError);
               toast({
                 title: t('hint') || "提示",
                 description: "无法从PNG文件中提取角色卡数据，请尝试使用JSON格式文件",
@@ -228,6 +308,7 @@ const Index = () => {
             description: t('importSuccessDesc'),
           });
         } catch (error) {
+          console.error('Import error:', error);
           toast({
             title: t('importError'),
             description: t('importErrorDesc'),
