@@ -156,28 +156,40 @@ const Index = () => {
                     keyEnd++;
                   }
                   
-                  const keyword = new TextDecoder('utf-8').decode(uint8Array.slice(textStart, keyEnd));
+                  // 使用UTF-8解码关键字
+                  const keyword = new TextDecoder('utf-8', { fatal: false }).decode(uint8Array.slice(textStart, keyEnd));
                   console.log('tEXt keyword:', keyword);
                   
                   // 检查是否是角色卡相关的关键字
                   if (keyword === 'chara' || keyword === 'ccv3' || keyword === 'ccv2' || keyword === 'Comment') {
                     const dataStart = keyEnd + 1;
-                    const textData = new TextDecoder('utf-8').decode(uint8Array.slice(dataStart, textEnd));
+                    const textDataBytes = uint8Array.slice(dataStart, textEnd);
                     
-                    console.log('Found potential character data, length:', textData.length);
+                    console.log('Found potential character data, length:', textDataBytes.length);
                     
                     // 尝试base64解码
                     try {
+                      // 首先用UTF-8解码
+                      const textData = new TextDecoder('utf-8', { fatal: false }).decode(textDataBytes);
                       const decoded = atob(textData);
-                      const parsed = JSON.parse(decoded);
-                      console.log('Successfully parsed base64 JSON');
+                      
+                      // 将base64解码后的字节转换为UTF-8字符串
+                      const decodedBytes = new Uint8Array(decoded.length);
+                      for (let j = 0; j < decoded.length; j++) {
+                        decodedBytes[j] = decoded.charCodeAt(j);
+                      }
+                      const decodedText = new TextDecoder('utf-8', { fatal: false }).decode(decodedBytes);
+                      const parsed = JSON.parse(decodedText);
+                      
+                      console.log('Successfully parsed base64 JSON with UTF-8 handling');
                       foundData = parsed;
                       break;
                     } catch (e) {
                       // 尝试直接JSON解析
                       try {
+                        const textData = new TextDecoder('utf-8', { fatal: false }).decode(textDataBytes);
                         const parsed = JSON.parse(textData);
-                        console.log('Successfully parsed direct JSON');
+                        console.log('Successfully parsed direct JSON with UTF-8 handling');
                         foundData = parsed;
                         break;
                       } catch (e2) {
@@ -199,7 +211,7 @@ const Index = () => {
           if (!foundData) {
             console.log('tEXt method failed, trying string search...');
             
-            // 转换为字符串进行搜索
+            // 使用UTF-8解码器处理整个文件
             const decoder = new TextDecoder('utf-8', { fatal: false });
             const fullText = decoder.decode(uint8Array);
             
@@ -242,7 +254,7 @@ const Index = () => {
                     try {
                       const jsonStr = fullText.substring(jsonStart, jsonEnd);
                       const parsed = JSON.parse(jsonStr);
-                      console.log('Successfully parsed JSON from string search');
+                      console.log('Successfully parsed JSON from string search with UTF-8');
                       foundData = parsed;
                       break;
                     } catch (e) {
@@ -272,9 +284,17 @@ const Index = () => {
             for (const match of base64Matches) {
               try {
                 const decoded = atob(match[0]);
-                if (decoded.includes('"name"') || decoded.includes('"char_name"') || decoded.includes('chara_card')) {
-                  const parsed = JSON.parse(decoded);
-                  console.log('Successfully parsed base64 character data');
+                
+                // 将base64解码后的字节转换为UTF-8字符串
+                const decodedBytes = new Uint8Array(decoded.length);
+                for (let j = 0; j < decoded.length; j++) {
+                  decodedBytes[j] = decoded.charCodeAt(j);
+                }
+                const decodedText = new TextDecoder('utf-8', { fatal: false }).decode(decodedBytes);
+                
+                if (decodedText.includes('"name"') || decodedText.includes('"char_name"') || decodedText.includes('chara_card')) {
+                  const parsed = JSON.parse(decodedText);
+                  console.log('Successfully parsed base64 character data with UTF-8');
                   foundData = parsed;
                   break;
                 }
