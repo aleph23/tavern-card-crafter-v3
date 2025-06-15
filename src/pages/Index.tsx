@@ -216,7 +216,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 dark:from-purple-900 dark:via-blue-900 dark:to-indigo-900 p-4">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
           <div className="flex justify-end mb-4">
             <Toolbar />
@@ -247,7 +247,7 @@ const Index = () => {
         </div>
 
         <div className="space-y-6">
-          {/* 表单部分 - 全宽度 */}
+          {/* 表单部分 - 调整宽度 */}
           <Card className="shadow-lg border-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="text-2xl font-semibold text-gray-800 dark:text-gray-200">
@@ -307,7 +307,7 @@ const Index = () => {
             </CardContent>
           </Card>
 
-          {/* 预览部分 - 全宽度，位于底部 */}
+          {/* 预览部分 - 调整宽度 */}
           <CharacterPreview 
             characterData={characterData}
             characterImage={characterImage}
