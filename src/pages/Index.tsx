@@ -477,23 +477,19 @@ const Index = () => {
         </div>
 
         <div className="space-y-6">
-          {/* AI助手面板 - 使用与下方相同的布局约束 */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
+          {/* AI助手面板 - 居中显示 */}
+          <div className="flex justify-center">
+            <div className="w-full max-w-4xl">
               <AIAssistant 
                 aiSettings={aiSettings}
                 onInsertField={handleInsertField}
               />
             </div>
-            <div className="lg:col-span-1">
-              {/* 右侧空白区域保持一致 */}
-            </div>
           </div>
 
-          {/* 角色信息编辑和预览 */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* 左侧表单部分 - 调整为占2列 */}
-            <div className="lg:col-span-2 space-y-6">
+          {/* 角色信息编辑和预览 - 居中显示 */}
+          <div className="flex justify-center">
+            <div className="w-full max-w-4xl space-y-6">
               <Card className="shadow-lg border-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
                 <CardHeader>
                   <CardTitle className="text-2xl font-semibold text-gray-800 dark:text-gray-200">
@@ -553,16 +549,11 @@ const Index = () => {
                 </CardContent>
               </Card>
 
-              {/* 预览部分移到左侧下方 */}
+              {/* 预览部分 */}
               <CharacterPreview 
                 characterData={characterData}
                 characterImage={characterImage}
               />
-            </div>
-
-            {/* 右侧空白区域 */}
-            <div className="lg:col-span-1">
-              {/* 可以在这里添加其他组件 */}
             </div>
           </div>
         </div>
