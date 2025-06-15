@@ -341,7 +341,9 @@ const Index = () => {
       let parsedData;
       
       if (file.name.endsWith('.json')) {
-        // 处理JSON文件
+        // 处理JSON文件 - 清除之前的图片
+        setCharacterImage(null);
+        
         const content = await new Promise<string>((resolve, reject) => {
           const reader = new FileReader();
           reader.onload = (e) => resolve(e.target?.result as string);
