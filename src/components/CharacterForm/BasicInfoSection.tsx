@@ -3,7 +3,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Upload, X, Sparkles, Loader2 } from "lucide-react";
+import { Upload, X, Sparkles, Loader2, RefreshCcw, Trash2 } from "lucide-react";
 import { useRef, useState } from "react";
 import { generateWithAI, generateDescription } from "@/utils/aiGenerator";
 import { AISettings } from "@/components/AISettings";
@@ -35,7 +35,7 @@ const BasicInfoSection = ({ data, updateField, characterImage, setCharacterImage
   };
 
   const handleAIGenerateDescription = async () => {
-    if (!aiSettings?.apiKey) {
+    if (!aiSettings?.apiKey && !['ollama', 'lmstudio'].includes(aiSettings?.provider?.toLowerCase() || '')) {
       toast({
         title: "配置错误",
         description: "请先在AI设置中配置API密钥",
@@ -72,6 +72,14 @@ const BasicInfoSection = ({ data, updateField, characterImage, setCharacterImage
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleClearDescription = () => {
+    updateField("description", "");
+    toast({
+      title: "已清空",
+      description: "角色描述已清空"
+    });
   };
 
   return (
@@ -147,19 +155,45 @@ const BasicInfoSection = ({ data, updateField, characterImage, setCharacterImage
       <div className="form-group">
         <div className="flex items-center justify-between mb-2">
           <Label htmlFor="description" className="text-sm font-medium text-gray-700">角色描述 *</Label>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={handleAIGenerateDescription}
-            disabled={loading}
-          >
-            {loading ? (
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-            ) : (
-              <Sparkles className="w-4 h-4 mr-2" />
-            )}
-            AI生成描述
-          </Button>
+          <div className="flex gap-1">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleAIGenerateDescription}
+              disabled={loading}
+              className="h-8 px-2 text-xs"
+            >
+              {loading ? (
+                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+              ) : (
+                <RefreshCcw className="w-3 h-3 mr-1" />
+              )}
+              重新生成
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleAIGenerateDescription}
+              disabled={loading}
+              className="h-8 px-2 text-xs"
+            >
+              {loading ? (
+                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+              ) : (
+                <Sparkles className="w-3 h-3 mr-1" />
+              )}
+              AI生成
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleClearDescription}
+              className="h-8 px-2 text-xs"
+            >
+              <Trash2 className="w-3 h-3 mr-1" />
+              清空
+            </Button>
+          </div>
         </div>
         <Textarea
           id="description"

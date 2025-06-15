@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Loader2 } from "lucide-react";
+import { Sparkles, Loader2, RefreshCcw, Trash2 } from "lucide-react";
 import { generateWithAI, generateSystemPrompt, generatePostHistoryInstructions } from "@/utils/aiGenerator";
 import { AISettings } from "@/components/AISettings";
 import { useToast } from "@/hooks/use-toast";
@@ -19,7 +19,7 @@ const PromptsSection = ({ data, updateField, aiSettings }: PromptsSectionProps) 
   const { toast } = useToast();
 
   const handleAIGenerate = async (field: string, promptGenerator: (data: any) => string) => {
-    if (!aiSettings?.apiKey) {
+    if (!aiSettings?.apiKey && !['ollama', 'lmstudio'].includes(aiSettings?.provider?.toLowerCase() || '')) {
       toast({
         title: "配置错误",
         description: "请先在AI设置中配置API密钥",
@@ -58,6 +58,14 @@ const PromptsSection = ({ data, updateField, aiSettings }: PromptsSectionProps) 
     }
   };
 
+  const handleClearField = (field: string) => {
+    updateField(field, "");
+    toast({
+      title: "已清空",
+      description: `${field} 已清空`
+    });
+  };
+
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold text-gray-800 mb-4">提示词设置</h3>
@@ -65,19 +73,45 @@ const PromptsSection = ({ data, updateField, aiSettings }: PromptsSectionProps) 
       <div>
         <div className="flex items-center justify-between mb-2">
           <Label htmlFor="system_prompt" className="text-sm font-medium text-gray-700">系统提示词</Label>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => handleAIGenerate('system_prompt', generateSystemPrompt)}
-            disabled={loading.system_prompt}
-          >
-            {loading.system_prompt ? (
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-            ) : (
-              <Sparkles className="w-4 h-4 mr-2" />
-            )}
-            AI生成
-          </Button>
+          <div className="flex gap-1">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleAIGenerate('system_prompt', generateSystemPrompt)}
+              disabled={loading.system_prompt}
+              className="h-8 px-2 text-xs"
+            >
+              {loading.system_prompt ? (
+                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+              ) : (
+                <RefreshCcw className="w-3 h-3 mr-1" />
+              )}
+              重新生成
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleAIGenerate('system_prompt', generateSystemPrompt)}
+              disabled={loading.system_prompt}
+              className="h-8 px-2 text-xs"
+            >
+              {loading.system_prompt ? (
+                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+              ) : (
+                <Sparkles className="w-3 h-3 mr-1" />
+              )}
+              AI生成
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleClearField('system_prompt')}
+              className="h-8 px-2 text-xs"
+            >
+              <Trash2 className="w-3 h-3 mr-1" />
+              清空
+            </Button>
+          </div>
         </div>
         <Textarea
           id="system_prompt"
@@ -92,19 +126,45 @@ const PromptsSection = ({ data, updateField, aiSettings }: PromptsSectionProps) 
       <div>
         <div className="flex items-center justify-between mb-2">
           <Label htmlFor="post_history" className="text-sm font-medium text-gray-700">历史后指令</Label>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => handleAIGenerate('post_history_instructions', generatePostHistoryInstructions)}
-            disabled={loading.post_history_instructions}
-          >
-            {loading.post_history_instructions ? (
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-            ) : (
-              <Sparkles className="w-4 h-4 mr-2" />
-            )}
-            AI生成
-          </Button>
+          <div className="flex gap-1">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleAIGenerate('post_history_instructions', generatePostHistoryInstructions)}
+              disabled={loading.post_history_instructions}
+              className="h-8 px-2 text-xs"
+            >
+              {loading.post_history_instructions ? (
+                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+              ) : (
+                <RefreshCcw className="w-3 h-3 mr-1" />
+              )}
+              重新生成
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleAIGenerate('post_history_instructions', generatePostHistoryInstructions)}
+              disabled={loading.post_history_instructions}
+              className="h-8 px-2 text-xs"
+            >
+              {loading.post_history_instructions ? (
+                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+              ) : (
+                <Sparkles className="w-3 h-3 mr-1" />
+              )}
+              AI生成
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleClearField('post_history_instructions')}
+              className="h-8 px-2 text-xs"
+            >
+              <Trash2 className="w-3 h-3 mr-1" />
+              清空
+            </Button>
+          </div>
         </div>
         <Textarea
           id="post_history"

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Loader2 } from "lucide-react";
+import { Sparkles, Loader2, RefreshCcw, Trash2 } from "lucide-react";
 import { generateWithAI, generatePersonality, generateScenario, generateFirstMessage, generateMessageExample } from "@/utils/aiGenerator";
 import { AISettings } from "@/components/AISettings";
 import { useToast } from "@/hooks/use-toast";
@@ -19,7 +19,7 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
   const { toast } = useToast();
 
   const handleAIGenerate = async (field: string, promptGenerator: (data: any) => string) => {
-    if (!aiSettings?.apiKey) {
+    if (!aiSettings?.apiKey && !['ollama', 'lmstudio'].includes(aiSettings?.provider?.toLowerCase() || '')) {
       toast({
         title: "配置错误",
         description: "请先在AI设置中配置API密钥",
@@ -58,6 +58,14 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
     }
   };
 
+  const handleClearField = (field: string) => {
+    updateField(field, "");
+    toast({
+      title: "已清空",
+      description: `${field} 已清空`
+    });
+  };
+
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold text-gray-800 mb-4">性格设定</h3>
@@ -65,19 +73,45 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
       <div>
         <div className="flex items-center justify-between mb-2">
           <Label htmlFor="personality" className="text-sm font-medium text-gray-700">性格特征 *</Label>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => handleAIGenerate('personality', generatePersonality)}
-            disabled={loading.personality}
-          >
-            {loading.personality ? (
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-            ) : (
-              <Sparkles className="w-4 h-4 mr-2" />
-            )}
-            AI生成
-          </Button>
+          <div className="flex gap-1">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleAIGenerate('personality', generatePersonality)}
+              disabled={loading.personality}
+              className="h-8 px-2 text-xs"
+            >
+              {loading.personality ? (
+                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+              ) : (
+                <RefreshCcw className="w-3 h-3 mr-1" />
+              )}
+              重新生成
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleAIGenerate('personality', generatePersonality)}
+              disabled={loading.personality}
+              className="h-8 px-2 text-xs"
+            >
+              {loading.personality ? (
+                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+              ) : (
+                <Sparkles className="w-3 h-3 mr-1" />
+              )}
+              AI生成
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleClearField('personality')}
+              className="h-8 px-2 text-xs"
+            >
+              <Trash2 className="w-3 h-3 mr-1" />
+              清空
+            </Button>
+          </div>
         </div>
         <Textarea
           id="personality"
@@ -92,19 +126,45 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
       <div>
         <div className="flex items-center justify-between mb-2">
           <Label htmlFor="scenario" className="text-sm font-medium text-gray-700">场景设定 *</Label>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => handleAIGenerate('scenario', generateScenario)}
-            disabled={loading.scenario || !data.personality}
-          >
-            {loading.scenario ? (
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-            ) : (
-              <Sparkles className="w-4 h-4 mr-2" />
-            )}
-            AI生成
-          </Button>
+          <div className="flex gap-1">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleAIGenerate('scenario', generateScenario)}
+              disabled={loading.scenario || !data.personality}
+              className="h-8 px-2 text-xs"
+            >
+              {loading.scenario ? (
+                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+              ) : (
+                <RefreshCcw className="w-3 h-3 mr-1" />
+              )}
+              重新生成
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleAIGenerate('scenario', generateScenario)}
+              disabled={loading.scenario || !data.personality}
+              className="h-8 px-2 text-xs"
+            >
+              {loading.scenario ? (
+                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+              ) : (
+                <Sparkles className="w-3 h-3 mr-1" />
+              )}
+              AI生成
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleClearField('scenario')}
+              className="h-8 px-2 text-xs"
+            >
+              <Trash2 className="w-3 h-3 mr-1" />
+              清空
+            </Button>
+          </div>
         </div>
         <Textarea
           id="scenario"
@@ -119,19 +179,45 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
       <div>
         <div className="flex items-center justify-between mb-2">
           <Label htmlFor="first_mes" className="text-sm font-medium text-gray-700">首条消息 *</Label>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => handleAIGenerate('first_mes', generateFirstMessage)}
-            disabled={loading.first_mes || !data.scenario}
-          >
-            {loading.first_mes ? (
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-            ) : (
-              <Sparkles className="w-4 h-4 mr-2" />
-            )}
-            AI生成
-          </Button>
+          <div className="flex gap-1">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleAIGenerate('first_mes', generateFirstMessage)}
+              disabled={loading.first_mes || !data.scenario}
+              className="h-8 px-2 text-xs"
+            >
+              {loading.first_mes ? (
+                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+              ) : (
+                <RefreshCcw className="w-3 h-3 mr-1" />
+              )}
+              重新生成
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleAIGenerate('first_mes', generateFirstMessage)}
+              disabled={loading.first_mes || !data.scenario}
+              className="h-8 px-2 text-xs"
+            >
+              {loading.first_mes ? (
+                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+              ) : (
+                <Sparkles className="w-3 h-3 mr-1" />
+              )}
+              AI生成
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleClearField('first_mes')}
+              className="h-8 px-2 text-xs"
+            >
+              <Trash2 className="w-3 h-3 mr-1" />
+              清空
+            </Button>
+          </div>
         </div>
         <Textarea
           id="first_mes"
@@ -146,19 +232,45 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
       <div>
         <div className="flex items-center justify-between mb-2">
           <Label htmlFor="mes_example" className="text-sm font-medium text-gray-700">对话示例</Label>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => handleAIGenerate('mes_example', generateMessageExample)}
-            disabled={loading.mes_example || !data.first_mes}
-          >
-            {loading.mes_example ? (
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-            ) : (
-              <Sparkles className="w-4 h-4 mr-2" />
-            )}
-            AI生成
-          </Button>
+          <div className="flex gap-1">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleAIGenerate('mes_example', generateMessageExample)}
+              disabled={loading.mes_example || !data.first_mes}
+              className="h-8 px-2 text-xs"
+            >
+              {loading.mes_example ? (
+                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+              ) : (
+                <RefreshCcw className="w-3 h-3 mr-1" />
+              )}
+              重新生成
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleAIGenerate('mes_example', generateMessageExample)}
+              disabled={loading.mes_example || !data.first_mes}
+              className="h-8 px-2 text-xs"
+            >
+              {loading.mes_example ? (
+                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+              ) : (
+                <Sparkles className="w-3 h-3 mr-1" />
+              )}
+              AI生成
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleClearField('mes_example')}
+              className="h-8 px-2 text-xs"
+            >
+              <Trash2 className="w-3 h-3 mr-1" />
+              清空
+            </Button>
+          </div>
         </div>
         <Textarea
           id="mes_example"
