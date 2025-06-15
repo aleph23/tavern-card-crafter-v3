@@ -1,4 +1,3 @@
-
 import { useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,6 +11,7 @@ import PromptsSection from "@/components/CharacterForm/PromptsSection";
 import AlternateGreetings from "@/components/CharacterForm/AlternateGreetings";
 import CharacterBook from "@/components/CharacterForm/CharacterBook";
 import TagsSection from "@/components/CharacterForm/TagsSection";
+import MetadataSection from "@/components/CharacterForm/MetadataSection";
 import CharacterPreview from "@/components/CharacterPreview";
 
 interface CharacterBookEntry {
@@ -255,6 +255,11 @@ const Index = () => {
                     
                     <TagsSection 
                       tags={characterData.data.tags}
+                      updateField={updateField}
+                    />
+                    
+                    <MetadataSection 
+                      data={characterData.data}
                       updateField={updateField}
                     />
                   </div>
