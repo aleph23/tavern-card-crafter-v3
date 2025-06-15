@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -80,31 +81,31 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
   return (
     <Card className="shadow-lg border-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm h-fit sticky top-4">
       <CardHeader className="pb-4">
-        <CardTitle className="text-xl font-semibold text-gray-800 dark:text-gray-200 flex items-center justify-between">
-          {t('jsonPreview')}
-          <div className="flex gap-2">
-            <Button onClick={copyToClipboard} size="sm" variant="outline">
-              <Copy className="w-4 h-4 mr-2" />
-              {t('copy')}
+        <CardTitle className="text-xl font-semibold text-gray-800 dark:text-gray-200 flex items-start justify-between flex-col gap-3">
+          <span>{t('jsonPreview')}</span>
+          <div className="flex flex-col sm:flex-row gap-2 w-full">
+            <Button onClick={copyToClipboard} size="sm" variant="outline" className="flex-1 min-w-0">
+              <Copy className="w-4 h-4 mr-2 flex-shrink-0" />
+              <span className="truncate">{t('copy')}</span>
             </Button>
-            <Button onClick={downloadJson} size="sm" className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
-              <Download className="w-4 h-4 mr-2" />
-              {t('exportJson')}
+            <Button onClick={downloadJson} size="sm" className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 flex-1 min-w-0">
+              <Download className="w-4 h-4 mr-2 flex-shrink-0" />
+              <span className="truncate">{t('exportJson')}</span>
             </Button>
-            <Button onClick={downloadWithImage} size="sm" variant="outline">
-              <ImageIcon className="w-4 h-4 mr-2" />
-              {t('exportPng')}
+            <Button onClick={downloadWithImage} size="sm" variant="outline" className="flex-1 min-w-0">
+              <ImageIcon className="w-4 h-4 mr-2 flex-shrink-0" />
+              <span className="truncate">{t('exportPng')}</span>
             </Button>
           </div>
         </CardTitle>
-        <div className="text-sm text-gray-600 dark:text-gray-400 mt-2 flex gap-4">
+        <div className="text-sm text-gray-600 dark:text-gray-400 mt-2 flex flex-col sm:flex-row gap-2 sm:gap-4">
           <span>{t('totalChars')}: {totalChars}</span>
           <span>{t('totalTokens')}: {totalTokens}</span>
         </div>
       </CardHeader>
       <CardContent>
         <ScrollArea className="h-[600px] custom-scrollbar">
-          <pre className="bg-gray-900 dark:bg-gray-800 text-green-400 p-4 rounded-lg text-sm font-mono whitespace-pre-wrap">
+          <pre className="bg-gray-900 dark:bg-gray-800 text-green-400 p-4 rounded-lg text-sm font-mono whitespace-pre-wrap break-all">
             {JSON.stringify(characterData, null, 2)}
           </pre>
         </ScrollArea>
