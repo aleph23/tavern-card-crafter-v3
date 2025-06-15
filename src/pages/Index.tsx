@@ -4,16 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useLanguage } from "@/contexts/LanguageContext";
 import AISettings, { AISettings as AISettingsType } from "@/components/AISettings";
-
-import BasicInfoSection from "@/components/CharacterForm/BasicInfoSection";
-import PersonalitySection from "@/components/CharacterForm/PersonalitySection";
-import PromptsSection from "@/components/CharacterForm/PromptsSection";
-import AlternateGreetings from "@/components/CharacterForm/AlternateGreetings";
-import CharacterBook from "@/components/CharacterForm/CharacterBook";
-import TagsSection from "@/components/CharacterForm/TagsSection";
-import MetadataSection from "@/components/CharacterForm/MetadataSection";
-import CharacterPreview from "@/components/CharacterPreview";
+import Toolbar from "@/components/Toolbar";
 
 interface CharacterBookEntry {
   keys: string[];
@@ -55,6 +48,7 @@ interface CharacterCardV3 {
 
 const Index = () => {
   const { toast } = useToast();
+  const { t } = useLanguage();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [aiSettings, setAISettings] = useState<AISettingsType | null>(null);
 
@@ -102,8 +96,8 @@ const Index = () => {
   const handleAISettingsChange = (newSettings: AISettingsType) => {
     setAISettings(newSettings);
     toast({
-      title: "设置已更新",
-      description: "AI设置已成功更新并保存",
+      title: t('settingsUpdated') || "设置已更新",
+      description: t('settingsUpdatedDesc') || "AI设置已成功更新并保存",
     });
   };
 
@@ -131,8 +125,8 @@ const Index = () => {
             parsedData = JSON.parse(content);
           } else if (file.name.endsWith('.png')) {
             toast({
-              title: "提示",
-              description: "PNG 格式导入功能需要更复杂的实现，请使用 JSON 文件",
+              title: t('hint') || "提示",
+              description: t('pngExportHint'),
               variant: "destructive"
             });
             return;
@@ -197,13 +191,13 @@ const Index = () => {
           }
 
           toast({
-            title: "导入成功",
-            description: "角色卡数据已成功导入",
+            title: t('importSuccess'),
+            description: t('importSuccessDesc'),
           });
         } catch (error) {
           toast({
-            title: "导入失败",
-            description: "文件格式错误或数据损坏",
+            title: t('importError'),
+            description: t('importErrorDesc'),
             variant: "destructive"
           });
         }
@@ -213,14 +207,17 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 dark:from-purple-900 dark:via-blue-900 dark:to-indigo-900 p-4">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-8">
+          <div className="flex justify-end mb-4">
+            <Toolbar />
+          </div>
           <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-4">
-            SillyTavern 角色卡 V3 生成器
+            {t('pageTitle')}
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-4">
-            创建专业的 SillyTavern V3 格式角色卡，支持 V1/V2/V3 格式导入导出
+          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-4">
+            {t('pageDescription')}
           </p>
           <div className="flex justify-center gap-4">
             <input
@@ -232,7 +229,7 @@ const Index = () => {
             />
             <Button onClick={() => fileInputRef.current?.click()} variant="outline" className="mb-4">
               <Upload className="w-4 h-4 mr-2" />
-              导入角色卡
+              {t('importCard')}
             </Button>
             <AISettings 
               onSettingsChange={handleAISettingsChange} 
@@ -244,10 +241,10 @@ const Index = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* 表单部分 - 占2/3宽度 */}
           <div className="lg:col-span-2">
-            <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+            <Card className="shadow-lg border-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
               <CardHeader>
-                <CardTitle className="text-2xl font-semibold text-gray-800">
-                  角色信息编辑
+                <CardTitle className="text-2xl font-semibold text-gray-800 dark:text-gray-200">
+                  {t('characterInfo')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
