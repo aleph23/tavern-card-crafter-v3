@@ -171,18 +171,6 @@ const PromptsSection = ({ data, updateField, aiSettings }: PromptsSectionProps) 
           showCounter={true}
         />
       </div>
-
-      <div>
-        <Label htmlFor="creator_notes" className="text-sm font-medium text-gray-700">创作者备注</Label>
-        <Textarea
-          id="creator_notes"
-          value={data.creator_notes}
-          onChange={(e) => updateField("creator_notes", e.target.value)}
-          placeholder="给其他用户的关于角色的说明..."
-          className="mt-1 min-h-[100px]"
-          showCounter={true}
-        />
-      </div>
     </div>
   );
 };
