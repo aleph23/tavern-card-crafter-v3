@@ -15,7 +15,7 @@ mac:
   category: public.app-category.productivity
   target: dmg
 win:
-  target: nsis
+  target: portable
   forceCodeSigning: false
 linux:
   target: AppImage
