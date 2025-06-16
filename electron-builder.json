@@ -3,7 +3,7 @@
   "appId": "com.taverncard.crafter",
   "productName": "Tavern Card Crafter",
   "directories": {
-    "output": "dist-electron"
+    "output": "build-electron"
   },
   "files": [
     "dist/**/*",
@@ -21,8 +21,9 @@
     "target": "dmg"
   },
   "win": {
-    "target": "nsis",
-    "forceCodeSigning": false
+    "target": "portable",
+    "forceCodeSigning": false,
+    "sign": null
   },
   "linux": {
     "target": "AppImage",
