@@ -20,6 +20,9 @@ Tavern Card Crafter 是一个专业的AI角色卡片制作工具，帮助用户�
 - **角色书**: 世界观设定和记忆条目
 - **标签分类**: 角色标签和元数据管理
 
+![image](image/image01.png)
+---
+![image](image/image02.png)
 ### 📱 多平台支持
 - **Web版本**: 浏览器直接访问使用
 - **桌面应用**: 跨平台Electron桌面应用
@@ -30,6 +33,8 @@ Tavern Card Crafter 是一个专业的AI角色卡片制作工具，帮助用户�
 - **多格式导出**: 支持JSON和PNG格式导出
 - **本地化界面**: 完全中文界面，操作简单直观
 - **响应式设计**: 支持各种设备和屏幕尺寸
+---
+![image](image/image03.png)
 
 ## 技术栈
 
