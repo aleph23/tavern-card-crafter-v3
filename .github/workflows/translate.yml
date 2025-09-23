@@ -20,7 +20,7 @@ jobs:
         language: ["english"]
         include:
           - language: "english"
-            file: "README.en.md"
+            file: "*.*"
             
     steps:
       - uses: actions/checkout@v4
