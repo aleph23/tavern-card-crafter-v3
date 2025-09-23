@@ -174,7 +174,9 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
 
   // Intelligently build API URL - Special treatment for different providers
   const buildApiUrl = (baseUrl: string, provider: string = settings.provider): string => {
-    if (!baseUrl) return '';
+    if (!baseUrl) {
+      return '';
+    }
 
     // Remove the end slash
     const cleanUrl = baseUrl.replace(/\/+$/, '');
@@ -210,7 +212,9 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
 
   // Build the model API address
   const buildModelsUrl = (baseUrl: string, provider: string = settings.provider): string => {
-    if (!baseUrl) return '';
+    if (!baseUrl) {
+      return '';
+    }
 
     const cleanUrl = baseUrl.replace(/\/+$/, '');
 

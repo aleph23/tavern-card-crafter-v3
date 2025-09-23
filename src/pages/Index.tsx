@@ -241,8 +241,7 @@ const Index = () => {
               console.log(`Pattern ${pattern.source} found ${matches.length} matches`);
 
               for (const match of matches) {
-                if (!match.index) continue;
-
+                if (!match.index) { continue; }
                 // Backwards looking for braces at the beginning of JSON
                 let jsonStart = match.index;
                 while (jsonStart > 0 && fullText[jsonStart] !== '{') {
@@ -255,8 +254,12 @@ const Index = () => {
                   let jsonEnd = -1;
 
                   for (let i = jsonStart; i < fullText.length; i++) {
-                    if (fullText[i] === '{') braceCount++;
-                    if (fullText[i] === '}') braceCount--;
+                    if (fullText[i] === '{') {
+                      braceCount++;
+                    }
+                    if (fullText[i] === '}') {
+                      braceCount--;
+                    }
                     if (braceCount === 0 && i > jsonStart) {
                       jsonEnd = i + 1;
                       break;
@@ -277,7 +280,9 @@ const Index = () => {
                 }
               }
 
-              if (foundData) break;
+              if (foundData) {
+                break;
+              }
             }
           }
 
@@ -337,7 +342,9 @@ const Index = () => {
 
   const handleFileImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file) return;
+    if (!file) {
+      return;
+    }
 
     try {
       let parsedData;

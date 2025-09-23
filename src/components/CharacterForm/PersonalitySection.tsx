@@ -40,7 +40,7 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
 
     abortControllerRefs.current[field] = new AbortController();
     setLoading(prev => ({ ...prev, [field]: true }));
-    
+
     try {
       const prompt = promptGenerator(data);
       const result = await generateWithAI(aiSettings, prompt);
@@ -141,7 +141,7 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold text-gray-800 mb-4">Character setting</h3>
-      
+
       <div>
         <div className="flex items-center justify-between mb-2">
           <Label htmlFor="personality" className="text-sm font-medium text-gray-700">Character traits *</Label>

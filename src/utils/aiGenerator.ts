@@ -24,7 +24,7 @@ export const estimateTokens = (text: string): number => {
 
 // Intelligently build API URL - consistent with the AISettings component
 const buildApiUrl = (baseUrl: string, provider: string): string => {
-  if (!baseUrl) return '';
+  if (!baseUrl) { return ''; }
 
   // Remove the end slash
   const cleanUrl = baseUrl.replace(/\/+$/, '');
@@ -242,7 +242,7 @@ export const generateFirstMessage = (data: CharacterData): string => {
   return `Generate the first message of the character (opening remarks):
 
 Role name: ${data.name} 
-Role description: ${data.Description} 
+Role description: ${data.description} 
 Character traits: ${data.personality} 
 Scene settings: ${data.scenario}
 
@@ -308,10 +308,10 @@ export const generateAlternateGreeting = (data: CharacterData): string => {
   return `Generate an alternate greeting based on the following information:
 
 Role name: ${data.name} 
-Role description: ${data.Description} 
+Role description: ${data.description} 
 Character traits: ${data.personality} 
 Scene settings: ${data.scenario} 
-First message: ${data.first.mes} 
+First message: ${data.first_mes} 
 
 Please generate an alternate greeting with a different style from the first message to reflect the multifaceted nature of the character. Please answer in Chinese, be natural and vivid。`;
 };

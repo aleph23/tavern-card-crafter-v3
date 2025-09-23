@@ -104,18 +104,18 @@ This is an anime character, please generate:
 - scenario: Anime world background settings
 - first mes: Opening remarks that fit the anime character style
 - mes example: A dialogue example that reflects the character's speaking style ${jsonFormat
-    }`,
+        }`,
 
-      game: `${ baseInstructions }
+      game: `${baseInstructions}
 
 This is the game character, please generate:
 - description: Character appearance, equipment, special ability description
 - personality: personality traits, combat style, values
 - scenario: Game world background settings
 - first mes: Opening remarks that match the identity of the game character
-- mes example: A dialogue example containing multiple scenarios ${jsonFormat } `,
+- mes example: A dialogue example containing multiple scenarios ${jsonFormat} `,
 
-      novel: `${ baseInstructions }
+      novel: `${baseInstructions}
 
 This is the novel character, please generate:
 - description: detailed appearance description
@@ -124,7 +124,7 @@ This is the novel character, please generate:
 - first mes: Literary opening remarks
 - mes example: dialogue that reflects the depth of the character's thoughts ${jsonFormat}`,
 
-    historical: `${baseInstructions}
+      historical: `${baseInstructions}
 
 This is a historical figure, please generate: 
 - description: Appearance and clothing description based on historical materials 
@@ -132,8 +132,8 @@ This is a historical figure, please generate:
 - scenario: Detailed historical context 
 - first mes: Opening remarks that match the identity of historical figures 
 - mes example: A dialogue that embodies the wisdom of historical figures ${jsonFormat
-  }` 
-};
+        }`
+    };
 
     return typeSpecificPrompts[type as keyof typeof typeSpecificPrompts] || typeSpecificPrompts.general;
   };
@@ -238,7 +238,9 @@ This is a historical figure, please generate:
   };
 
   const insertAllFields = () => {
-    if (!parsedData) return;
+    if (!parsedData) {
+      return;
+    }
 
     let insertedCount = 0;
 
@@ -253,7 +255,7 @@ This is a historical figure, please generate:
     if (insertedCount > 0) {
       toast({
         title: "Insert successfully",
-        description: `Successfully inserted ${ insertedCount } Fields into the role card form`
+        description: `Successfully inserted ${insertedCount} Fields into the role card form`
       });
     } else {
       toast({
@@ -285,7 +287,7 @@ This is a historical figure, please generate:
       return value.join(", ");
     }
     const text = value.toString();
-    return text.length > 150 ? `${ text.substring(0, 150) }...` : text;
+    return text.length > 150 ? `${text.substring(0, 150)}...` : text;
   };
 
   const selectedType = CHARACTER_TYPES.find(type => type.value === characterType);
@@ -359,7 +361,7 @@ etc..."
             ) : (
               <>
                 <Wand className="w-4 h-4 mr-2" />
-                {`AI analysis generation(${ selectedType?.label })`}
+                {`AI analysis generation(${selectedType?.label})`}
               </>
             )}
           </Button>
@@ -391,7 +393,9 @@ etc..."
 
             <div className="space-y-3 max-h-[400px] overflow-y-auto bg-gray-50 dark:bg-gray-800 rounded-lg p-3 scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-300 dark:scrollbar-track-gray-700 dark:scrollbar-thumb-gray-600 hover:scrollbar-thumb-gray-400 dark:hover:scrollbar-thumb-gray-500">
               {Object.entries(parsedData).map(([key, value]) => {
-                if (!value || (Array.isArray(value) && value.length === 0)) return null;
+                if (!value || (Array.isArray(value) && value.length === 0)) {
+                  return null;
+                }
 
                 return (
                   <div key={key} className="border-b border-gray-200 dark:border-gray-700 pb-2 last:border-b-0">

@@ -46,7 +46,7 @@ const TagsSection = ({ tags, updateField, aiSettings, characterData }: TagsSecti
     if (!aiSettings?.apiKey && !['ollama', 'lmstudio'].includes(aiSettings?.provider?.toLowerCase() || '')) {
       toast({
         title: t('configError') || "Configuration error",
-        description: t('configApiKey') || "Please configure the API key in the AI ​​settings first",
+        description: t('configApiKey') || "Please configure the API key in the AI settings first",
         variant: "destructive"
       });
       return;
