@@ -35,8 +35,8 @@ jobs:
 
       - name: Save translation
         run: |
-          mkdir -p docs
-          echo "$TRANSLATED_TEXT" | tee docs/${{ matrix.file }}
+          mkdir -p en
+          echo "$TRANSLATED_TEXT" | tee en/${{ matrix.file }}
         env:
           TRANSLATED_TEXT: ${{ steps.translate.outputs.translated-text }}
 
@@ -44,7 +44,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.file }}
-          path: docs/${{ matrix.file }}
+          path: en/${{ matrix.file }}
 
   create-pr:
     needs: translate
@@ -64,8 +64,8 @@ jobs:
             This PR updates all translations of the repo:
 
             Changes were automatically generated using the [ai-translate-action](https://github.com/FidelusAleksander/ai-translate-action) action.
-          branch: en/update-readme-translations
+          branch: en/update-translations
           add-paths: "en/README*"
-          delete-branch: true
+          delete-branch: false
           labels: |
             tranlation
