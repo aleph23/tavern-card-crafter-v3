@@ -11,27 +11,32 @@ permissions:
   contents: write
   pull-requests: write
   models: read
-
+  
 jobs:
+  list-files:
+    runs-on: ubuntu-latest
+    outputs:
+      files: ${{ steps.set-files.outputs.files }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: set-files
+        run: echo "files=$(git ls-files | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
+
   translate:
+    needs: list-files
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        language: ["english"]
-        include:
-          - language: "english"
-            file: "*.*"
-            
+        file: ${{fromJson(needs.list-files.outputs.files)}}
     steps:
       - uses: actions/checkout@v4
-
-      - name: Translate repo
+      - name: Translate file
         uses: FidelusAleksander/ai-translate-action@v1
-        id: translate
         with:
-          text-file: "*.*"
-          target-language: ${{ matrix.language }}
+          text-file: ${{ matrix.file }}
+          target-language: english
           custom-instructions: "Translate all to English"
+      # ...save and upload steps as before
 
       - name: Save translation
         run: |
@@ -65,7 +70,6 @@ jobs:
 
             Changes were automatically generated using the [ai-translate-action](https://github.com/FidelusAleksander/ai-translate-action) action.
           branch: en/update-translations
-          add-paths: "en/README*"
           delete-branch: false
           labels: |
             tranlation
