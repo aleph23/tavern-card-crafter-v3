@@ -1,38 +1,38 @@
 
-# Tavern Card Crafter - AI角色卡制作工具
+# Tavern Card Crafter - AI character card maker
 
-## 项目简介
+## Project Introduction
 
-Tavern Card Crafter 是一个专业的AI角色卡片制作工具，帮助用户轻松创建和编辑用于聊天机器人和角色扮演的角色卡片。该工具提供直观的界面和强大的功能，让角色创作变得简单高效。
+Tavern Card Crafter is a professional AI character card maker that helps users easily create and edit character cards for chatbots and roleplay. The tool offers an intuitive interface and powerful features that make character creation easy and efficient.
 
-## 主要功能
+## Key features:
 
-### 🤖 AI智能助手
-- **智能角色创建**: 通过AI助手快速生成角色基础信息
-- **多类型支持**: 支持动漫、游戏、小说、历史人物等不同类型角色
-- **智能内容提取**: 粘贴任意文本，AI自动提取并生成结构化角色信息
+### 🤖 AI intelligent assistant
+- **Intelligent Character Creation**: Quickly generate basic character information through AI assistants
+- **Multi-genre support**: Supports different types of characters such as anime, games, novels, and historical figures
+- **Intelligent Content Extraction**: Paste any text, and AI automatically extracts and generates structured character information
 
-### ✏️ 完整角色编辑
-- **基本信息**: 姓名、描述、第一人称视角等
-- **个性特征**: 详细的性格特征和行为模式
-- **场景设定**: 背景故事和环境描述
-- **对话系统**: 示例对话、问候语、替代问候语
-- **角色书**: 世界观设定和记忆条目
-- **标签分类**: 角色标签和元数据管理
+### ✏️ Full character editing
+- **Basic information**: Name, description, first-person perspective, etc
+- **Personality Traits**: Detailed personality traits and behavior patterns
+- **Setting Setting**: Backstory and environment description
+- **Dialogue System**: Sample dialogues, greetings, alternative greetings
+- **Character Book**: Worldview setting and memory entries
+- **Tag Classification**: Role labeling and metadata management
 
 ![image](image/image01.png)
 ---
 ![image](image/image02.png)
-### 📱 多平台支持
-- **Web版本**: 浏览器直接访问使用
-- **桌面应用**: 跨平台Electron桌面应用
-- **侧边栏布局**: AI助手、角色编辑、JSON预览分离式选项卡界面
+### \uD83D\uDCF1 Multi-platform support
+- **Web version**: Browser direct access and use
+- **Desktop App**: A cross-platform Electron desktop app
+- **Sidebar Layout**: AI assistant, character editing, JSON preview split tab interface
 
-### 🔧 实用功能
-- **实时预览**: JSON格式实时预览，语法高亮显示
-- **多格式导出**: 支持JSON和PNG格式导出
-- **本地化界面**: 完全中文界面，操作简单直观
-- **响应式设计**: 支持各种设备和屏幕尺寸
+### \uD83D\uDD27 Practical features
+- **Real-time preview**: Real-time preview in JSON format, syntax highlighting
+- **Multi-format export**: Supports JSON and PNG format export
+- **Localized Interface**: Completely Chinese interface, easy and intuitive to operate
+- **Responsive Design**: Supports a wide range of devices and screen sizes
 ---
 ![image](image/image03.png)
 
