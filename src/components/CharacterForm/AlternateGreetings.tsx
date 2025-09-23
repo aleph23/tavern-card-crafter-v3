@@ -59,8 +59,8 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
   const handleAIGenerateGreeting = async () => {
     if (!aiSettings?.apiKey && !['ollama', 'lmstudio'].includes(aiSettings?.provider?.toLowerCase() || '')) {
       toast({
-        title: t('configError') || "配置错误",
-        description: t('configApiKey') || "请先在AI设置中配置API密钥",
+        title: t('configError') || "Configuration error",
+        description: t('configApiKey') || "Please configure the API key in the AI ​​settings first",
         variant: "destructive"
       });
       return;
@@ -68,8 +68,8 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
 
     if (!characterData.name || !characterData.description) {
       toast({
-        title: t('incompleteInfo') || "信息不完整",
-        description: t('fillNameDesc') || "请先填写角色名称和角色描述",
+        title: t('incompleteInfo') || "Incomplete information",
+        description: t('fillNameDesc') || "Please fill in the role name and role description first",
         variant: "destructive"
       });
       return;
@@ -77,25 +77,25 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
 
     abortControllerRef.current = new AbortController();
     setLoading(true);
-    
+
     try {
       const prompt = generateAlternateGreeting(characterData);
       const result = await generateWithAI(aiSettings, prompt);
       updateField("alternate_greetings", [...greetings, result]);
       toast({
-        title: t('generateSuccess') || "生成成功",
-        description: t('alternateGreetingGenerated') || "备用问候语已生成完成"
+        title: t('generateSuccess') || "Generate successfully",
+        description: t('alternateGreetingGenerated') || "Alternative greetings have been generated"
       });
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
         toast({
-          title: "已取消",
-          description: "AI生成已被用户取消"
+          title: "Canceled",
+          description: "AI generation has been canceled by the user"
         });
       } else {
         toast({
-          title: t('generateError') || "生成失败",
-          description: error instanceof Error ? error.message : t('unknownError') || "未知错误",
+          title: t('generateError') || "Generation failed",
+          description: error instanceof Error ? error.message : t('unknownError') || "Unknown error",
           variant: "destructive"
         });
       }
@@ -111,8 +111,8 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
       setLoading(false);
       abortControllerRef.current = null;
       toast({
-        title: "已取消",
-        description: "AI生成已取消"
+        title: "Canceled",
+        description: "AI generation has been canceled"
       });
     }
   };
@@ -120,8 +120,8 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
   const handleClearAll = () => {
     updateField("alternate_greetings", []);
     toast({
-      title: "已清空",
-      description: "所有备选问候语已清空"
+      title: "Cleared",
+      description: "All alternative greetings have been cleared"
     });
   };
 
@@ -138,7 +138,7 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
               className="h-8 px-2 text-xs"
             >
               <RefreshCcw className="w-3 h-3 mr-1" />
-              重新生成
+              Regenerate
             </Button>
           )}
           <Button
@@ -151,12 +151,12 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
             {loading ? (
               <>
                 <X className="w-3 h-3 mr-1" />
-                取消
+                Cancel
               </>
             ) : (
               <>
                 <Sparkles className="w-3 h-3 mr-1" />
-                AI生成
+                AI generation
               </>
             )}
           </Button>
@@ -167,18 +167,18 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
             className="h-8 px-2 text-xs"
           >
             <Trash2 className="w-3 h-3 mr-1" />
-            清空
+            Clear
           </Button>
         </div>
       </div>
-      
+
       <div className="form-group">
-        <Label className="text-sm font-medium text-gray-700 dark:text-gray-200">{t('addNewGreeting') || '添加新问候语'}</Label>
+        <Label className="text-sm font-medium text-gray-700 dark:text-gray-200">{t('addNewGreeting') || 'Add new greetings'}</Label>
         <div className="flex gap-2 mt-1">
           <Textarea
             value={newGreeting}
             onChange={(e) => setNewGreeting(e.target.value)}
-            placeholder={t('addAlternateGreetingPlaceholder') || "添加备用问候语..."}
+            placeholder={t('addAlternateGreetingPlaceholder') || "Add alternate greetings..."}
             className="min-h-[60px]"
           />
           <Button onClick={addGreeting} size="sm" className="self-end bg-primary hover:bg-primary/90 text-primary-foreground">
@@ -191,7 +191,7 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
         {greetings.map((greeting, index) => (
           <div key={index} className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg relative">
             <div className="absolute top-2 left-2 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs font-medium px-2 py-1 rounded-full">
-              {t('greeting') || '问候语'} {index + 1}
+              {t('greeting') || 'Greetings'} {index + 1}
             </div>
             {editingIndex === index ? (
               <div className="space-y-2 pt-6">

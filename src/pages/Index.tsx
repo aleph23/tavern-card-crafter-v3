@@ -92,7 +92,7 @@ const Index = () => {
   const [characterImage, setCharacterImage] = useState<string | null>(null);
 
   useEffect(() => {
-    // 加载保存的AI设置
+    // Load saved AI settings
     const savedSettings = localStorage.getItem('ai-settings');
     if (savedSettings) {
       try {
@@ -107,8 +107,8 @@ const Index = () => {
   const handleAISettingsChange = (newSettings: AISettingsType) => {
     setAISettings(newSettings);
     toast({
-      title: t('settingsUpdated') || "设置已更新",
-      description: t('settingsUpdatedDesc') || "AI设置已成功更新并保存",
+      title: t('settingsUpdated') || "Settings updated",
+      description: t('settingsUpdatedDesc') || "AI settings have been successfully updated and saved",
     });
   };
 
@@ -125,7 +125,7 @@ const Index = () => {
 
   const handleInsertField = (field: string, value: string | string[]) => {
     if (field === 'tags' && Array.isArray(value)) {
-      // 合并现有标签和新标签，去重
+      // Merge existing tags and new tags to deduplicate
       const existingTags = characterData.data.tags || [];
       const newTags = [...new Set([...existingTags, ...value])];
       updateField('tags', newTags);
@@ -141,64 +141,64 @@ const Index = () => {
         try {
           const arrayBuffer = e.target?.result as ArrayBuffer;
           const uint8Array = new Uint8Array(arrayBuffer);
-          
+
           console.log('PNG file size:', uint8Array.length);
-          
-          // 方法1: 查找PNG tEXt块
+
+          // Method 1: Find PNG t EXt block
           let foundData = null;
-          
-          // PNG tEXt块查找
+
+          // PNG t EXt block search
           for (let i = 8; i < uint8Array.length - 8; i++) {
-            // 读取块长度
-            const chunkLength = (uint8Array[i] << 24) | (uint8Array[i+1] << 16) | (uint8Array[i+2] << 8) | uint8Array[i+3];
-            
-            // 检查是否是tEXt块 (0x74455874)
-            if (uint8Array[i+4] === 0x74 && uint8Array[i+5] === 0x45 && 
-                uint8Array[i+6] === 0x58 && uint8Array[i+7] === 0x74) {
-              
+            // Read block length
+            const chunkLength = (uint8Array[i] << 24) | (uint8Array[i + 1] << 16) | (uint8Array[i + 2] << 8) | uint8Array[i + 3];
+
+            // Check if it is a t EXt block (0x74455874)
+            if (uint8Array[i + 4] === 0x74 && uint8Array[i + 5] === 0x45 &&
+              uint8Array[i + 6] === 0x58 && uint8Array[i + 7] === 0x74) {
+
               console.log('Found tEXt chunk at:', i, 'length:', chunkLength);
-              
+
               const textStart = i + 8;
               const textEnd = textStart + chunkLength;
-              
+
               if (textEnd <= uint8Array.length) {
                 try {
-                  // 查找关键字结束位置（null字节）
+                  // Find keyword end position (null bytes)
                   let keyEnd = textStart;
                   while (keyEnd < textEnd && uint8Array[keyEnd] !== 0) {
                     keyEnd++;
                   }
-                  
-                  // 使用UTF-8解码关键字
+
+                  // Decode keywords using UTF-8
                   const keyword = new TextDecoder('utf-8', { fatal: false }).decode(uint8Array.slice(textStart, keyEnd));
                   console.log('tEXt keyword:', keyword);
-                  
-                  // 检查是否是角色卡相关的关键字
+
+                  // Check whether it is a keyword related to a character card
                   if (keyword === 'chara' || keyword === 'ccv3' || keyword === 'ccv2' || keyword === 'Comment') {
                     const dataStart = keyEnd + 1;
                     const textDataBytes = uint8Array.slice(dataStart, textEnd);
-                    
+
                     console.log('Found potential character data, length:', textDataBytes.length);
-                    
-                    // 尝试base64解码
+
+                    // Try base64 decoding
                     try {
-                      // 首先用UTF-8解码
+                      // First decode with UTF-8
                       const textData = new TextDecoder('utf-8', { fatal: false }).decode(textDataBytes);
                       const decoded = atob(textData);
-                      
-                      // 将base64解码后的字节转换为UTF-8字符串
+
+                      // Convert base64 decoded bytes to UTF-8 strings
                       const decodedBytes = new Uint8Array(decoded.length);
                       for (let j = 0; j < decoded.length; j++) {
                         decodedBytes[j] = decoded.charCodeAt(j);
                       }
                       const decodedText = new TextDecoder('utf-8', { fatal: false }).decode(decodedBytes);
                       const parsed = JSON.parse(decodedText);
-                      
+
                       console.log('Successfully parsed base64 JSON with UTF-8 handling');
                       foundData = parsed;
                       break;
                     } catch (e) {
-                      // 尝试直接JSON解析
+                      // Try to parse directly on JSON
                       try {
                         const textData = new TextDecoder('utf-8', { fatal: false }).decode(textDataBytes);
                         const parsed = JSON.parse(textData);
@@ -214,46 +214,46 @@ const Index = () => {
                   console.log('Error processing tEXt chunk:', e);
                 }
               }
-              
-              // 跳到下一个块
-              i += 8 + chunkLength + 4 - 1; // -1因为for循环会+1
+
+              // Jump to the next block
+              i += 8 + chunkLength + 4 - 1; // -1 Because the for loop will+1
             }
           }
-          
-          // 方法2: 如果tEXt块方法失败，尝试字符串搜索
+
+          // Method 2: If the t EXt block method fails, try string search
           if (!foundData) {
             console.log('tEXt method failed, trying string search...');
-            
-            // 使用UTF-8解码器处理整个文件
+
+            // Using UTF-8 Decoder handles the entire file
             const decoder = new TextDecoder('utf-8', { fatal: false });
             const fullText = decoder.decode(uint8Array);
-            
-            // 查找可能的JSON起始位置
+
+            // Find possible JSON start locations
             const jsonPatterns = [
               /"spec"\s*:\s*"chara_card_v[123]"/g,
               /"name"\s*:\s*"/g,
               /\{\s*"name"\s*:/g,
               /\{\s*"char_name"\s*:/g
             ];
-            
+
             for (const pattern of jsonPatterns) {
               const matches = [...fullText.matchAll(pattern)];
               console.log(`Pattern ${pattern.source} found ${matches.length} matches`);
-              
+
               for (const match of matches) {
                 if (!match.index) continue;
-                
-                // 向后查找JSON开始的大括号
+
+                // Backwards looking for braces at the beginning of JSON
                 let jsonStart = match.index;
                 while (jsonStart > 0 && fullText[jsonStart] !== '{') {
                   jsonStart--;
                 }
-                
+
                 if (jsonStart >= 0) {
-                  // 向前查找JSON结束
+                  // Looking forward to the end of JSON
                   let braceCount = 0;
                   let jsonEnd = -1;
-                  
+
                   for (let i = jsonStart; i < fullText.length; i++) {
                     if (fullText[i] === '{') braceCount++;
                     if (fullText[i] === '}') braceCount--;
@@ -262,7 +262,7 @@ const Index = () => {
                       break;
                     }
                   }
-                  
+
                   if (jsonEnd > jsonStart) {
                     try {
                       const jsonStr = fullText.substring(jsonStart, jsonEnd);
@@ -276,35 +276,35 @@ const Index = () => {
                   }
                 }
               }
-              
+
               if (foundData) break;
             }
           }
-          
-          // 方法3: 查找base64编码的数据
+
+          // Method 3: Find base64 encoded data
           if (!foundData) {
             console.log('String search failed, trying base64 search...');
-            
+
             const decoder = new TextDecoder('utf-8', { fatal: false });
             const fullText = decoder.decode(uint8Array);
-            
-            // 查找长的base64字符串
+
+            // Find a long base64 string
             const base64Pattern = /[A-Za-z0-9+/]{100,}={0,2}/g;
             const base64Matches = [...fullText.matchAll(base64Pattern)];
-            
+
             console.log(`Found ${base64Matches.length} potential base64 strings`);
-            
+
             for (const match of base64Matches) {
               try {
                 const decoded = atob(match[0]);
-                
-                // 将base64解码后的字节转换为UTF-8字符串
+
+                // Convert base64 decoded bytes to UTF-8 strings
                 const decodedBytes = new Uint8Array(decoded.length);
                 for (let j = 0; j < decoded.length; j++) {
                   decodedBytes[j] = decoded.charCodeAt(j);
                 }
                 const decodedText = new TextDecoder('utf-8', { fatal: false }).decode(decodedBytes);
-                
+
                 if (decodedText.includes('"name"') || decodedText.includes('"char_name"') || decodedText.includes('chara_card')) {
                   const parsed = JSON.parse(decodedText);
                   console.log('Successfully parsed base64 character data with UTF-8');
@@ -312,11 +312,11 @@ const Index = () => {
                   break;
                 }
               } catch (e) {
-                // 继续尝试下一个
+                // Keep trying the next one
               }
             }
           }
-          
+
           if (foundData) {
             console.log('Character data found:', foundData);
             resolve(foundData);
@@ -329,7 +329,7 @@ const Index = () => {
           reject(error);
         }
       };
-      
+
       reader.onerror = () => reject(new Error('Failed to read file'));
       reader.readAsArrayBuffer(file);
     });
@@ -341,24 +341,24 @@ const Index = () => {
 
     try {
       let parsedData;
-      
+
       if (file.name.endsWith('.json')) {
-        // 处理JSON文件 - 清除之前的图片
+        // Processing JSON files - Clear previous pictures
         setCharacterImage(null);
-        
+
         const content = await new Promise<string>((resolve, reject) => {
           const reader = new FileReader();
           reader.onload = (e) => resolve(e.target?.result as string);
           reader.onerror = () => reject(new Error('Failed to read JSON file'));
           reader.readAsText(file);
         });
-        
+
         parsedData = JSON.parse(content);
       } else if (file.name.endsWith('.png')) {
-        // 处理PNG文件
+        // Processing PNG files
         parsedData = await extractPNGCharacterData(file);
-        
-        // 如果成功从PNG提取数据，同时将PNG图片设置为角色头像
+
+        // If the data is successfully extracted from PNG, and the PNG image is set as the character avatar at the same time
         const reader = new FileReader();
         reader.onload = (e) => {
           const result = e.target?.result as string;
@@ -367,18 +367,18 @@ const Index = () => {
         reader.readAsDataURL(file);
       } else {
         toast({
-          title: t('hint') || "提示",
-          description: "请选择 JSON 或 PNG 格式的角色卡文件",
+          title: t('hint') || "hint",
+          description: "Please select JSON or PNG Format role card file",
           variant: "destructive"
         });
         return;
       }
 
-      // 兼容不同版本的角色卡格式
+      // Compatible with different versions of the role card format
       if (parsedData.spec === "chara_card_v3" || parsedData.spec_version === "3.0") {
         setCharacterData(parsedData);
       } else if (parsedData.spec === "chara_card_v2" || parsedData.data) {
-        // V2 格式转换为 V3
+        // V2 Convert format to V3
         const v3Data: CharacterCardV3 = {
           spec: "chara_card_v3",
           spec_version: "3.0",
@@ -405,7 +405,7 @@ const Index = () => {
         };
         setCharacterData(v3Data);
       } else {
-        // V1 格式或其他格式
+        // V1 Format or other format
         const v3Data: CharacterCardV3 = {
           spec: "chara_card_v3",
           spec_version: "3.0",
@@ -439,9 +439,9 @@ const Index = () => {
     } catch (error) {
       console.error('Import error:', error);
       toast({
-        title: t('importError') || "导入失败",
-        description: file.name.endsWith('.png') 
-          ? "此PNG文件中未找到角色卡数据，请确保使用包含角色卡信息的PNG文件"
+        title: t('importError') || "Import failed",
+        description: file.name.endsWith('.png')
+          ? "The role card data is not found in this PNG file. Please make sure to use the PNG file containing the role card information."
           : t('importErrorDesc'),
         variant: "destructive"
       });
@@ -480,55 +480,52 @@ const Index = () => {
           </div>
         </div>
 
-        {/* 全屏侧边栏选项卡布局 */}
+        {/* Full screen sidebar tab layout */}
         <div className="flex h-[calc(100vh-180px)] bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm rounded-lg overflow-hidden shadow-lg">
-          {/* 左侧边栏 */}
+          {/* Left sidebar */}
           <div className="w-56 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-r border-gray-200 dark:border-gray-700 flex flex-col">
             <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-              <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">功能面板</h2>
+              <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Feature Panel</h2>
             </div>
             <nav className="flex-1 p-2">
               <div className="space-y-1">
                 <button
                   onClick={() => setActiveTab("assistant")}
-                  className={`w-full flex items-center gap-3 px-3 py-3 text-left rounded-lg transition-all duration-200 ${
-                    activeTab === "assistant"
+                  className={`w-full flex items-center gap-3 px-3 py-3 text-left rounded-lg transition-all duration-200 ${activeTab === "assistant"
                       ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-md"
                       : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-                  }`}
+                    }`}
                 >
                   <Bot className="w-5 h-5" />
-                  <span className="font-medium">AI角色卡助手</span>
+                  <span className="font-medium">AI character card assistant</span>
                 </button>
                 <button
                   onClick={() => setActiveTab("editor")}
-                  className={`w-full flex items-center gap-3 px-3 py-3 text-left rounded-lg transition-all duration-200 ${
-                    activeTab === "editor"
+                  className={`w-full flex items-center gap-3 px-3 py-3 text-left rounded-lg transition-all duration-200 ${activeTab === "editor"
                       ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-md"
                       : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-                  }`}
+                    }`}
                 >
                   <User className="w-5 h-5" />
-                  <span className="font-medium">角色信息编辑</span>
+                  <span className="font-medium">Role information edit</span>
                 </button>
                 <button
                   onClick={() => setActiveTab("preview")}
-                  className={`w-full flex items-center gap-3 px-3 py-3 text-left rounded-lg transition-all duration-200 ${
-                    activeTab === "preview"
+                  className={`w-full flex items-center gap-3 px-3 py-3 text-left rounded-lg transition-all duration-200 ${activeTab === "preview"
                       ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-md"
                       : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-                  }`}
+                    }`}
                 >
                   <FileText className="w-5 h-5" />
-                  <span className="font-medium">JSON 预览</span>
+                  <span className="font-medium">JSON Preview</span>
                 </button>
               </div>
             </nav>
           </div>
 
-          {/* 右侧内容区域 */}
+          {/* Content area on the right */}
           <div className="flex-1 flex flex-col">
-            {/* AI助手面板 */}
+            {/* AI Assistant Panel */}
             {activeTab === "assistant" && (
               <div className="flex-1 p-6 min-h-0 overflow-auto">
                 <AIAssistant
@@ -538,7 +535,7 @@ const Index = () => {
               </div>
             )}
 
-            {/* 角色信息编辑面板 */}
+            {/* Role Information Editing Panel */}
             {activeTab === "editor" && (
               <div className="flex-1 flex flex-col min-h-0">
                 <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
@@ -600,7 +597,7 @@ const Index = () => {
               </div>
             )}
 
-            {/* JSON预览面板 */}
+            {/* JSON Preview Panel */}
             {activeTab === "preview" && (
               <div className="flex-1 p-6 min-h-0 overflow-auto">
                 <CharacterPreview

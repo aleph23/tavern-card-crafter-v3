@@ -1,6 +1,8 @@
+/* stylelint-disable at-rule-no-unknown */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+/* stylelint-enable at-rule-no-unknown */
 
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. */
 
@@ -102,12 +104,12 @@
   }
 }
 
-/* 自定义滚动条样式 - 应用到所有滚动元素 */
-.custom-scrollbar, 
-input[type="text"], 
-input[type="email"], 
-input[type="password"], 
-input[type="url"], 
+/* Custom scroll bar style - Apply to all scroll elements */
+.custom-scrollbar,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="url"],
 textarea {
   scrollbar-width: thin;
   scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
@@ -152,7 +154,7 @@ textarea::-webkit-scrollbar-thumb:hover {
   background-color: rgba(107, 114, 128, 0.7);
 }
 
-/* 为整个页面添加自定义滚动条 */
+/* Add custom scrollbars to the entire page */
 html {
   scrollbar-width: thin;
   scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
@@ -176,7 +178,7 @@ html::-webkit-scrollbar-thumb:hover {
   background-color: rgba(107, 114, 128, 0.7);
 }
 
-/* 修复输入框焦点边框问题 */
+/* Fixed the input frame focus border problem */
 .form-group {
   position: relative;
   z-index: 1;
@@ -186,7 +188,7 @@ html::-webkit-scrollbar-thumb:hover {
   z-index: 10;
 }
 
-/* 确保所有输入框都有正确的焦点环样式 */
+/* Make sure all input boxes have the correct focus ring style */
 input:focus-visible,
 textarea:focus-visible {
   outline: none !important;
@@ -196,7 +198,7 @@ textarea:focus-visible {
   position: relative;
 }
 
-/* 为了确保焦点环不被遮挡，给所有表单控件添加适当的边距 */
+/* To ensure that the focus ring is not obstructed, add appropriate margins to all form controls */
 .form-group input,
 .form-group textarea {
   position: relative;

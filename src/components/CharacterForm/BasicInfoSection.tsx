@@ -38,8 +38,8 @@ const BasicInfoSection = ({ data, updateField, characterImage, setCharacterImage
   const handleAIGenerateDescription = async () => {
     if (!aiSettings?.apiKey && !['ollama', 'lmstudio'].includes(aiSettings?.provider?.toLowerCase() || '')) {
       toast({
-        title: "配置错误",
-        description: "请先在AI设置中配置API密钥",
+        title: "Configuration error",
+        description: "Please configure the API key in the AI ​​settings first",
         variant: "destructive"
       });
       return;
@@ -47,8 +47,8 @@ const BasicInfoSection = ({ data, updateField, characterImage, setCharacterImage
 
     if (!data.name) {
       toast({
-        title: "信息不完整",
-        description: "请先填写角色名称",
+        title: "Incomplete information",
+        description: "Please fill in the role name first",
         variant: "destructive"
       });
       return;
@@ -56,25 +56,25 @@ const BasicInfoSection = ({ data, updateField, characterImage, setCharacterImage
 
     abortControllerRef.current = new AbortController();
     setLoading(true);
-    
+
     try {
       const prompt = generateDescription(data);
       const result = await generateWithAI(aiSettings, prompt);
       updateField("description", result);
       toast({
-        title: "生成成功",
-        description: "角色描述已生成完成"
+        title: "Generate successfully",
+        description: "Role description has been generated"
       });
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
         toast({
-          title: "已取消",
-          description: "AI生成已被用户取消"
+          title: "Canceled",
+          description: "AI generation has been canceled by the user"
         });
       } else {
         toast({
-          title: "生成失败",
-          description: error instanceof Error ? error.message : "未知错误",
+          title: "Generation failed",
+          description: error instanceof Error ? error.message : "Unknown error",
           variant: "destructive"
         });
       }
@@ -90,8 +90,8 @@ const BasicInfoSection = ({ data, updateField, characterImage, setCharacterImage
       setLoading(false);
       abortControllerRef.current = null;
       toast({
-        title: "已取消",
-        description: "AI生成已取消"
+        title: "Canceled",
+        description: "AI generation has been canceled"
       });
     }
   };
@@ -99,24 +99,24 @@ const BasicInfoSection = ({ data, updateField, characterImage, setCharacterImage
   const handleClearDescription = () => {
     updateField("description", "");
     toast({
-      title: "已清空",
-      description: "角色描述已清空"
+      title: "Cleared",
+      description: "Character description has been cleared"
     });
   };
 
   return (
     <div className="space-y-6">
-      <h3 className="text-lg font-semibold text-gray-800 mb-4">基本信息</h3>
-      
-      {/* 角色头像 */}
+      <h3 className="text-lg font-semibold text-gray-800 mb-4">Basic information</h3>
+
+      {/* Character avatar */}
       <div className="form-group">
-        <Label className="text-sm font-medium text-gray-700">角色头像</Label>
+        <Label className="text-sm font-medium text-gray-700">Character avatar</Label>
         <div className="flex items-center gap-4 mt-2">
           {characterImage && (
             <div className="relative">
-              <img 
-                src={characterImage} 
-                alt="角色头像" 
+              <img
+                src={characterImage}
+                alt="Character avatar"
                 className="w-20 h-20 rounded-lg object-cover border-2 border-gray-200"
               />
               <Button
@@ -143,15 +143,15 @@ const BasicInfoSection = ({ data, updateField, characterImage, setCharacterImage
               size="sm"
             >
               <Upload className="w-4 h-4 mr-2" />
-              {characterImage ? '更换头像' : '上传头像'}
+              {characterImage ? 'Change avatar' : 'Upload avatar'}
             </Button>
           </div>
         </div>
       </div>
 
-      {/* 角色名称 */}
+      {/* Role name */}
       <div className="form-group">
-        <Label htmlFor="name" className="text-sm font-medium text-gray-700">角色名称 *</Label>
+        <Label htmlFor="name" className="text-sm font-medium text-gray-700">Role name *</Label>
         <Input
           id="name"
           value={data.name}
@@ -161,22 +161,22 @@ const BasicInfoSection = ({ data, updateField, characterImage, setCharacterImage
         />
       </div>
 
-      {/* 昵称 */}
+      {/* Nick name */}
       <div className="form-group">
-        <Label htmlFor="nickname" className="text-sm font-medium text-gray-700">昵称</Label>
+        <Label htmlFor="nickname" className="text-sm font-medium text-gray-700">Nick name</Label>
         <Input
           id="nickname"
           value={data.nickname || ""}
           onChange={(e) => updateField("nickname", e.target.value)}
-          placeholder="输入角色昵称..."
+          placeholder="Enter the role nickname..."
           className="mt-1 w-full max-w-none"
         />
       </div>
 
-      {/* 角色描述 */}
+      {/* Role description */}
       <div className="form-group">
         <div className="flex items-center justify-between mb-2">
-          <Label htmlFor="description" className="text-sm font-medium text-gray-700">角色描述 *</Label>
+          <Label htmlFor="description" className="text-sm font-medium text-gray-700">Role description *</Label>
           <div className="flex gap-1">
             {!loading && (
               <Button
@@ -186,7 +186,7 @@ const BasicInfoSection = ({ data, updateField, characterImage, setCharacterImage
                 className="h-8 px-2 text-xs"
               >
                 <RefreshCcw className="w-3 h-3 mr-1" />
-                重新生成
+                Regenerate
               </Button>
             )}
             <Button
@@ -199,12 +199,12 @@ const BasicInfoSection = ({ data, updateField, characterImage, setCharacterImage
               {loading ? (
                 <>
                   <X className="w-3 h-3 mr-1" />
-                  取消
+                  Cancel
                 </>
               ) : (
                 <>
                   <Sparkles className="w-3 h-3 mr-1" />
-                  AI生成
+                  AI generation
                 </>
               )}
             </Button>
@@ -215,7 +215,7 @@ const BasicInfoSection = ({ data, updateField, characterImage, setCharacterImage
               className="h-8 px-2 text-xs"
             >
               <Trash2 className="w-3 h-3 mr-1" />
-              清空
+              Clear
             </Button>
           </div>
         </div>
@@ -223,7 +223,7 @@ const BasicInfoSection = ({ data, updateField, characterImage, setCharacterImage
           id="description"
           value={data.description}
           onChange={(e) => updateField("description", e.target.value)}
-          placeholder="详细描述角色的外观、背景、特征等..."
+          placeholder="Describe the appearance, background, characteristics, etc. of the character in detail..."
           className="mt-1 min-h-[120px] w-full max-w-none"
           showCounter={true}
         />

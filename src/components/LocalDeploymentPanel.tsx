@@ -153,10 +153,10 @@ pause`;
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    
+
     toast({
-      title: language === 'en' ? "Downloaded" : "下载完成",
-      description: language === 'en' ? "start-server.bat has been downloaded" : "start-server.bat 文件已下载",
+      title: language === 'en' ? "Downloaded" : "Download completed",
+      description: language === 'en' ? "start-server.bat has been downloaded" : "start-server.bat File downloaded",
     });
   };
 
@@ -170,10 +170,10 @@ pause`;
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    
+
     toast({
       title: language === 'en' ? "Downloaded" : "下载完成",
-      description: language === 'en' ? "package.json has been downloaded" : "package.json 文件已下载",
+      description: language === 'en' ? "package.json has been downloaded" : "package.json File downloaded",
     });
   };
 
@@ -181,7 +181,7 @@ pause`;
     navigator.clipboard.writeText(text);
     toast({
       title: language === 'en' ? "Copied" : "已复制",
-      description: language === 'en' ? "Command copied to clipboard" : "命令已复制到剪贴板",
+      description: language === 'en' ? "Command copied to clipboard" : "The command has been copied to the clipboard",
     });
   };
 
@@ -200,10 +200,10 @@ pause`;
             {language === 'en' ? 'Local Deployment Guide' : '本地部署指南'}
           </DialogTitle>
         </DialogHeader>
-        
+
         <ScrollArea className="h-[60vh] pr-4">
           <div className="space-y-6">
-            {/* 部署步骤 */}
+            {/* Deployment steps */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -225,7 +225,7 @@ pause`;
               </CardContent>
             </Card>
 
-            {/* 系统要求 */}
+            {/* System requirements */}
             <Card>
               <CardHeader>
                 <CardTitle>{language === 'en' ? 'System Requirements' : '系统要求'}</CardTitle>
@@ -252,7 +252,7 @@ pause`;
               </CardContent>
             </Card>
 
-            {/* 命令行指令 */}
+            {/* Command line command */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -265,7 +265,7 @@ pause`;
                   {commands.map((command, index) => (
                     <div key={index} className="space-y-2">
                       <p className="text-sm text-muted-foreground">
-                        {index === 0 
+                        {index === 0
                           ? (language === 'en' ? 'Install dependencies:' : '安装依赖:')
                           : (language === 'en' ? 'Start development server:' : '启动开发服务器:')
                         }
@@ -288,7 +288,7 @@ pause`;
               </CardContent>
             </Card>
 
-            {/* 下载文件 */}
+            {/* Download the file */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -302,9 +302,9 @@ pause`;
                     <div className="p-4 border rounded-lg">
                       <h4 className="font-medium mb-2">start-server.bat</h4>
                       <p className="text-sm text-muted-foreground mb-3">
-                        {language === 'en' 
+                        {language === 'en'
                           ? 'Automated startup script for Windows. Double-click to run after downloading project files.'
-                          : 'Windows 自动启动脚本。下载项目文件后双击运行。'
+                          : 'Windows Automatically start the script. After downloading the project file, double-click to run.'
                         }
                       </p>
                       <Button onClick={downloadBatFile} className="w-full">
@@ -317,7 +317,7 @@ pause`;
                     <div className="p-4 border rounded-lg">
                       <h4 className="font-medium mb-2">package.json</h4>
                       <p className="text-sm text-muted-foreground mb-3">
-                        {language === 'en' 
+                        {language === 'en'
                           ? 'Project configuration file containing all dependencies and scripts.'
                           : '项目配置文件，包含所有依赖和脚本。'
                         }
@@ -353,7 +353,7 @@ pause`;
                       <li>4. {language === 'en' ? 'Double-click start-server.bat to run' : '双击 start-server.bat 运行'}</li>
                     </ol>
                   </div>
-                  
+
                   <div className="p-4 bg-green-50 dark:bg-green-950 rounded-lg">
                     <h4 className="font-medium mb-2 text-green-900 dark:text-green-100">
                       {language === 'en' ? 'Manual Setup' : '手动设置'}

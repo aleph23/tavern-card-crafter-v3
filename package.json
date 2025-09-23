@@ -2,7 +2,7 @@
   "name": "vite_react_shadcn_ts",
   "private": true,
   "version": "0.0.0",
-  "description": "Tavern Card Crafter - AI角色卡制作工具",
+  "description": "Tavern Card Crafter - AI character card creation tool",
   "author": "Tavern Card Crafter Team",
   "type": "module",
   "main": "electron/main.cjs",

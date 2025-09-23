@@ -23,52 +23,52 @@ export interface AISettings {
 const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
   const { toast } = useToast();
 
-  // API提供商预设配置
+  // API provider preset configuration
   const apiProviders = [
     {
-      name: "OpenAI 官方",
+      name: "OpenAI official",
       value: "openai",
       url: "https://api.openai.com",
       modelsUrl: "https://api.openai.com/v1/models",
       models: ["gpt-4o", "gpt-4o-mini", "gpt-4-turbo", "gpt-4", "gpt-3.5-turbo"],
       requiresKey: true,
-      tips: "需要海外网络环境和有效的OpenAI API密钥"
+      tips: "Need an overseas network environment and an effective Open AI API Key"
     },
     {
-      name: "DeepSeek 深度求索",
+      name: "DeepSeek In-depth search",
       value: "deepseek",
       url: "https://api.deepseek.com",
       modelsUrl: "https://api.deepseek.com/v1/models",
       models: ["deepseek-chat", "deepseek-coder"],
       requiresKey: true,
-      tips: "国内可直接访问，性价比高"
+      tips: "Direct access in China, high cost performance"
     },
     {
-      name: "月之暗面 Moonshot",
-      value: "moonshot", 
+      name: "The dark side of the moon Moonshot",
+      value: "moonshot",
       url: "https://api.moonshot.cn",
       modelsUrl: "https://api.moonshot.cn/v1/models",
       models: ["moonshot-v1-8k", "moonshot-v1-32k", "moonshot-v1-128k"],
       requiresKey: true,
-      tips: "国内API，支持长上下文"
+      tips: "Domestic API, support long context"
     },
     {
-      name: "智谱 GLM",
+      name: "Wisdom GLM",
       value: "zhipu",
       url: "https://open.bigmodel.cn/api/paas/v4",
       modelsUrl: "https://open.bigmodel.cn/api/paas/v4/models",
       models: ["glm-4-plus", "glm-4-0520", "glm-4", "glm-4-air", "glm-4-airx", "glm-4-flash"],
       requiresKey: true,
-      tips: "智谱清言API，国内服务"
+      tips: "Zhipu Qingyan API, domestic servicesn API, domestic services"
     },
     {
-      name: "零一万物 Yi",
+      name: "Zero 10,000 things Yi",
       value: "yi",
       url: "https://api.lingyiwanwu.com",
       modelsUrl: "https://api.lingyiwanwu.com/v1/models",
       models: ["yi-large", "yi-medium", "yi-spark", "yi-large-rag"],
       requiresKey: true,
-      tips: "零一万物API"
+      tips: "Zero One All Things API"
     },
     {
       name: "OpenRouter",
@@ -77,25 +77,25 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
       modelsUrl: "https://openrouter.ai/api/v1/models",
       models: ["openai/gpt-4o", "anthropic/claude-3.5-sonnet", "google/gemini-2.0-flash-exp", "deepseek/deepseek-r1-distill-qwen-7b"],
       requiresKey: true,
-      tips: "OpenRouter统一接口，支持多种模型"
+      tips: "Open Router unified interface, supports multiple models"
     },
     {
-      name: "Ollama (本地)",
+      name: "Ollama (local)",
       value: "ollama",
       url: "http://localhost:11434",
       modelsUrl: "http://localhost:11434/api/tags",
       models: ["llama3.2", "llama3.1", "qwen2.5", "deepseek-coder", "codegemma", "mistral"],
       requiresKey: false,
-      tips: "本地Ollama服务，无需API密钥。需要先下载模型：ollama pull 模型名。默认端口11434"
+      tips: "Local Ollama service, no API key required. You need to download the model first: ollama pull Model name. Default port 11434"
     },
     {
-      name: "LM Studio (本地)",
+      name: "LM Studio (local)",
       value: "lmstudio",
       url: "http://localhost:1234",
       modelsUrl: "http://localhost:1234/v1/models",
       models: ["local-model"],
       requiresKey: false,
-      tips: "LM Studio本地服务，无需API密钥，需要先加载模型。默认端口1234"
+      tips: "LM Studio local service, no API key is required, the model needs to be loaded first. Default port 1234"
     },
     {
       name: "OneAPI/New API",
@@ -104,16 +104,16 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
       modelsUrl: "http://localhost:3000/v1/models",
       models: ["gpt-3.5-turbo", "gpt-4", "claude-3-sonnet"],
       requiresKey: true,
-      tips: "OneAPI统一接口，支持多种模型代理。默认端口3000"
+      tips: "One API unified interface supports multiple model proxy. Default port 3000"
     },
     {
-      name: "自定义 OpenAI 兼容接口",
+      name: "Customize Open AI Compatible interface",
       value: "custom",
       url: "",
       modelsUrl: "",
       models: ["gpt-3.5-turbo", "gpt-4"],
       requiresKey: true,
-      tips: "自定义OpenAI兼容接口，请手动配置API地址和模型名称"
+      tips: "Customize Open AI-compatible interface, please manually configure the API address and model name"
     }
   ];
 
@@ -132,7 +132,7 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [lastError, setLastError] = useState<string>("");
 
-  // 默认模型列表（当无法获取模型列表时使用）
+  // Default model list (used when the model list cannot be obtained)
   const defaultModels = [
     "gpt-4o", "gpt-4o-mini", "gpt-4-turbo", "gpt-4", "gpt-3.5-turbo",
     "deepseek-chat", "deepseek-coder",
@@ -145,7 +145,7 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
     const currentProvider = apiProviders.find(p => p.value === settings.provider);
     if (currentProvider && currentProvider.models.length > 0) {
       setAvailableModels(currentProvider.models);
-      // 如果当前模型不在可用模型列表中，自动选择第一个可用模型
+      // If the current model is not in the available model list, the first available model will be automatically selected
       if (!currentProvider.models.includes(settings.model)) {
         setSettings(prev => ({
           ...prev,
@@ -165,42 +165,42 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
         provider: providerValue,
         apiUrl: provider.url,
         model: provider.models[0] || prev.model,
-        // 如果是不需要密钥的提供商，清空密钥
+        // If it is a provider that does not require a key, clear the key
         apiKey: provider.requiresKey ? prev.apiKey : ""
       }));
       setAvailableModels(provider.models.length > 0 ? provider.models : defaultModels);
     }
   };
 
-  // 智能构建API URL - 针对不同提供商的特殊处理
+  // Intelligently build API URL - Special treatment for different providers
   const buildApiUrl = (baseUrl: string, provider: string = settings.provider): string => {
     if (!baseUrl) return '';
-    
-    // 移除末尾的斜杠
+
+    // Remove the end slash
     const cleanUrl = baseUrl.replace(/\/+$/, '');
-    
-    // Ollama特殊处理
+
+    // Ollama special treatment
     if (provider === 'ollama') {
       if (baseUrl.includes('/v1/chat/completions')) {
         return cleanUrl;
       }
       return `${cleanUrl}/v1/chat/completions`;
     }
-    
-    // 智谱GLM特殊处理
+
+    // Special processing of Zhipu GLM
     if (provider === 'zhipu') {
       if (baseUrl.includes('/chat/completions')) {
         return cleanUrl;
       }
       return `${cleanUrl}/chat/completions`;
     }
-    
-    // 其他提供商的标准处理
+
+    // Standard processing from other providers
     if (baseUrl.includes('/chat/completions')) {
       return cleanUrl;
     }
-    
-    // 智能添加端点
+
+    // Smartly add endpoints
     if (cleanUrl.includes('/v1')) {
       return `${cleanUrl}/chat/completions`;
     } else {
@@ -208,25 +208,25 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
     }
   };
 
-  // 构建模型API地址
+  // Build the model API address
   const buildModelsUrl = (baseUrl: string, provider: string = settings.provider): string => {
     if (!baseUrl) return '';
-    
+
     const cleanUrl = baseUrl.replace(/\/+$/, '');
-    
-    // Ollama特殊处理
+
+    // Ollama special treatment
     if (provider === 'ollama') {
       if (baseUrl.includes('/api/tags')) {
         return cleanUrl;
       }
       return `${cleanUrl}/api/tags`;
     }
-    
-    // 其他提供商
+
+    // Other providers
     if (baseUrl.includes('/models')) {
       return cleanUrl;
     }
-    
+
     if (cleanUrl.includes('/v1')) {
       return `${cleanUrl}/models`;
     } else {
@@ -234,56 +234,56 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
     }
   };
 
-  // 解析API错误信息
+  // Parsing API error message
   const parseApiError = (error: any, response?: Response): string => {
     try {
       if (typeof error === 'string') {
-        // 处理常见错误
-        if (error.includes('model') && (error.includes('not found') || error.includes('无效的模型'))) {
-          return "模型不存在，请检查模型名称或先下载模型（如Ollama需要执行: ollama pull 模型名）";
+        // Handle common errors
+        if (error.includes('model') && (error.includes('not found') || error.includes('Invalid model'))) {
+          return "The model does not exist, please check the model name or download the model first (if Ollama needs to execute it: ollama pull Model name)";
         }
-        if (error.includes('无可用渠道') || error.includes('no available channels')) {
-          return "当前API分组无可用渠道，请检查API配置或联系服务提供商";
+        if (error.includes('No channels available') || error.includes('no available channels')) {
+          return "There is no available channel for the current API grouping. Please check the API configuration or contact the service provider.";
         }
         if (error.includes('User location is not supported') || error.includes('location')) {
-          return "当前地区不支持此API服务，可能需要使用代理或更换API提供商";
+          return "This API service is not supported in the current region, and it may be necessary to use a proxy or replace the API provider.";
         }
         if (error.includes('Unauthorized') || error.includes('401')) {
-          return "API密钥无效或已过期，请检查密钥是否正确";
+          return "The API key is invalid or expired. Please check if the key is correct.";
         }
         if (error.includes('rate limit') || error.includes('429')) {
-          return "API调用频率超限，请稍后重试";
+          return "API call frequency exceeds the limit, please try again later";
         }
         if (error.includes('quota') || error.includes('insufficient')) {
-          return "API额度不足，请检查账户余额";
+          return "The API limit is insufficient, please check the account balance";
         }
         if (error.includes('Failed to fetch') || error.includes('fetch')) {
-          return "网络连接失败，请检查网络或API地址是否正确。对于本地服务，请确保服务已启动";
+          return "The network connection has failed. Please check whether the network or API address is correct. For local services, make sure the service is started";
         }
         if (error.includes('CORS')) {
-          return "跨域请求被阻止，请检查API服务的CORS配置";
+          return "Cross-domain requests are blocked, please check the CORS configuration of the API service";
         }
         return error;
       }
-      
+
       if (error?.error?.message) {
         return error.error.message;
       }
-      
-      return "未知错误";
+
+      return "Unknown error";
     } catch {
-      return "解析错误信息失败";
+      return "Failed to parse error message";
     }
   };
 
   const testConnection = async () => {
     const currentProvider = apiProviders.find(p => p.value === settings.provider);
-    
-    // 检查是否需要API密钥 - 修复本地服务的密钥检查
+
+    // Check if the API key is required - Fix local service key check
     if (currentProvider?.requiresKey && !settings.apiKey) {
       toast({
-        title: "配置缺失",
-        description: "请先填写API密钥",
+        title: "Configuration missing",
+        description: "Please fill in the API key first",
         variant: "destructive"
       });
       return;
@@ -291,28 +291,28 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
 
     if (!settings.apiUrl) {
       toast({
-        title: "配置缺失",
-        description: "请先填写API地址",
+        title: "Configuration missing",
+        description: "Please fill in the API address first",
         variant: "destructive"
       });
       return;
     }
 
-    // 对于本地服务，如果没有获取到模型列表，建议先获取模型
-    if (['ollama', 'lmstudio'].includes(settings.provider) && 
-        availableModels.length === 0) {
+    // For local services, if no model list is obtained, it is recommended to obtain the model first
+    if (['ollama', 'lmstudio'].includes(settings.provider) &&
+      availableModels.length === 0) {
       toast({
-        title: "建议操作",
-        description: "建议先点击获取模型按钮获取可用模型列表",
+        title: "Recommended operation",
+        description: "It is recommended to click the Get Model button to get the list of available models first.",
         variant: "default"
       });
     }
 
-    // 检查当前模型是否在可用模型列表中
+    // Check if the current model is in the list of available models
     if (availableModels.length > 0 && !availableModels.includes(settings.model)) {
       toast({
-        title: "模型无效",
-        description: `当前模型"${settings.model}"不在可用模型列表中，请选择有效模型或先获取模型列表`,
+        title: "Invalid model",
+        description: `Current model"${settings.model}"Not in the available models list, please select a valid model or get the model list first`,
         variant: "destructive"
       });
       return;
@@ -324,17 +324,17 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
 
     try {
       const apiUrl = buildApiUrl(settings.apiUrl, settings.provider);
-      
+
       console.log('Testing connection to:', apiUrl);
       console.log('Provider:', settings.provider);
       console.log('Model:', settings.model);
-      
-      // 使用统一的OpenAI兼容格式
+
+      // Use a unified Open AI-compatible format
       let headers: any = {
         'Content-Type': 'application/json',
       };
 
-      // 只有需要密钥的提供商才添加Authorization头
+      // Only providers that require a key will add Authorization header
       if (currentProvider?.requiresKey && settings.apiKey) {
         headers['Authorization'] = `Bearer ${settings.apiKey}`;
       }
@@ -353,7 +353,7 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
         method: 'POST',
         headers,
         body: JSON.stringify(requestBody),
-        signal: AbortSignal.timeout(30000) // 30秒超时
+        signal: AbortSignal.timeout(30000) // 30 seconds timeout
       });
 
       console.log('Response status:', response.status);
@@ -362,34 +362,34 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
         setConnectionStatus('success');
         setLastError("");
         toast({
-          title: "连接成功 ✅",
-          description: `${settings.provider.toUpperCase()} API连接测试通过`,
+          title: "Connection successfully ✅",
+          description: `${settings.provider.toUpperCase()} API connection test passed`,
         });
       } else {
         const errorText = await response.text();
         console.log('Error response:', errorText);
-        
+
         let errorData;
         try {
           errorData = JSON.parse(errorText);
         } catch {
           errorData = { error: { message: errorText } };
         }
-        
+
         const errorMessage = parseApiError(errorData, response);
         setConnectionStatus('error');
         setLastError(`${response.status}: ${errorMessage}`);
-        
-        // 针对本地服务的特殊提示
+
+        // Special tips for local services
         if (['ollama', 'lmstudio'].includes(settings.provider) && response.status === 400) {
           toast({
-            title: "连接失败 ❌",
-            description: `${errorMessage}。建议先获取模型列表，确保使用有效的模型名称。`,
+            title: "Connection failed ❌",
+            description: `${errorMessage}. It is recommended to get the model list first to ensure that you use a valid model name.`,
             variant: "destructive"
           });
         } else {
           toast({
-            title: "连接失败 ❌",
+            title: "Connection failed ❌",
             description: `${errorMessage}`,
             variant: "destructive"
           });
@@ -397,29 +397,29 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
       }
     } catch (error: any) {
       console.error('Connection test error:', error);
-      
-      let errorMessage = "网络连接错误";
-      
+
+      let errorMessage = "Network connection error";
+
       if (error.name === 'TimeoutError') {
-        errorMessage = "请求超时，请检查网络连接或API地址";
+        errorMessage = "Request timeout, please check the network connection or API address";
       } else if (error.message?.includes('Failed to fetch')) {
         if (settings.provider === 'ollama') {
-          errorMessage = "无法连接到Ollama服务。请确保：\n1. Ollama已启动 (ollama serve)\n2. 服务运行在正确端口 (默认11434)\n3. 防火墙允许访问";
+          errorMessage = "Unable to connect to the Ollama service. Please make sure:\n1. Ollama has been started (ollama serve)\n2. The service runs on the correct port (Default 11434)\n3. Firewall allows access";
         } else if (settings.provider === 'lmstudio') {
-          errorMessage = "无法连接到LM Studio服务。请确保：\n1. LM Studio已启动\n2. 已启用本地服务器\n3. 服务运行在正确端口 (默认1234)";
+          errorMessage = "Unable to connect to LM Studio Services. Please make sure:\n1. LM Studio is started\n2. Local server enabled\n3. The service runs on the correct port (Default 1234)";
         } else {
-          errorMessage = "网络连接失败，请检查API地址是否正确或服务是否运行";
+          errorMessage = "The network connection failed. Please check whether the API address is correct or whether the service is running.";
         }
       } else if (error.message?.includes('CORS')) {
-        errorMessage = "跨域请求被阻止，请检查API服务的CORS配置";
+        errorMessage = "Cross-domain requests are blocked, please check the CORS configuration of the API service";
       } else if (error.message) {
         errorMessage = parseApiError(error.message);
       }
-        
+
       setConnectionStatus('error');
       setLastError(errorMessage);
       toast({
-        title: "连接失败 ❌",
+        title: "Connection failed ❌",
         description: errorMessage,
         variant: "destructive"
       });
@@ -430,12 +430,12 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
 
   const fetchModels = async () => {
     const currentProvider = apiProviders.find(p => p.value === settings.provider);
-    
-    // 检查是否需要API密钥
+
+    // Check if the API key is required
     if (currentProvider?.requiresKey && !settings.apiKey) {
       toast({
-        title: "配置缺失",
-        description: "请先填写API密钥",
+        title: "Configuration missing",
+        description: "Please fill in the API key first",
         variant: "destructive"
       });
       return;
@@ -443,8 +443,8 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
 
     if (!settings.apiUrl) {
       toast({
-        title: "配置缺失",
-        description: "请先填写API地址",
+        title: "Configuration missing",
+        description: "Please fill in the API address first",
         variant: "destructive"
       });
       return;
@@ -454,20 +454,20 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
 
     try {
       const modelsUrl = currentProvider?.modelsUrl || buildModelsUrl(settings.apiUrl, settings.provider);
-      
+
       console.log('Fetching models from:', modelsUrl);
       console.log('Provider:', settings.provider);
-      
+
       let headers: any = {};
 
-      // 只有需要密钥的提供商才添加Authorization头
+      // Only providers that require a key will add Authorization header
       if (currentProvider?.requiresKey && settings.apiKey) {
         headers['Authorization'] = `Bearer ${settings.apiKey}`;
       }
 
-      const response = await fetch(modelsUrl, { 
+      const response = await fetch(modelsUrl, {
         headers,
-        signal: AbortSignal.timeout(15000) // 15秒超时
+        signal: AbortSignal.timeout(15000) // 15 seconds timeout
       });
 
       console.log('Models response status:', response.status);
@@ -475,7 +475,7 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
       if (response.ok) {
         const data = await response.json();
         console.log('Models data:', data);
-        
+
         let modelIds: string[] = [];
 
         if (settings.provider === 'ollama' && data.models) {
@@ -487,14 +487,14 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
         if (modelIds.length > 0) {
           setAvailableModels(modelIds);
           toast({
-            title: "获取成功 ✅",
-            description: `成功获取 ${modelIds.length} 个模型`,
+            title: "Get successful ✅",
+            description: `Successfully obtained ${modelIds.length} A model`,
           });
         } else {
           setAvailableModels(currentProvider?.models || defaultModels);
           toast({
-            title: "使用预设列表",
-            description: "无法解析模型数据，使用预设模型列表",
+            title: "Use preset list",
+            description: "Unable to parse model data, use preset model list",
           });
         }
       } else {
@@ -502,21 +502,21 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
         const errorText = await response.text();
         console.log('Models fetch error:', errorText);
         toast({
-          title: "获取失败",
-          description: `无法获取模型列表: ${response.status}，使用预设模型列表`,
+          title: "Failed to obtain",
+          description: `Unable to get the model list: ${response.status}, use the preset model list`,
         });
       }
     } catch (error: any) {
       console.error('Models fetch error:', error);
       setAvailableModels(currentProvider?.models || defaultModels);
-      
-      let errorMessage = "无法连接到API服务器，使用预设模型列表";
+
+      let errorMessage = "Unable to connect to API server, use preset model list";
       if (settings.provider === 'ollama') {
-        errorMessage = "无法连接到Ollama服务获取模型列表，请确保Ollama已启动";
+        errorMessage = "Unable to connect to Ollama service to get the model list, make sure Ollama is started";
       }
-      
+
       toast({
-        title: "获取失败",
+        title: "Failed to obtain",
         description: errorMessage,
       });
     } finally {
@@ -526,12 +526,12 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
 
   const handleSave = () => {
     const currentProvider = apiProviders.find(p => p.value === settings.provider);
-    
-    // 检查必要字段
+
+    // Check the necessary fields
     if (currentProvider?.requiresKey && !settings.apiKey) {
       toast({
-        title: "配置缺失",
-        description: "请填写API密钥",
+        title: "Configuration missing",
+        description: "Please fill in the API key",
         variant: "destructive"
       });
       return;
@@ -539,14 +539,14 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
 
     if (!settings.apiUrl) {
       toast({
-        title: "配置缺失",
-        description: "请填写API地址",
+        title: "Configuration missing",
+        description: "Please fill in the API address",
         variant: "destructive"
       });
       return;
     }
 
-    // 确保API地址格式正确
+    // Ensure the API address format is correct
     const finalSettings = {
       ...settings,
       apiUrl: buildApiUrl(settings.apiUrl, settings.provider)
@@ -556,8 +556,8 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
     onSettingsChange(finalSettings);
     setIsOpen(false);
     toast({
-      title: "保存成功 ✅",
-      description: "AI设置已保存",
+      title: "Save successfully ✅",
+      description: "AI settings saved",
     });
   };
 
@@ -582,19 +582,19 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
           <Settings className="w-4 h-4 mr-2" />
-          AI设置
+          AI Settings
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px] max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>AI设置</DialogTitle>
+          <DialogTitle>AI Settings</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="provider">API提供商</Label>
+            <Label htmlFor="provider">API provider</Label>
             <Select value={settings.provider} onValueChange={handleProviderChange}>
               <SelectTrigger>
-                <SelectValue placeholder="选择API提供商" />
+                <SelectValue placeholder="Select an API provider" />
               </SelectTrigger>
               <SelectContent>
                 {apiProviders.map((provider) => (
@@ -616,43 +616,43 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
 
           {currentProvider?.requiresKey && (
             <div className="space-y-2">
-              <Label htmlFor="apiKey">API密钥</Label>
+              <Label htmlFor="apiKey">API Key</Label>
               <Input
                 id="apiKey"
                 type="password"
                 value={settings.apiKey}
                 onChange={(e) => setSettings(prev => ({ ...prev, apiKey: e.target.value }))}
-                placeholder="输入您的API密钥..."
+                placeholder="Enter your API key..."
               />
             </div>
           )}
-          
+
           <div className="space-y-2">
-            <Label htmlFor="apiUrl">API地址</Label>
+            <Label htmlFor="apiUrl">API Address</Label>
             <Input
               id="apiUrl"
               value={settings.apiUrl}
               onChange={(e) => setSettings(prev => ({ ...prev, apiUrl: e.target.value }))}
-              placeholder="输入API地址，系统会自动补全/v1/chat/completions..."
+              placeholder="Enter the API address and the system will automatically complete it/v1/chat/completions..."
             />
             <p className="text-xs text-muted-foreground">
-              提示：只需输入基础地址，系统会自动添加 /v1/chat/completions 后缀
+              Tip: Just enter the basic address and the system will automatically add it /v1/chat/completions suffix
             </p>
           </div>
 
           <div className="flex gap-2">
-            <Button 
-              onClick={testConnection} 
+            <Button
+              onClick={testConnection}
               disabled={isTestingConnection || !settings.apiUrl || (currentProvider?.requiresKey && !settings.apiKey)}
               variant="outline"
               size="sm"
               className="flex-1"
             >
               {getConnectionIcon()}
-              <span className="ml-2">测试连接</span>
+              <span className="ml-2">Test connection</span>
             </Button>
-            <Button 
-              onClick={fetchModels} 
+            <Button
+              onClick={fetchModels}
               disabled={isLoadingModels || !settings.apiUrl || (currentProvider?.requiresKey && !settings.apiKey)}
               variant="outline"
               size="sm"
@@ -663,7 +663,7 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
               ) : (
                 <RefreshCw className="w-4 h-4 mr-2" />
               )}
-              获取模型
+              Get the model
             </Button>
           </div>
 
@@ -671,16 +671,16 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription className="text-sm">
-                <strong>连接错误:</strong> {lastError}
+                <strong>Connection error:</strong> {lastError}
               </AlertDescription>
             </Alert>
           )}
-          
+
           <div className="space-y-2">
-            <Label htmlFor="model">模型选择</Label>
+            <Label htmlFor="model">Model selection</Label>
             <Select value={settings.model} onValueChange={(value) => setSettings(prev => ({ ...prev, model: value }))}>
               <SelectTrigger>
-                <SelectValue placeholder="选择模型" />
+                <SelectValue placeholder="Select a model" />
               </SelectTrigger>
               <SelectContent>
                 {availableModels.filter(model => model && model.trim() !== '').map((model) => (
@@ -691,9 +691,9 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
               </SelectContent>
             </Select>
           </div>
-          
+
           <Button onClick={handleSave} className="w-full">
-            保存设置
+            Save settings
           </Button>
         </div>
       </DialogContent>

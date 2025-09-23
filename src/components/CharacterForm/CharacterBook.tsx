@@ -39,11 +39,11 @@ const CharacterBook = ({ entries, updateField, aiSettings, characterData }: Char
         insertion_order: 100,
         enabled: true
       };
-      
+
       updateField("character_book", {
         entries: [...entries, entry]
       });
-      
+
       setNewEntryKeys("");
       setNewEntryContent("");
     }
@@ -58,8 +58,8 @@ const CharacterBook = ({ entries, updateField, aiSettings, characterData }: Char
   const handleAIGenerateEntry = async () => {
     if (!aiSettings?.apiKey && !['ollama', 'lmstudio'].includes(aiSettings?.provider?.toLowerCase() || '')) {
       toast({
-        title: "配置错误",
-        description: "请先在AI设置中配置API密钥",
+        title: "Configuration error",
+        description: "Please configure the API key in the AI ​​settings first",
         variant: "destructive"
       });
       return;
@@ -67,8 +67,8 @@ const CharacterBook = ({ entries, updateField, aiSettings, characterData }: Char
 
     if (!characterData.name || !characterData.description) {
       toast({
-        title: "信息不完整",
-        description: "请先填写角色名称和角色描述",
+        title: "Incomplete information",
+        description: "Please fill in the role name and role description first",
         variant: "destructive"
       });
       return;
@@ -76,62 +76,62 @@ const CharacterBook = ({ entries, updateField, aiSettings, characterData }: Char
 
     abortControllerRef.current = new AbortController();
     setLoading(true);
-    
+
     try {
       const prompt = generateCharacterBookEntry(characterData);
       const result = await generateWithAI(aiSettings, prompt);
-      
-      // 解析AI返回的内容，尝试提取关键词和内容
+
+      // Analyze the content returned by AI and try to extract keywords and content
       const lines = result.split('\n').filter(line => line.trim());
       let keys: string[] = [];
       let content = result;
-      
-      // 尝试解析格式化的回复
+
+      // Try to parse formatted reply
       for (const line of lines) {
-        if (line.includes('关键词:') || line.includes('关键词：')) {
-          const keywordsMatch = line.match(/关键词[:：]\s*(.+)/);
+        if (line.includes('Keywords:') || line.includes('Keywords:')) {
+          const keywordsMatch = line.match(/Keywords[:：]\s*(.+)/);
           if (keywordsMatch) {
             keys = keywordsMatch[1].split(/[,，]/).map(k => k.trim()).filter(k => k);
           }
-        } else if (line.includes('内容:') || line.includes('内容：')) {
-          const contentMatch = line.match(/内容[:：]\s*(.+)/);
+        } else if (line.includes('content:') || line.includes('content:')) {
+          const contentMatch = line.match(/content[:：]\s*(.+)/);
           if (contentMatch) {
-            content = lines.slice(lines.indexOf(line)).join('\n').replace(/^内容[:：]\s*/, '');
+            content = lines.slice(lines.indexOf(line)).join('\n').replace(/^content[:：]\s*/, '');
             break;
           }
         }
       }
-      
-      // 如果没有解析到关键词，使用角色名作为关键词
+
+      // If the keyword is not parsed, use the role name as the keyword
       if (keys.length === 0) {
         keys = [characterData.name];
       }
-      
+
       const entry: CharacterBookEntry = {
         keys,
         content: content.trim(),
         insertion_order: 100,
         enabled: true
       };
-      
+
       updateField("character_book", {
         entries: [...entries, entry]
       });
-      
+
       toast({
-        title: "生成成功",
-        description: "角色书条目已生成完成"
+        title: "Generate successfully",
+        description: "The character book entry has been generated"
       });
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
         toast({
-          title: "已取消",
-          description: "AI生成已被用户取消"
+          title: "Canceled",
+          description: "AI generation has been canceled by the user"
         });
       } else {
         toast({
-          title: "生成失败",
-          description: error instanceof Error ? error.message : "未知错误",
+          title: "Generation failed",
+          description: error instanceof Error ? error.message : "Unknown error",
           variant: "destructive"
         });
       }
@@ -147,8 +147,8 @@ const CharacterBook = ({ entries, updateField, aiSettings, characterData }: Char
       setLoading(false);
       abortControllerRef.current = null;
       toast({
-        title: "已取消",
-        description: "AI生成已取消"
+        title: "Canceled",
+        description: "AI generation has been canceled"
       });
     }
   };
@@ -156,8 +156,8 @@ const CharacterBook = ({ entries, updateField, aiSettings, characterData }: Char
   const handleClearAll = () => {
     updateField("character_book", { entries: [] });
     toast({
-      title: "已清空",
-      description: "所有角色书条目已清空"
+      title: "Cleared",
+      description: "All character book entries have been cleared"
     });
   };
 
@@ -174,7 +174,7 @@ const CharacterBook = ({ entries, updateField, aiSettings, characterData }: Char
               className="h-8 px-2 text-xs"
             >
               <RefreshCcw className="w-3 h-3 mr-1" />
-              重新生成
+              Regenerate
             </Button>
           )}
           <Button
@@ -187,12 +187,12 @@ const CharacterBook = ({ entries, updateField, aiSettings, characterData }: Char
             {loading ? (
               <>
                 <X className="w-3 h-3 mr-1" />
-                取消
+                Cancel
               </>
             ) : (
               <>
                 <Sparkles className="w-3 h-3 mr-1" />
-                AI生成条目
+                AI generates entries
               </>
             )}
           </Button>
@@ -203,29 +203,29 @@ const CharacterBook = ({ entries, updateField, aiSettings, characterData }: Char
             className="h-8 px-2 text-xs"
           >
             <Trash2 className="w-3 h-3 mr-1" />
-            清空
+            Clear
           </Button>
         </div>
       </div>
-      
+
       <div>
-        <Label className="text-sm font-medium text-gray-700">添加新条目</Label>
+        <Label className="text-sm font-medium text-gray-700">Add a new entry</Label>
         <div className="space-y-2 mt-2">
           <Input
             value={newEntryKeys}
             onChange={(e) => setNewEntryKeys(e.target.value)}
-            placeholder="关键词（用逗号分隔）..."
+            placeholder="Keywords (separated by commas)..."
           />
           <Textarea
             value={newEntryContent}
             onChange={(e) => setNewEntryContent(e.target.value)}
-            placeholder="条目内容..."
+            placeholder="Entry content..."
             className="min-h-[80px]"
             showCounter={true}
           />
           <Button onClick={addBookEntry} size="sm">
             <Plus className="w-4 h-4 mr-2" />
-            添加条目
+            Add an entry
           </Button>
         </div>
       </div>
@@ -243,11 +243,11 @@ const CharacterBook = ({ entries, updateField, aiSettings, characterData }: Char
             </Button>
             <div className="pr-8">
               <div className="text-sm font-medium text-gray-700 mb-1">
-                关键词: {entry.keys.join(', ')}
+                Keywords: {entry.keys.join(', ')}
               </div>
               <p className="text-sm text-gray-600 mb-2">{entry.content}</p>
               <div className="text-xs text-gray-400">
-                字符: {entry.content.length} | Token: {Math.ceil(entry.content.length * 0.75)}
+                character: {entry.content.length} | Token: {Math.ceil(entry.content.length * 0.75)}
               </div>
             </div>
           </div>

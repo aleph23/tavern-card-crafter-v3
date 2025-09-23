@@ -12,7 +12,7 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 const App = () => {
-  // 检测是否在 Electron 环境中
+  // Check if it is Electron In the environment
   const isElectron = typeof window !== 'undefined' && window.location.protocol === 'file:';
   const Router = isElectron ? HashRouter : BrowserRouter;
 

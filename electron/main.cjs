@@ -6,7 +6,7 @@ const isDev = process.env.NODE_ENV === 'development';
 let mainWindow;
 
 function createWindow() {
-  // 创建浏览器窗口
+  // Create a browser window
   mainWindow = new BrowserWindow({
     width: 1400,
     height: 900,
@@ -19,48 +19,48 @@ function createWindow() {
       webSecurity: true
     },
     icon: path.join(__dirname, '../public/favicon.ico'),
-    title: 'Tavern Card Crafter - AI角色卡制作工具',
-    show: false, // 先不显示，等加载完成后再显示
+    title: 'Tavern Card Crafter - AI character card creation tool',
+    show: false, // Don't display it first, wait until the load is completed before displaying
     titleBarStyle: 'default',
     frame: true
   });
 
-  // 加载应用
+  // Loading the app
   if (isDev) {
     mainWindow.loadURL('http://localhost:8080');
-    // 开发模式下打开开发者工具
+    // Open the developer tools in development mode
     mainWindow.webContents.openDevTools();
   } else {
     mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
   }
 
-  // 窗口准备好后显示
+  // Displayed after the window is ready
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
 
-    // 聚焦窗口
+    // Focus window
     if (isDev) {
       mainWindow.focus();
     }
   });
 
-  // 当窗口关闭时
+  // When the window is closed
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
 
-  // 阻止新窗口打开
+  // Prevent new window from opening
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     require('electron').shell.openExternal(url);
     return { action: 'deny' };
   });
 }
 
-// 当 Electron 完成初始化并准备创建浏览器窗口时调用此方法
+// 当 Electron Call this method when you complete initialization and prepare to create a browser window
 app.whenReady().then(() => {
   createWindow();
 
-  // macOS 下，当所有窗口关闭时，应用通常会保持活跃状态
+  // macOS Under, when all windows are closed, the application will usually remain active
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow();
@@ -68,14 +68,14 @@ app.whenReady().then(() => {
   });
 });
 
-// 当所有窗口关闭时退出应用 (除了 macOS)
+// Exit the app when all windows are closed (Apart from macOS)
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
 });
 
-// 在开发模式下，当主进程收到热重载信号时
+// In development mode, when the main process receives a hot reload signal
 if (isDev) {
   try {
     require('electron-reload')(__dirname, {
@@ -87,7 +87,7 @@ if (isDev) {
   }
 }
 
-// 设置应用菜单
+// Settings Application Menu
 const template = [
   {
     label: 'File',
@@ -158,7 +158,7 @@ const template = [
             type: 'info',
             title: 'About Tavern Card Crafter',
             message: 'Tavern Card Crafter',
-            detail: 'AI角色卡制作工具\n专业的AI角色卡片制作工具，帮助用户轻松创建和编辑用于聊天机器人和角色扮演的角色卡片'
+            detail: 'AI character card creation tool\n Professional AI character card making tool to help users easily create and edit character cards for chatbots and role-playing'
           });
         }
       }

@@ -12,7 +12,7 @@ const translations = {
     // 页面标题
     pageTitle: 'SillyTavern 角色卡 V3 生成器',
     pageDescription: '创建专业的 SillyTavern V3 格式角色卡，支持 V1/V2/V3 格式导入导出',
-    
+
     // 按钮
     importCard: '导入角色卡',
     aiSettings: 'AI 设置',
@@ -21,7 +21,7 @@ const translations = {
     exportPng: '导出 PNG',
     save: '保存',
     cancel: '取消',
-    
+
     // 表单标题
     characterInfo: '角色信息编辑',
     basicInfo: '基本信息',
@@ -31,7 +31,7 @@ const translations = {
     characterBook: '角色书',
     tags: '标签',
     metadata: '元数据',
-    
+
     // 字段标签
     name: '角色名称',
     nickname: '昵称',
@@ -45,14 +45,14 @@ const translations = {
     postHistoryInstructions: '对话后指令',
     creator: '作者',
     characterVersion: '角色版本',
-    
+
     // 预览
     jsonPreview: 'JSON 预览',
     totalChars: '总字符',
     totalTokens: '总Token',
     chars: '字符',
     tokens: 'Token',
-    
+
     // 消息
     importSuccess: '导入成功',
     importSuccessDesc: '角色卡数据已成功导入',
@@ -62,7 +62,7 @@ const translations = {
     copySuccessDesc: '角色卡 JSON 已复制到剪贴板',
     uploadImageHint: '请先上传角色头像',
     pngExportHint: 'PNG 格式导出功能需要更复杂的实现，请使用 JSON 导出',
-    
+
     // AI 生成
     aiGenerate: 'AI 生成',
     generating: '生成中...',
@@ -73,19 +73,19 @@ const translations = {
     incompleteInfo: '信息不完整',
     fillNameDesc: '请先填写角色名称和角色描述',
     unknownError: '未知错误',
-    
+
     // 备选问候语
     addNewGreeting: '添加新问候语',
     addAlternateGreetingPlaceholder: '添加备用问候语...',
     aiGenerateGreeting: 'AI生成问候语',
     alternateGreetingGenerated: '备用问候语已生成完成',
     greeting: '问候语',
-    
+
     // 标签
     enterTag: '输入标签...',
     aiGenerateTags: 'AI生成标签',
     tagsGenerated: '标签已生成完成',
-    
+
     // 角色书
     addNewEntry: '添加新条目',
     addEntry: '添加条目',
@@ -96,7 +96,7 @@ const translations = {
     content: '内容',
     insertionOrder: '插入顺序',
     enabled: '启用',
-    
+
     // 主题切换
     lightMode: '浅色模式',
     darkMode: '深色模式',
@@ -105,7 +105,7 @@ const translations = {
     // Page titles
     pageTitle: 'SillyTavern Character Card V3 Generator',
     pageDescription: 'Create professional SillyTavern V3 format character cards with V1/V2/V3 import/export support',
-    
+
     // Buttons
     importCard: 'Import Card',
     aiSettings: 'AI Settings',
@@ -114,7 +114,7 @@ const translations = {
     exportPng: 'Export PNG',
     save: 'Save',
     cancel: 'Cancel',
-    
+
     // Form titles
     characterInfo: 'Character Information Editor',
     basicInfo: 'Basic Information',
@@ -124,7 +124,7 @@ const translations = {
     characterBook: 'Character Book',
     tags: 'Tags',
     metadata: 'Metadata',
-    
+
     // Field labels
     name: 'Character Name',
     nickname: 'Nickname',
@@ -138,14 +138,14 @@ const translations = {
     postHistoryInstructions: 'Post History Instructions',
     creator: 'Creator',
     characterVersion: 'Character Version',
-    
+
     // Preview
     jsonPreview: 'JSON Preview',
     totalChars: 'Total Characters',
     totalTokens: 'Total Tokens',
     chars: 'Characters',
     tokens: 'Tokens',
-    
+
     // Messages
     importSuccess: 'Import Successful',
     importSuccessDesc: 'Character card data has been successfully imported',
@@ -155,7 +155,7 @@ const translations = {
     copySuccessDesc: 'Character card JSON has been copied to clipboard',
     uploadImageHint: 'Please upload character avatar first',
     pngExportHint: 'PNG export requires more complex implementation, please use JSON export',
-    
+
     // AI Generation
     aiGenerate: 'AI Generate',
     generating: 'Generating...',
@@ -166,19 +166,19 @@ const translations = {
     incompleteInfo: 'Incomplete Information',
     fillNameDesc: 'Please fill in character name and description first',
     unknownError: 'Unknown Error',
-    
+
     // Alternate Greetings
     addNewGreeting: 'Add New Greeting',
     addAlternateGreetingPlaceholder: 'Add alternate greeting...',
     aiGenerateGreeting: 'AI Generate Greeting',
     alternateGreetingGenerated: 'Alternate greeting has been generated',
     greeting: 'Greeting',
-    
+
     // Tags
     enterTag: 'Enter tag...',
     aiGenerateTags: 'AI Generate Tags',
     tagsGenerated: 'Tags have been generated',
-    
+
     // Character Book
     addNewEntry: 'Add New Entry',
     addEntry: 'Add Entry',
@@ -189,7 +189,7 @@ const translations = {
     content: 'Content',
     insertionOrder: 'Insertion Order',
     enabled: 'Enabled',
-    
+
     // Theme toggle
     lightMode: 'Light Mode',
     darkMode: 'Dark Mode',

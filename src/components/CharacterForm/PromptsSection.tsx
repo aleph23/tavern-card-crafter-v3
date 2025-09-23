@@ -22,8 +22,8 @@ const PromptsSection = ({ data, updateField, aiSettings }: PromptsSectionProps) 
   const handleAIGenerate = async (field: string, promptGenerator: (data: any) => string) => {
     if (!aiSettings?.apiKey && !['ollama', 'lmstudio'].includes(aiSettings?.provider?.toLowerCase() || '')) {
       toast({
-        title: "配置错误",
-        description: "请先在AI设置中配置API密钥",
+        title: "Configuration error",
+        description: "Please configure the API key in the AI ​​settings first",
         variant: "destructive"
       });
       return;
@@ -31,8 +31,8 @@ const PromptsSection = ({ data, updateField, aiSettings }: PromptsSectionProps) 
 
     if (!data.name || !data.description || !data.personality) {
       toast({
-        title: "信息不完整",
-        description: "请先填写前面的基本信息",
+        title: "Incomplete information",
+        description: "Please fill in the basic information first",
         variant: "destructive"
       });
       return;
@@ -40,25 +40,25 @@ const PromptsSection = ({ data, updateField, aiSettings }: PromptsSectionProps) 
 
     abortControllerRefs.current[field] = new AbortController();
     setLoading(prev => ({ ...prev, [field]: true }));
-    
+
     try {
       const prompt = promptGenerator(data);
       const result = await generateWithAI(aiSettings, prompt);
       updateField(field, result);
       toast({
-        title: "生成成功",
-        description: `${field} 已生成完成`
+        title: "Generate successfully",
+        description: `${field} Generated completed`
       });
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
         toast({
-          title: "已取消",
-          description: "AI生成已被用户取消"
+          title: "Canceled",
+          description: "AI generation has been canceled by the user"
         });
       } else {
         toast({
-          title: "生成失败",
-          description: error instanceof Error ? error.message : "未知错误",
+          title: "Generation failed",
+          description: error instanceof Error ? error.message : "Unknown error",
           variant: "destructive"
         });
       }
@@ -74,8 +74,8 @@ const PromptsSection = ({ data, updateField, aiSettings }: PromptsSectionProps) 
       setLoading(prev => ({ ...prev, [field]: false }));
       abortControllerRefs.current[field] = null;
       toast({
-        title: "已取消",
-        description: "AI生成已取消"
+        title: "Canceled",
+        description: "AI generation has been canceled"
       });
     }
   };
@@ -83,8 +83,8 @@ const PromptsSection = ({ data, updateField, aiSettings }: PromptsSectionProps) 
   const handleClearField = (field: string) => {
     updateField(field, "");
     toast({
-      title: "已清空",
-      description: `${field} 已清空`
+      title: "Cleared",
+      description: `${field} Cleared`
     });
   };
 
@@ -103,7 +103,7 @@ const PromptsSection = ({ data, updateField, aiSettings }: PromptsSectionProps) 
             className="h-8 px-2 text-xs"
           >
             <RefreshCcw className="w-3 h-3 mr-1" />
-            重新生成
+            Regenerate
           </Button>
         )}
         <Button
@@ -116,12 +116,12 @@ const PromptsSection = ({ data, updateField, aiSettings }: PromptsSectionProps) 
           {isLoading ? (
             <>
               <X className="w-3 h-3 mr-1" />
-              取消
+              Cancel
             </>
           ) : (
             <>
               <Sparkles className="w-3 h-3 mr-1" />
-              AI生成
+              AI generation
             </>
           )}
         </Button>
@@ -132,7 +132,7 @@ const PromptsSection = ({ data, updateField, aiSettings }: PromptsSectionProps) 
           className="h-8 px-2 text-xs"
         >
           <Trash2 className="w-3 h-3 mr-1" />
-          清空
+          Clear
         </Button>
       </div>
     );
@@ -140,18 +140,18 @@ const PromptsSection = ({ data, updateField, aiSettings }: PromptsSectionProps) 
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-gray-800 mb-4">提示词设置</h3>
-      
+      <h3 className="text-lg font-semibold text-gray-800 mb-4">Prompt word settings</h3>
+
       <div>
         <div className="flex items-center justify-between mb-2">
-          <Label htmlFor="system_prompt" className="text-sm font-medium text-gray-700">系统提示词</Label>
+          <Label htmlFor="system_prompt" className="text-sm font-medium text-gray-700">System prompt words</Label>
           {renderFieldButtons('system_prompt', generateSystemPrompt)}
         </div>
         <Textarea
           id="system_prompt"
           value={data.system_prompt}
           onChange={(e) => updateField("system_prompt", e.target.value)}
-          placeholder="给 AI 的系统级指令..."
+          placeholder="Give AI System-level instructions..."
           className="mt-1 min-h-[100px]"
           showCounter={true}
         />
@@ -159,14 +159,14 @@ const PromptsSection = ({ data, updateField, aiSettings }: PromptsSectionProps) 
 
       <div>
         <div className="flex items-center justify-between mb-2">
-          <Label htmlFor="post_history" className="text-sm font-medium text-gray-700">历史后指令</Label>
+          <Label htmlFor="post_history" className="text-sm font-medium text-gray-700">Post-historical instructions</Label>
           {renderFieldButtons('post_history_instructions', generatePostHistoryInstructions)}
         </div>
         <Textarea
           id="post_history"
           value={data.post_history_instructions}
           onChange={(e) => updateField("post_history_instructions", e.target.value)}
-          placeholder="在聊天历史后出现的指令..."
+          placeholder="Instructions appear after chat history..."
           className="mt-1 min-h-[100px]"
           showCounter={true}
         />

@@ -26,9 +26,9 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
 
   const downloadJson = () => {
     const dataStr = JSON.stringify(characterData, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
     const exportFileDefaultName = `${characterData.data.name || 'character'}_card_v3.json`;
-    
+
     const linkElement = document.createElement('a');
     linkElement.setAttribute('href', dataUri);
     linkElement.setAttribute('download', exportFileDefaultName);
@@ -49,48 +49,48 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       const img = new Image();
-      
+
       img.onload = () => {
-        // 设置画布尺寸
+        // Set the canvas size
         canvas.width = img.width;
         canvas.height = img.height;
-        
-        // 绘制图片
+
+        // Draw pictures
         ctx?.drawImage(img, 0, 0);
-        
-        // 将角色卡数据嵌入到PNG中
+
+        // Embed role card data into PNG
         const jsonData = JSON.stringify(characterData);
         const canvas2 = document.createElement('canvas');
         const ctx2 = canvas2.getContext('2d');
-        
+
         canvas2.width = canvas.width;
         canvas2.height = canvas.height;
-        
-        // 复制原图像
+
+        // Copy the original image
         ctx2?.drawImage(canvas, 0, 0);
-        
-        // 获取图像数据
+
+        // Get image data
         const imageData = ctx2?.getImageData(0, 0, canvas2.width, canvas2.height);
         if (imageData) {
-          // 将JSON数据编码到图像的最后几个像素中（这是一个简化的实现）
+          // Encode JSON data into the last few pixels of the image (this is a simplified implementation)
           const jsonBytes = new TextEncoder().encode(jsonData);
           const dataView = new DataView(imageData.data.buffer);
-          
-          // 在图像数据末尾存储JSON长度和数据
+
+          // Store JSON length and data at the end of the image data
           let offset = imageData.data.length - 4;
           dataView.setUint32(offset, jsonBytes.length, true);
-          
-          // 存储JSON数据（这里简化处理，实际应该有更复杂的编码方案）
+
+          // Storing JSON data (there is simplified here, there should be a more complex encoding scheme in fact)
           for (let i = 0; i < Math.min(jsonBytes.length, 1000); i++) {
             if (offset - i * 4 >= 0) {
               imageData.data[offset - i * 4 - 4] = jsonBytes[i];
             }
           }
-          
+
           ctx2?.putImageData(imageData, 0, 0);
         }
-        
-        // 导出PNG文件
+
+        // Export PNG file
         canvas2.toBlob((blob) => {
           if (blob) {
             const url = URL.createObjectURL(blob);
@@ -99,34 +99,34 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
             link.download = `${characterData.data.name || 'character'}_card.png`;
             link.click();
             URL.revokeObjectURL(url);
-            
+
             toast({
-              title: "导出成功",
-              description: "PNG格式角色卡已导出"
+              title: "Export successfully",
+              description: "PNG format role card has been exported"
             });
           }
         }, 'image/png');
       };
-      
+
       img.onerror = () => {
         toast({
-          title: "导出失败",
-          description: "图像处理失败，请重试",
+          title: "Export failed",
+          description: "Image processing failed, please try again",
           variant: "destructive"
         });
       };
-      
+
       img.src = characterImage;
     } catch (error) {
       toast({
-        title: "导出失败",
-        description: "PNG导出过程中出现错误",
+        title: "Export failed",
+        description: "An error occurred during PNG export",
         variant: "destructive"
       });
     }
   };
 
-  // 计算总字符数和token数
+  // Calculate the total number of characters and tokens
   const calculateTotalStats = () => {
     const data = characterData.data;
     let totalChars = 0;
@@ -153,20 +153,20 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
 
   const { totalChars, totalTokens } = calculateTotalStats();
 
-  // JSON语法高亮函数
+  // JSON syntax highlighting function
   const syntaxHighlight = (json: string) => {
     return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, (match) => {
-      let cls = 'text-yellow-300'; // 默认颜色 - 数字和其他
+      let cls = 'text-yellow-300'; // Default color - Numbers and others
       if (/^"/.test(match)) {
         if (/:$/.test(match)) {
-          cls = 'text-blue-300 font-semibold'; // 键名 - 蓝色加粗
+          cls = 'text-blue-300 font-semibold'; // Key name - Blue thick
         } else {
-          cls = 'text-green-300'; // 字符串值 - 绿色
+          cls = 'text-green-300'; // String value - green
         }
       } else if (/true|false/.test(match)) {
-        cls = 'text-purple-300'; // 布尔值 - 紫色
+        cls = 'text-purple-300'; // Boolean value - Purple
       } else if (/null/.test(match)) {
-        cls = 'text-red-300'; // null值 - 红色
+        cls = 'text-red-300'; // null value - red
       }
       return `<span class="${cls}">${match}</span>`;
     });
@@ -202,7 +202,7 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
       <CardContent>
         <ScrollArea className="h-[600px] custom-scrollbar">
           <div className="bg-gray-900 dark:bg-gray-800 p-4 rounded-lg text-sm font-mono whitespace-pre-wrap break-all">
-            <div 
+            <div
               className="text-gray-300"
               dangerouslySetInnerHTML={{ __html: highlightedJson }}
             />
