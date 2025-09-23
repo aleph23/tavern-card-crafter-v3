@@ -5,8 +5,8 @@ export interface CharacterData {
   description: string;
   personality?: string;
   scenario?: string;
-  first_mes?: string;
-  mes_example?: string;
+  greeting?: string;
+  exchat?: string;
   system_prompt?: string;
   post_history_instructions?: string;
   tags?: string[];
@@ -68,11 +68,11 @@ export const generateWithAI = async (
 
   // Only non-local services check the key
   if (requiresKey && !settings.apiKey) {
-    throw new Error("Please configure the API key in the AI ​​settings first");
+    throw new Error("Please configure the API key in the AI settings first");
   }
 
   if (!settings.apiUrl) {
-    throw new Error("Please configure the API address in the AI ​​settings first");
+    throw new Error("Please configure the API address in the AI settings first");
   }
 
   try {
@@ -134,7 +134,7 @@ export const generateWithAI = async (
       // Special error prompts for local services
       if (localServices.includes(settings.provider.toLowerCase())) {
         if (response.status === 400 || errorText.includes('model')) {
-          errorMessage = `Model"${settings.model}"Not present or not loaded. Please get a list of available models in the AI ​​settings or make sure it has been downloaded/Load the model.`;
+          errorMessage = `Model"${settings.model}"Not present or not loaded. Please get a list of available models in the AI settings or make sure it has been downloaded/Load the model.`;
         }
       }
 
@@ -209,13 +209,13 @@ export const generateDescription = (data: CharacterData): string => {
 Role name:${data.name}
 Existing description:${existingDescription}
 
-Please add descriptive content such as the character's appearance details, body characteristics, clothing style, etc. based on the existing description. Only output the role description content, do not include role names and other information. Please output the description directly, and do not add summary or additional instructions. Please answer in Chinese.`;
+Please add descriptive content such as the character's appearance details, body characteristics, clothing style, etc. based on the existing description. Only output the role description content, do not include role names and other information. Please output the description directly, and do not add summary or additional instructions.`;
   } else {
     return `Generate a detailed character appearance description based on the character name:
 
 Role name:${data.name}
 
-Please generate a detailed character appearance description, including the character's physical characteristics, facial features, clothing style, temperament, etc. Only output character description content, do not include character name, background story or other information. Please output the description directly, and do not add summary or additional instructions. Please answer in Chinese.`;
+Please generate a detailed character appearance description, including the character's physical characteristics, facial features, clothing style, temperament, etc. Only output character description content, do not include character name, background story or other information. Please output the description directly, and do not add summary or additional instructions.`;
   }
 };
 
@@ -225,7 +225,7 @@ export const generatePersonality = (data: CharacterData): string => {
 Role name: ${data.name}
 Role description: ${data.description}
 
-Please generate a detailed character description, including the character's behavioral patterns, habits, emotional characteristics, etc. Please output a description of personality traits directly, and do not include summary paragraphs or additional instructions. Please answer in Chinese, the content should be specific and in line with the role settings.`;
+Please generate a detailed character description, including the character's behavioral patterns, habits, emotional characteristics, etc. Please output a description of personality traits directly, and do not include summary paragraphs or additional instructions. The content should be specific and in line with the role settings.`;
 };
 
 export const generateScenario = (data: CharacterData): string => {
@@ -235,21 +235,21 @@ Role name: ${data.name}
 Role description: ${data.description}
 Character traits: ${data.personality}
 
-Please generate a detailed scene setting that describes the environment, background and situation in which the character is located. Please output the scene description directly, do not include summary paragraphs or additional instructions. Please answer in Chinese, the content should be specific and in line with the role settings.`;
+Please generate a detailed scene setting that describes the environment, background and situation in which the character is located. Please output the scene description directly, do not include summary paragraphs or additional instructions. The content should be specific and in line with the role settings.`;
 };
 
-export const generateFirstMessage = (data: CharacterData): string => {
-  return `Generate the first message of the character (opening remarks):
+export const generategreeting = (data: CharacterData): string => {
+  return `Generate the first message of the character along with scene introductions for the player:
 
 Role name: ${data.name} 
 Role description: ${data.description} 
 Character traits: ${data.personality} 
 Scene settings: ${data.scenario}
 
-Please generate a natural opening remark that reflects the character's personality and the scene in which you are located. Please answer in Chinese, be vivid and interesting.`;
+Please generate a natural opening remark that reflects the character's personality and the scene in which you are located. Be vivid and interesting.`;
 };
 
-export const generateMessageExample = (data: CharacterData): string => {
+export const generatechatEx = (data: CharacterData): string => {
   return `Generate a conversation example of a role based on the following information:
 
 Role name: ${data.name}
@@ -257,7 +257,7 @@ Role description: ${data.description}
 Character traits: ${data.personality}
 Scene setting: ${data.scenario}
 
-请生成3-4 conversation examples in standard format, each conversation example must be <START> beginning. The format is as follows:
+Please generate 3-4 conversation examples in standard format, each conversation example must be <START> beginning. The format is as follows:
 
 <START>
 {{user}}: User's words
@@ -269,7 +269,7 @@ ${data.name}: The role's answer
 {{user}}: User's words
 ${data.name}: The role's answer
 
-Make sure each conversation example starts with a <START> macro that shows how and style the character speaks. Please answer in Chinese, which must be consistent with the character's personality. `;
+Make sure each conversation example starts with a <START> macro that shows how and style the character speaks. This must be consistent with the character's personality. `;
 };
 
 export const generateSystemPrompt = (data: CharacterData): string => {
@@ -280,7 +280,7 @@ Role description: ${data.description}
 Character traits: ${data.personality}
 Scene settings: ${data.scenario}
 
-Please generate a system prompt word to guide AI how to play this role. Please answer in Chinese, be concise and clear.`;
+Please generate a system prompt word to guide AI how to play this role. Be concise and clear.`;
 };
 
 export const generatePostHistoryInstructions = (data: CharacterData): string => {
@@ -290,7 +290,7 @@ Role name: ${data.name}
 Role description: ${data.description}
 Character traits: ${data.personality}
 
-Please generate post-historical instructions to remind the AI to maintain role consistency during the conversation. Please answer in Chinese, be concise and practical.`;
+Please generate post-historical instructions to remind the AI to maintain role consistency during the conversation. Be concise and practical.`;
 };
 
 export const generateTags = (data: CharacterData): string => {
@@ -301,7 +301,7 @@ Role description: ${data.description}
 Character traits: ${data.personality}
 Scene setting: ${data.scenario}
 
-Please generate 5-10 related tags, separated by commas. Tags should include character type, personality traits, scene type, etc. Please answer in Chinese. `;
+Please generate 5-10 related tags, separated by commas. Tags should include character type, personality traits, scene type, etc.`;
 };
 
 export const generateAlternateGreeting = (data: CharacterData): string => {
@@ -311,9 +311,9 @@ Role name: ${data.name}
 Role description: ${data.description} 
 Character traits: ${data.personality} 
 Scene settings: ${data.scenario} 
-First message: ${data.first_mes} 
+First message: ${data.greeting} 
 
-Please generate an alternate greeting with a different style from the first message to reflect the multifaceted nature of the character. Please answer in Chinese, be natural and vivid。`;
+Please generate an alternate greeting with a different style from the first message to reflect the multifaceted nature of the character. Be natural and vivid。`;
 };
 
 export const generateCharacterBookEntry = (data: CharacterData, context?: string): string => {
@@ -334,5 +334,5 @@ The format is as follows:
 Keywords: core keyword 1, core keyword 2 
 Content: Detailed settings description 
 
-Please answer in Chinese, the content should be rich and helpful for role-playing.`;
+The content should be rich and helpful for role-playing.`;
 };

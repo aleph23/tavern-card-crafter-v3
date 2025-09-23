@@ -22,11 +22,11 @@ const LocalDeploymentPanel = () => {
     "Start the development server",
     "Open browser to view the application"
   ] : [
-    "下载项目文件",
-    "安装 Node.js（版本 18 或更高）",
-    "使用 npm 安装依赖",
-    "启动开发服务器",
-    "打开浏览器查看应用"
+    "Download project files",
+    "Install Node.js (version 18 or higher)",
+    "use npm Installation dependencies",
+    "Start the development server",
+    "Open a browser to view the application"
   ];
 
   const commands = [

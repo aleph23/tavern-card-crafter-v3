@@ -134,9 +134,9 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
 
     const fields = [
       data.name, data.nickname, data.description, data.personality,
-      data.scenario, data.first_mes, data.mes_example, data.creator_notes,
+      data.scenario, data.greeting, data.exchat, data.creator_notes,
       data.system_prompt, data.post_history_instructions,
-      ...(data.alternate_greetings || []),
+      ...(data.alt_greetings || []),
       ...(data.tags || []).join(', '),
       ...(data.character_book?.entries || []).map((entry: any) => entry.content).join(' ')
     ];

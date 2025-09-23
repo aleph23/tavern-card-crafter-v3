@@ -11,23 +11,23 @@ interface MetadataSectionProps {
 const MetadataSection = ({ data, updateField }: MetadataSectionProps) => {
   return (
     <div className="space-y-6">
-      <h3 className="text-lg font-semibold text-gray-800 mb-4">创作信息</h3>
+      <h3 className="text-lg font-semibold text-gray-800 mb-4">Creative information</h3>
       
       {/* Creator */}
       <div className="form-group">
-        <Label htmlFor="creator" className="text-sm font-medium text-gray-700">创作者</Label>
+        <Label htmlFor="creator" className="text-sm font-medium text-gray-300">Creator</Label>
         <Input
           id="creator"
           value={data.creator}
           onChange={(e) => updateField("creator", e.target.value)}
-          placeholder="输入创作者名称..."
+          placeholder="Enter the creator name..."
           className="mt-1 w-full max-w-none"
         />
       </div>
 
       {/* Role Version */}
       <div className="form-group">
-        <Label htmlFor="character_version" className="text-sm font-medium text-gray-700">Role Version</Label>
+        <Label htmlFor="character_version" className="text-sm font-medium text-gray-300">Role Version</Label>
         <Input
           id="character_version"
           value={data.character_version}
@@ -39,7 +39,7 @@ const MetadataSection = ({ data, updateField }: MetadataSectionProps) => {
 
       {/* Source link */}
       <div className="form-group">
-        <Label htmlFor="source" className="text-sm font-medium text-gray-700">Source link</Label>
+        <Label htmlFor="source" className="text-sm font-medium text-gray-300">Source link</Label>
         <Input
           id="source"
           value={data.source || ""}
@@ -51,7 +51,7 @@ const MetadataSection = ({ data, updateField }: MetadataSectionProps) => {
 
       {/* Creation Notes */}
       <div className="form-group">
-        <Label htmlFor="creator_notes" className="text-sm font-medium text-gray-700">Creation Notes</Label>
+        <Label htmlFor="creator_notes" className="text-sm font-medium text-gray-300">Creation Notes</Label>
         <Textarea
           id="creator_notes"
           value={data.creator_notes}

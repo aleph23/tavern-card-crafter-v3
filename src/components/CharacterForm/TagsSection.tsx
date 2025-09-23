@@ -168,7 +168,7 @@ const TagsSection = ({ tags, updateField, aiSettings, characterData }: TagsSecti
           value={newTag}
           onChange={(e) => setNewTag(e.target.value)}
           onKeyPress={handleKeyPress}
-          placeholder={t('enterTag') || "输入标签..."}
+          placeholder={t('enterTag') || "Enter a tag..."}
           className="flex-1"
         />
         <Button onClick={addTag} size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground">

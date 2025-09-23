@@ -9,11 +9,11 @@ interface LanguageContextType {
 
 const translations = {
   zh: {
-    // 页面标题
+    // Page title
     pageTitle: 'SillyTavern 角色卡 V3 生成器',
     pageDescription: '创建专业的 SillyTavern V3 格式角色卡，支持 V1/V2/V3 格式导入导出',
 
-    // 按钮
+    // Button
     importCard: '导入角色卡',
     aiSettings: 'AI 设置',
     copy: '复制',
@@ -22,7 +22,7 @@ const translations = {
     save: '保存',
     cancel: '取消',
 
-    // 表单标题
+    // Form title
     characterInfo: '角色信息编辑',
     basicInfo: '基本信息',
     personality: '性格设定',
@@ -32,28 +32,28 @@ const translations = {
     tags: '标签',
     metadata: '元数据',
 
-    // 字段标签
+    // Field Tags
     name: '角色名称',
     nickname: '昵称',
     description: '角色描述',
     personalityDescription: '性格描述',
     scenario: '场景设定',
-    firstMessage: '首条信息',
-    messageExample: '对话示例',
+    greeting: '首条信息',
+    chatEx: '对话示例',
     creatorNotes: '作者注释',
     systemPrompt: '系统提示',
     postHistoryInstructions: '对话后指令',
     creator: '作者',
     characterVersion: '角色版本',
 
-    // 预览
+    // Preview
     jsonPreview: 'JSON 预览',
     totalChars: '总字符',
     totalTokens: '总Token',
     chars: '字符',
     tokens: 'Token',
 
-    // 消息
+    // information
     importSuccess: '导入成功',
     importSuccessDesc: '角色卡数据已成功导入',
     importError: '导入失败',
@@ -63,7 +63,7 @@ const translations = {
     uploadImageHint: '请先上传角色头像',
     pngExportHint: 'PNG 格式导出功能需要更复杂的实现，请使用 JSON 导出',
 
-    // AI 生成
+    // AI generate
     aiGenerate: 'AI 生成',
     generating: '生成中...',
     generateSuccess: '生成成功',
@@ -74,19 +74,19 @@ const translations = {
     fillNameDesc: '请先填写角色名称和角色描述',
     unknownError: '未知错误',
 
-    // 备选问候语
+    // Alternative greetings
     addNewGreeting: '添加新问候语',
     addAlternateGreetingPlaceholder: '添加备用问候语...',
     aiGenerateGreeting: 'AI生成问候语',
     alternateGreetingGenerated: '备用问候语已生成完成',
     greeting: '问候语',
 
-    // 标签
+    // Label
     enterTag: '输入标签...',
     aiGenerateTags: 'AI生成标签',
     tagsGenerated: '标签已生成完成',
 
-    // 角色书
+    // Character Book
     addNewEntry: '添加新条目',
     addEntry: '添加条目',
     aiGenerateEntry: 'AI生成条目',
@@ -97,7 +97,7 @@ const translations = {
     insertionOrder: '插入顺序',
     enabled: '启用',
 
-    // 主题切换
+    // Topic Switch
     lightMode: '浅色模式',
     darkMode: '深色模式',
   },
@@ -131,8 +131,8 @@ const translations = {
     description: 'Character Description',
     personalityDescription: 'Personality Description',
     scenario: 'Scenario',
-    firstMessage: 'First Message',
-    messageExample: 'Message Example',
+    greeting: 'First Message',
+    chatEx: 'Message Example',
     creatorNotes: 'Creator Notes',
     systemPrompt: 'System Prompt',
     postHistoryInstructions: 'Post History Instructions',
@@ -199,7 +199,7 @@ const translations = {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [language, setLanguageState] = useState<'zh' | 'en'>('zh');
+  const [language, setLanguageState] = useState<'zh' | 'en'>('en');
 
   useEffect(() => {
     const savedLanguage = localStorage.getItem('language') as 'zh' | 'en';

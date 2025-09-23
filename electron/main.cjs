@@ -27,7 +27,7 @@ function createWindow() {
 
   // Loading the app
   if (isDev) {
-    mainWindow.loadURL('http://localhost:8080');
+    mainWindow.loadURL('http://localhost:6090');
     // Open the developer tools in development mode
     mainWindow.webContents.openDevTools();
   } else {

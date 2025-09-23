@@ -17,7 +17,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     if (savedTheme) {
       setThemeState(savedTheme);
     } else {
-      // 检查系统偏好
+      // Check system preferences
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       setThemeState(prefersDark ? 'dark' : 'light');
     }

@@ -89,14 +89,14 @@ const CharacterBook = ({ entries, updateField, aiSettings, characterData }: Char
       // Try to parse formatted reply
       for (const line of lines) {
         if (line.includes('Keywords:') || line.includes('Keywords:')) {
-          const keywordsMatch = line.match(/Keywords[:：]\s*(.+)/);
+          const keywordsMatch = line.match(/Keywords[:: ]\s*(.+)/);
           if (keywordsMatch) {
-            keys = keywordsMatch[1].split(/[,，]/).map(k => k.trim()).filter(k => k);
+            keys = keywordsMatch[1].split(/[,, ]/).map(k => k.trim()).filter(k => k);
           }
         } else if (line.includes('content:') || line.includes('content:')) {
-          const contentMatch = line.match(/content[:：]\s*(.+)/);
+          const contentMatch = line.match(/content[:: ]\s*(.+)/);
           if (contentMatch) {
-            content = lines.slice(lines.indexOf(line)).join('\n').replace(/^content[:：]\s*/, '');
+            content = lines.slice(lines.indexOf(line)).join('\n').replace(/^content[:: ]\s*/, '');
             break;
           }
         }
@@ -164,7 +164,7 @@ const CharacterBook = ({ entries, updateField, aiSettings, characterData }: Char
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">角色书</h3>
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">Character Book</h3>
         <div className="flex gap-1">
           {!loading && (
             <Button
@@ -242,7 +242,7 @@ const CharacterBook = ({ entries, updateField, aiSettings, characterData }: Char
               <X className="w-4 h-4" />
             </Button>
             <div className="pr-8">
-              <div className="text-sm font-medium text-gray-700 mb-1">
+              <div className="text-sm font-medium text-gray-300 mb-1">
                 Keywords: {entry.keys.join(', ')}
               </div>
               <p className="text-sm text-gray-600 mb-2">{entry.content}</p>

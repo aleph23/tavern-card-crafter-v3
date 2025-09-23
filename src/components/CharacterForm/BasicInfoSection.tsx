@@ -110,7 +110,7 @@ const BasicInfoSection = ({ data, updateField, characterImage, setCharacterImage
 
       {/* Character avatar */}
       <div className="form-group">
-        <Label className="text-sm font-medium text-gray-700">Character avatar</Label>
+        <Label className="text-sm font-medium text-gray-300">Character avatar</Label>
         <div className="flex items-center gap-4 mt-2">
           {characterImage && (
             <div className="relative">
@@ -151,19 +151,19 @@ const BasicInfoSection = ({ data, updateField, characterImage, setCharacterImage
 
       {/* Role name */}
       <div className="form-group">
-        <Label htmlFor="name" className="text-sm font-medium text-gray-700">Role name *</Label>
+        <Label htmlFor="name" className="text-sm font-medium text-gray-300">Role name *</Label>
         <Input
           id="name"
           value={data.name}
           onChange={(e) => updateField("name", e.target.value)}
-          placeholder="输入角色名称..."
+          placeholder="Enter a role name..."
           className="mt-1 w-full max-w-none"
         />
       </div>
 
       {/* Nick name */}
       <div className="form-group">
-        <Label htmlFor="nickname" className="text-sm font-medium text-gray-700">Nick name</Label>
+        <Label htmlFor="nickname" className="text-sm font-medium text-gray-300">Nick name</Label>
         <Input
           id="nickname"
           value={data.nickname || ""}
@@ -176,7 +176,7 @@ const BasicInfoSection = ({ data, updateField, characterImage, setCharacterImage
       {/* Role description */}
       <div className="form-group">
         <div className="flex items-center justify-between mb-2">
-          <Label htmlFor="description" className="text-sm font-medium text-gray-700">Role description *</Label>
+          <Label htmlFor="description" className="text-sm font-medium text-gray-300">Role description *</Label>
           <div className="flex gap-1">
             {!loading && (
               <Button

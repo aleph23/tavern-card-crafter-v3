@@ -6,7 +6,7 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  base: "./", // 重要：Electron 需要相对路径
+  base: "./", // important：Electron Need a relative path
   server: {
     host: "::",
     port: 8080,

@@ -27,13 +27,13 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
 
   const addGreeting = () => {
     if (newGreeting.trim()) {
-      updateField("alternate_greetings", [...greetings, newGreeting.trim()]);
+      updateField("alt_greetings", [...greetings, newGreeting.trim()]);
       setNewGreeting("");
     }
   };
 
   const removeGreeting = (index: number) => {
-    updateField("alternate_greetings", greetings.filter((_, i) => i !== index));
+    updateField("alt_greetings", greetings.filter((_, i) => i !== index));
   };
 
   const startEditing = (index: number) => {
@@ -45,7 +45,7 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
     if (editingIndex !== null) {
       const updatedGreetings = [...greetings];
       updatedGreetings[editingIndex] = editingText;
-      updateField("alternate_greetings", updatedGreetings);
+      updateField("alt_greetings", updatedGreetings);
       setEditingIndex(null);
       setEditingText("");
     }
@@ -60,7 +60,7 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
     if (!aiSettings?.apiKey && !['ollama', 'lmstudio'].includes(aiSettings?.provider?.toLowerCase() || '')) {
       toast({
         title: t('configError') || "Configuration error",
-        description: t('configApiKey') || "Please configure the API key in the AI ​​settings first",
+        description: t('configApiKey') || "Please configure the API key in the AI settings first",
         variant: "destructive"
       });
       return;
@@ -81,7 +81,7 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
     try {
       const prompt = generateAlternateGreeting(characterData);
       const result = await generateWithAI(aiSettings, prompt);
-      updateField("alternate_greetings", [...greetings, result]);
+      updateField("alt_greetings", [...greetings, result]);
       toast({
         title: t('generateSuccess') || "Generate successfully",
         description: t('alternateGreetingGenerated') || "Alternative greetings have been generated"
@@ -118,7 +118,7 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
   };
 
   const handleClearAll = () => {
-    updateField("alternate_greetings", []);
+    updateField("alt_greetings", []);
     toast({
       title: "Cleared",
       description: "All alternative greetings have been cleared"
@@ -230,7 +230,7 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
                     <X className="w-4 h-4" />
                   </Button>
                 </div>
-                <p className="text-sm pr-16 pt-6 whitespace-pre-wrap text-gray-700 dark:text-gray-200">{greeting}</p>
+                <p className="text-sm pr-16 pt-6 whitespace-pre-wrap text-gray-300 dark:text-gray-200">{greeting}</p>
               </>
             )}
           </div>

@@ -34,15 +34,15 @@ interface CharacterCardV3 {
     description: string;
     personality: string;
     scenario: string;
-    first_mes: string;
-    mes_example: string;
+    greeting: string;
+    exchat: string;
     creator_notes: string;
     creator_notes_multilingual?: {
       [key: string]: string;
     };
     system_prompt: string;
     post_history_instructions: string;
-    alternate_greetings: string[];
+    alt_greetings: string[];
     character_book?: {
       entries: CharacterBookEntry[];
     };
@@ -71,12 +71,12 @@ const Index = () => {
       description: "",
       personality: "",
       scenario: "",
-      first_mes: "",
-      mes_example: "",
+      greeting: "",
+      exchat: "",
       creator_notes: "",
       system_prompt: "",
       post_history_instructions: "",
-      alternate_greetings: [],
+      alt_greetings: [],
       character_book: {
         entries: []
       },
@@ -395,12 +395,12 @@ const Index = () => {
             description: parsedData.data?.description || parsedData.description || "",
             personality: parsedData.data?.personality || parsedData.personality || "",
             scenario: parsedData.data?.scenario || parsedData.scenario || "",
-            first_mes: parsedData.data?.first_mes || parsedData.first_mes || "",
-            mes_example: parsedData.data?.mes_example || parsedData.mes_example || "",
+            greeting: parsedData.data?.greeting || parsedData.greeting || "",
+            exchat: parsedData.data?.exchat || parsedData.exchat || "",
             creator_notes: parsedData.data?.creator_notes || parsedData.creator_notes || "",
             system_prompt: parsedData.data?.system_prompt || "",
             post_history_instructions: parsedData.data?.post_history_instructions || "",
-            alternate_greetings: parsedData.data?.alternate_greetings || [],
+            alt_greetings: parsedData.data?.alt_greetings || [],
             character_book: parsedData.data?.character_book || { entries: [] },
             tags: parsedData.data?.tags || [],
             creator: parsedData.data?.creator || "",
@@ -421,12 +421,12 @@ const Index = () => {
             description: parsedData.description || "",
             personality: parsedData.personality || "",
             scenario: parsedData.scenario || "",
-            first_mes: parsedData.first_mes || "",
-            mes_example: parsedData.mes_example || "",
+            greeting: parsedData.greeting || "",
+            exchat: parsedData.exchat || "",
             creator_notes: parsedData.creator_notes || "",
             system_prompt: "",
             post_history_instructions: "",
-            alternate_greetings: parsedData.alternate_greetings || [],
+            alt_greetings: parsedData.alt_greetings || [],
             character_book: { entries: [] },
             tags: parsedData.tags || [],
             creator: parsedData.creator || "",
@@ -574,7 +574,7 @@ const Index = () => {
                       />
 
                       <AlternateGreetings
-                        greetings={characterData.data.alternate_greetings}
+                        greetings={characterData.data.alt_greetings}
                         updateField={updateField}
                         aiSettings={aiSettings}
                         characterData={characterData.data}

@@ -14,8 +14,8 @@ interface ParsedCharacterData {
   description?: string;
   personality?: string;
   scenario?: string;
-  first_mes?: string;
-  mes_example?: string;
+  greeting?: string;
+  exchat?: string;
   system_prompt?: string;
   post_history_instructions?: string;
   tags?: string[];
@@ -272,8 +272,8 @@ This is a historical figure, please generate:
       description: "Role description",
       personality: "character traits",
       scenario: "Scene Setting",
-      first_mes: "First message",
-      mes_example: "Conversation Example",
+      greeting: "First message",
+      exchat: "Conversation Example",
       system_prompt: "system prompt word",
       post_history_instructions: "Post history instructions",
       tags: "tag",

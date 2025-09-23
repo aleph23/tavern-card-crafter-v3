@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Loader2, RefreshCcw, Trash2, X } from "lucide-react";
-import { generateWithAI, generatePersonality, generateScenario, generateFirstMessage, generateMessageExample } from "@/utils/aiGenerator";
+import { generateWithAI, generatePersonality, generateScenario, generategreeting, generatechatEx } from "@/utils/aiGenerator";
 import { AISettings } from "@/components/AISettings";
 import { useToast } from "@/hooks/use-toast";
 
@@ -23,7 +23,7 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
     if (!aiSettings?.apiKey && !['ollama', 'lmstudio'].includes(aiSettings?.provider?.toLowerCase() || '')) {
       toast({
         title: "Configuration error",
-        description: "Please configure the API key in the AI ​​settings first",
+        description: "Please configure the API key in the AI settings first",
         variant: "destructive"
       });
       return;
@@ -144,7 +144,7 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
 
       <div>
         <div className="flex items-center justify-between mb-2">
-          <Label htmlFor="personality" className="text-sm font-medium text-gray-700">Character traits *</Label>
+          <Label htmlFor="personality" className="text-sm font-medium text-gray-300">Character traits *</Label>
           {renderFieldButtons('personality', generatePersonality, ['name', 'description'])}
         </div>
         <Textarea
@@ -159,7 +159,7 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
 
       <div>
         <div className="flex items-center justify-between mb-2">
-          <Label htmlFor="scenario" className="text-sm font-medium text-gray-700">Scene setting *</Label>
+          <Label htmlFor="scenario" className="text-sm font-medium text-gray-300">Scene setting *</Label>
           {renderFieldButtons('scenario', generateScenario, ['name', 'description', 'personality'])}
         </div>
         <Textarea
@@ -174,13 +174,13 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
 
       <div>
         <div className="flex items-center justify-between mb-2">
-          <Label htmlFor="first_mes" className="text-sm font-medium text-gray-700">First message *</Label>
-          {renderFieldButtons('first_mes', generateFirstMessage, ['name', 'description', 'personality', 'scenario'])}
+          <Label htmlFor="greeting" className="text-sm font-medium text-gray-300">First message *</Label>
+          {renderFieldButtons('greeting', generategreeting, ['name', 'description', 'personality', 'scenario'])}
         </div>
         <Textarea
-          id="first_mes"
-          value={data.first_mes}
-          onChange={(e) => updateField("first_mes", e.target.value)}
+          id="greeting"
+          value={data.greeting}
+          onChange={(e) => updateField("greeting", e.target.value)}
           placeholder="The character's opening remarks..."
           className="mt-1 min-h-[100px]"
           showCounter={true}
@@ -189,13 +189,13 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
 
       <div>
         <div className="flex items-center justify-between mb-2">
-          <Label htmlFor="mes_example" className="text-sm font-medium text-gray-700">Dialogue example</Label>
-          {renderFieldButtons('mes_example', generateMessageExample, ['name', 'description', 'personality', 'first_mes'])}
+          <Label htmlFor="exchat" className="text-sm font-medium text-gray-300">Dialogue example</Label>
+          {renderFieldButtons('exchat', generatechatEx, ['name', 'description', 'personality', 'greeting'])}
         </div>
         <Textarea
-          id="mes_example"
-          value={data.mes_example}
-          onChange={(e) => updateField("mes_example", e.target.value)}
+          id="exchat"
+          value={data.exchat}
+          onChange={(e) => updateField("exchat", e.target.value)}
           placeholder="Sample dialogue that helps define how a character speaks..."
           className="mt-1 min-h-[120px]"
           showCounter={true}
