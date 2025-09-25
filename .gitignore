@@ -14,7 +14,8 @@ dist-ssr
 
 # Editor directories and files
 .vscode/*
-!.vscode/extensions.json
+.vscode/**/*
+.vscode/extensions.json
 .idea
 .DS_Store
 *.suo
@@ -22,7 +23,19 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+.vs/*
+.vs/**/*
 .vs/tavern-card-crafter-v3/v17/.wsuo
 .vs/VSWorkspaceState.json
 .vs/tavern-card-crafter-v3/v17/DocumentLayout.backup.json
 .vs/tavern-card-crafter-v3/v17/DocumentLayout.json
+.vscode/launch.json
+.vscode/launch.json
+.vscode/launch.json
+.vscode/launch.json
+.vscode/launch.json
+.vscode/launch.json
+.vscode/launch.json
+.vscode/launch.json
+/.vscode/launch.json
+.vscode\launch.json
