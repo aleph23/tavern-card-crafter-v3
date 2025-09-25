@@ -38,7 +38,7 @@ const translations = {
     description: '角色描述',
     personalityDescription: '性格描述',
     scenario: '场景设定',
-    greeting: '首条信息',
+    first_mes: '首条信息',
     chatEx: '对话示例',
     creatorNotes: '作者注释',
     systemPrompt: '系统提示',
@@ -79,7 +79,7 @@ const translations = {
     addAlternateGreetingPlaceholder: '添加备用问候语...',
     aiGenerateGreeting: 'AI生成问候语',
     alternateGreetingGenerated: '备用问候语已生成完成',
-    greeting: '问候语',
+    first_mes: '问候语',
 
     // Label
     enterTag: '输入标签...',
@@ -131,7 +131,7 @@ const translations = {
     description: 'Character Description',
     personalityDescription: 'Personality Description',
     scenario: 'Scenario',
-    greeting: 'First Message',
+    first_mes: 'First Message',
     chatEx: 'Message Example',
     creatorNotes: 'Creator Notes',
     systemPrompt: 'System Prompt',
@@ -172,7 +172,7 @@ const translations = {
     addAlternateGreetingPlaceholder: 'Add alternate greeting...',
     aiGenerateGreeting: 'AI Generate Greeting',
     alternateGreetingGenerated: 'Alternate greeting has been generated',
-    greeting: 'Greeting',
+    first_mes: 'first_mes',
 
     // Tags
     enterTag: 'Enter tag...',

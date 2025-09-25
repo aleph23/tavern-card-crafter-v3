@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,11 +15,12 @@ interface ParsedCharacterData {
   description?: string;
   personality?: string;
   scenario?: string;
-  greeting?: string;
-  exchat?: string;
+  first_mes?: string;
+  mes_example?: string;
   system_prompt?: string;
   post_history_instructions?: string;
   tags?: string[];
+  creator?: string;
   creator_notes?: string;
 }
 
@@ -272,8 +274,8 @@ This is a historical figure, please generate:
       description: "Role description",
       personality: "character traits",
       scenario: "Scene Setting",
-      greeting: "First message",
-      exchat: "Conversation Example",
+      first_mes: "First message",
+      mes_example: "Conversation Example",
       system_prompt: "system prompt word",
       post_history_instructions: "Post history instructions",
       tags: "tag",
@@ -299,7 +301,7 @@ This is a historical figure, please generate:
           AI character card assistant
         </CardTitle>
         <p className="text-sm text-gray-600 dark:text-gray-400">
-          Paste any text content, select the role type, and the AI ​​will intelligently extract and generate detailed role information
+          Paste any text content, select the role type, and the AI will intelligently extract and generate detailed role information
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -391,15 +393,15 @@ etc..."
               </Button>
             </div>
 
-            <div className="space-y-3 max-h-[400px] overflow-y-auto bg-gray-50 dark:bg-gray-800 rounded-lg p-3 scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-300 dark:scrollbar-track-gray-700 dark:scrollbar-thumb-gray-600 hover:scrollbar-thumb-gray-400 dark:hover:scrollbar-thumb-gray-500">
+            <div className="space-y-3 max-h-[400px] overflow-y-auto bg-gray-50 dark:bg-gray-800 rounded-lg p-3 scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-300 dark:scrollbar-track-gray-300 dark:scrollbar-thumb-gray-600 hover:scrollbar-thumb-gray-400 dark:hover:scrollbar-thumb-gray-500">
               {Object.entries(parsedData).map(([key, value]) => {
                 if (!value || (Array.isArray(value) && value.length === 0)) {
                   return null;
                 }
 
                 return (
-                  <div key={key} className="border-b border-gray-200 dark:border-gray-700 pb-2 last:border-b-0">
-                    <div className="font-medium text-sm text-gray-700 dark:text-gray-300 mb-1">
+                  <div key={key} className="border-b border-gray-200 dark:border-gray-300 pb-2 last:border-b-0">
+                    <div className="font-medium text-sm text-gray-300 dark:text-gray-300 mb-1">
                       {getFieldLabel(key)}
                     </div>
                     <div className="text-sm text-gray-600 dark:text-gray-400 break-words leading-relaxed">

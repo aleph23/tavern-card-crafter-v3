@@ -1,3 +1,4 @@
+/* eslint-disable prefer-const */
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -38,7 +39,7 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
   const downloadWithImage = () => {
     if (!characterImage) {
       toast({
-        title: t('hint') || "提示",
+        title: t('hint') || "hint",
         description: t('uploadImageHint'),
         variant: "destructive"
       });
@@ -134,7 +135,7 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
 
     const fields = [
       data.name, data.nickname, data.description, data.personality,
-      data.scenario, data.greeting, data.exchat, data.creator_notes,
+      data.scenario, data.first_mes, data.mes_example, data.creator_notes,
       data.system_prompt, data.post_history_instructions,
       ...(data.alt_greetings || []),
       ...(data.tags || []).join(', '),
@@ -155,7 +156,7 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
 
   // JSON syntax highlighting function
   const syntaxHighlight = (json: string) => {
-    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, (match) => {
+    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\\-]?\d+)?)/g, (match) => {
       let cls = 'text-yellow-300'; // Default color - Numbers and others
       if (/^"/.test(match)) {
         if (/:$/.test(match)) {

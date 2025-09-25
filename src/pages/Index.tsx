@@ -17,6 +17,7 @@ import TagsSection from "@/components/CharacterForm/TagsSection";
 import MetadataSection from "@/components/CharacterForm/MetadataSection";
 import CharacterPreview from "@/components/CharacterPreview";
 import AIAssistant from "@/components/CharacterForm/AIAssistant";
+import { CharacterData } from '../utils/aiGenerator';
 
 interface CharacterBookEntry {
   keys: string[];
@@ -34,8 +35,8 @@ interface CharacterCardV3 {
     description: string;
     personality: string;
     scenario: string;
-    greeting: string;
-    exchat: string;
+    first_mes: string;
+    mes_example: string;
     creator_notes: string;
     creator_notes_multilingual?: {
       [key: string]: string;
@@ -49,6 +50,7 @@ interface CharacterCardV3 {
     tags: string[];
     creator: string;
     character_version: string;
+    group_only_greetings: [],
     creation_date?: string;
     modification_date?: string;
     source?: string;
@@ -71,8 +73,8 @@ const Index = () => {
       description: "",
       personality: "",
       scenario: "",
-      greeting: "",
-      exchat: "",
+      first_mes: "",
+      mes_example: "",
       creator_notes: "",
       system_prompt: "",
       post_history_instructions: "",
@@ -83,6 +85,7 @@ const Index = () => {
       tags: [],
       creator: "",
       character_version: "1.0",
+      group_only_greetings: [],
       creation_date: new Date().toISOString().split('T')[0],
       modification_date: new Date().toISOString().split('T')[0],
       extensions: {}
@@ -395,8 +398,8 @@ const Index = () => {
             description: parsedData.data?.description || parsedData.description || "",
             personality: parsedData.data?.personality || parsedData.personality || "",
             scenario: parsedData.data?.scenario || parsedData.scenario || "",
-            greeting: parsedData.data?.greeting || parsedData.greeting || "",
-            exchat: parsedData.data?.exchat || parsedData.exchat || "",
+            first_mes: parsedData.data?.first_mes || parsedData.first_mes || "",
+            mes_example: parsedData.data?.mes_example || parsedData.mes_example || "",
             creator_notes: parsedData.data?.creator_notes || parsedData.creator_notes || "",
             system_prompt: parsedData.data?.system_prompt || "",
             post_history_instructions: parsedData.data?.post_history_instructions || "",
@@ -405,6 +408,7 @@ const Index = () => {
             tags: parsedData.data?.tags || [],
             creator: parsedData.data?.creator || "",
             character_version: parsedData.data?.character_version || "1.0",
+            group_only_greetings: parsedData.data?.group_only_greetings || "",
             creation_date: new Date().toISOString().split('T')[0],
             modification_date: new Date().toISOString().split('T')[0],
             extensions: parsedData.data?.extensions || {}
@@ -421,8 +425,8 @@ const Index = () => {
             description: parsedData.description || "",
             personality: parsedData.personality || "",
             scenario: parsedData.scenario || "",
-            greeting: parsedData.greeting || "",
-            exchat: parsedData.exchat || "",
+            first_mes: parsedData.first_mes || "",
+            mes_example: parsedData.mes_example || "",
             creator_notes: parsedData.creator_notes || "",
             system_prompt: "",
             post_history_instructions: "",
@@ -431,6 +435,7 @@ const Index = () => {
             tags: parsedData.tags || [],
             creator: parsedData.creator || "",
             character_version: "1.0",
+            group_only_greetings: parsedData.group_only_greetings || "",
             creation_date: new Date().toISOString().split('T')[0],
             modification_date: new Date().toISOString().split('T')[0],
             extensions: {}
@@ -574,7 +579,8 @@ const Index = () => {
                       />
 
                       <AlternateGreetings
-                        greetings={characterData.data.alt_greetings}
+                        alternate_greetings={characterData.data.alt_greetings}
+                        group_only_greetings={characterData.data.group_only_greetings}
                         updateField={updateField}
                         aiSettings={aiSettings}
                         characterData={characterData.data}

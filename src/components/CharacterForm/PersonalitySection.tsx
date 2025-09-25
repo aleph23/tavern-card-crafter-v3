@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useState, useRef } from "react";
 import { Label } from "@/components/ui/label";
@@ -174,13 +175,13 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
 
       <div>
         <div className="flex items-center justify-between mb-2">
-          <Label htmlFor="greeting" className="text-sm font-medium text-gray-300">First message *</Label>
-          {renderFieldButtons('greeting', generategreeting, ['name', 'description', 'personality', 'scenario'])}
+          <Label htmlFor="first_mes" className="text-sm font-medium text-gray-300">First message *</Label>
+          {renderFieldButtons('first_mes', generategreeting, ['name', 'description', 'personality', 'scenario'])}
         </div>
         <Textarea
-          id="greeting"
-          value={data.greeting}
-          onChange={(e) => updateField("greeting", e.target.value)}
+          id="first_mes"
+          value={data.first_mes}
+          onChange={(e) => updateField("first_mes", e.target.value)}
           placeholder="The character's opening remarks..."
           className="mt-1 min-h-[100px]"
           showCounter={true}
@@ -189,13 +190,13 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
 
       <div>
         <div className="flex items-center justify-between mb-2">
-          <Label htmlFor="exchat" className="text-sm font-medium text-gray-300">Dialogue example</Label>
-          {renderFieldButtons('exchat', generatechatEx, ['name', 'description', 'personality', 'greeting'])}
+          <Label htmlFor="mes_example" className="text-sm font-medium text-gray-300">Dialogue example</Label>
+          {renderFieldButtons('mes_example', generatechatEx, ['name', 'description', 'personality', 'first_mes'])}
         </div>
         <Textarea
-          id="exchat"
-          value={data.exchat}
-          onChange={(e) => updateField("exchat", e.target.value)}
+          id="mes_example"
+          value={data.mes_example}
+          onChange={(e) => updateField("mes_example", e.target.value)}
           placeholder="Sample dialogue that helps define how a character speaks..."
           className="mt-1 min-h-[120px]"
           showCounter={true}

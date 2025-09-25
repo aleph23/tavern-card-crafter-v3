@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useState, useRef } from "react";
 import { Label } from "@/components/ui/label";
@@ -144,7 +145,7 @@ const PromptsSection = ({ data, updateField, aiSettings }: PromptsSectionProps) 
 
       <div>
         <div className="flex items-center justify-between mb-2">
-          <Label htmlFor="system_prompt" className="text-sm font-medium text-gray-700">System prompt words</Label>
+          <Label htmlFor="system_prompt" className="text-sm font-medium text-gray-300">System prompt words</Label>
           {renderFieldButtons('system_prompt', generateSystemPrompt)}
         </div>
         <Textarea
@@ -159,7 +160,7 @@ const PromptsSection = ({ data, updateField, aiSettings }: PromptsSectionProps) 
 
       <div>
         <div className="flex items-center justify-between mb-2">
-          <Label htmlFor="post_history" className="text-sm font-medium text-gray-700">Post-historical instructions</Label>
+          <Label htmlFor="post_history" className="text-sm font-medium text-gray-300">Post-historical instructions</Label>
           {renderFieldButtons('post_history_instructions', generatePostHistoryInstructions)}
         </div>
         <Textarea

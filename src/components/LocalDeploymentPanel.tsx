@@ -332,7 +332,7 @@ pause`;
               </CardContent>
             </Card>
 
-            {/* 使用说明 */}
+            {/* Instructions for use */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -344,11 +344,11 @@ pause`;
                 <div className="space-y-4">
                   <div className="p-4 bg-blue-50 dark:bg-blue-950 rounded-lg">
                     <h4 className="font-medium mb-2 text-blue-900 dark:text-blue-100">
-                      {language === 'en' ? 'Quick Start (Windows)' : '快速启动（Windows）'}
+                      {language === 'en' ? 'Quick Start (Windows)' : '快速启动 (Windows)'}
                     </h4>
                     <ol className="text-sm space-y-1 text-blue-800 dark:text-blue-200">
                       <li>1. {language === 'en' ? 'Download all project files from Lovable' : '从 Lovable 下载所有项目文件'}</li>
-                      <li>2. {language === 'en' ? 'Download the start-server.bat file above' : '下载上面的 start-server.bat 文件'}</li>
+                      <li>2. {language === 'en' ? 'Download the start-server.bat file above' : '下载上面的 start-server.bat 文件'} </li>
                       <li>3. {language === 'en' ? 'Place the .bat file in the project root directory' : '将 .bat 文件放在项目根目录'}</li>
                       <li>4. {language === 'en' ? 'Double-click start-server.bat to run' : '双击 start-server.bat 运行'}</li>
                     </ol>

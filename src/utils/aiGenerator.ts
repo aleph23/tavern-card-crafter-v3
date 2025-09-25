@@ -5,8 +5,8 @@ export interface CharacterData {
   description: string;
   personality?: string;
   scenario?: string;
-  greeting?: string;
-  exchat?: string;
+  first_mes?: string;
+  mes_example?: string;
   system_prompt?: string;
   post_history_instructions?: string;
   tags?: string[];
@@ -311,7 +311,7 @@ Role name: ${data.name}
 Role description: ${data.description} 
 Character traits: ${data.personality} 
 Scene settings: ${data.scenario} 
-First message: ${data.greeting} 
+First message: ${data.first_mes} 
 
 Please generate an alternate greeting with a different style from the first message to reflect the multifaceted nature of the character. Be natural and vivid。`;
 };
