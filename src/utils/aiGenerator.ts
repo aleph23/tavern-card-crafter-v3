@@ -238,7 +238,7 @@ Character traits: ${data.personality}
 Please generate a detailed scene setting that describes the environment, background and situation in which the character is located. Please output the scene description directly, do not include summary paragraphs or additional instructions. The content should be specific and in line with the role settings.`;
 };
 
-export const generategreeting = (data: CharacterData): string => {
+export const generateFirstMes = (data: CharacterData): string => {
   return `Generate the first message of the character along with scene introductions for the player:
 
 Role name: ${data.name} 
@@ -249,7 +249,7 @@ Scene settings: ${data.scenario}
 Please generate a natural opening remark that reflects the character's personality and the scene in which you are located. Be vivid and interesting.`;
 };
 
-export const generatechatEx = (data: CharacterData): string => {
+export const generateMesExample = (data: CharacterData): string => {
   return `Generate a conversation example of a role based on the following information:
 
 Role name: ${data.name}

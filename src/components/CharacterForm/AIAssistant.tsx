@@ -67,7 +67,7 @@ const AIAssistant = ({ aiSettings, onInsertField }: AIAssistantProps) => {
   const [parsedData, setParsedData] = useState<ParsedCharacterData | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
-
+  
   const getPromptByType = (type: string, content: string) => {
     // Limit the length of input content to avoid too long prompt words
     const truncatedContent = content.length > 2000 ? content.substring(0, 2000) + "..." : content;
@@ -85,12 +85,12 @@ Please output strictly in JSON format and do not add any other text:`;
 "description": "Detailed character appearance description",
 "personality": "Detailed description of personality traits",
 "scenario": "Detailed scene setting description",
-"first mes": "The character's opening remark",
-"mes example": "Dialogue example, format: <START>\\n{{user}}: User Discourse\\nRole name: Role answer",
-"system prompt": "System prompt word to guide AI how to play this role",
-"post history instructions": "post history instructions",
+"first_mes": "The character's opening remark",
+"mes_example": "Dialogue example, format: <START>\\n{{user}}: User Discourse\\nRole name: Role answer",
+"system_prompt": "System prompt word to guide AI how to play this role",
+"post_history_instructions": "post history instructions",
 "tags": ["Related tags"],
-"creator notes": "creator notes"
+"creator_notes": "creator notes"
 }`;
 
     const typeSpecificPrompts = {
@@ -104,9 +104,8 @@ This is an anime character, please generate:
 - description: Describe the appearance, clothing, and body characteristics in detail
 - personality: Detailed personality traits and speaking habits
 - scenario: Anime world background settings
-- first mes: Opening remarks that fit the anime character style
-- mes example: A dialogue example that reflects the character's speaking style ${jsonFormat
-        }`,
+- first_mes: Opening remarks that fit the anime character style
+- mes_example: A dialogue example that reflects the character's speaking style ${jsonFormat}`,
 
       game: `${baseInstructions}
 
@@ -114,8 +113,8 @@ This is the game character, please generate:
 - description: Character appearance, equipment, special ability description
 - personality: personality traits, combat style, values
 - scenario: Game world background settings
-- first mes: Opening remarks that match the identity of the game character
-- mes example: A dialogue example containing multiple scenarios ${jsonFormat} `,
+- first_mes: Opening remarks that match the identity of the game character
+- mes_example: A dialogue example containing multiple scenarios ${jsonFormat} `,
 
       novel: `${baseInstructions}
 
@@ -132,9 +131,8 @@ This is a historical figure, please generate:
 - description: Appearance and clothing description based on historical materials 
 - personality: Character traits based on history 
 - scenario: Detailed historical context 
-- first mes: Opening remarks that match the identity of historical figures 
-- mes example: A dialogue that embodies the wisdom of historical figures ${jsonFormat
-        }`
+- first_mes: Opening remarks that match the identity of historical figures 
+- mes_example: A dialogue that embodies the wisdom of historical figures ${jsonFormat}`
     };
 
     return typeSpecificPrompts[type as keyof typeof typeSpecificPrompts] || typeSpecificPrompts.general;
@@ -279,6 +277,7 @@ This is a historical figure, please generate:
       system_prompt: "system prompt word",
       post_history_instructions: "Post history instructions",
       tags: "tag",
+      creator: "Creator",
       creator_notes: "Creator notes"
     };
     return labels[field] || field;

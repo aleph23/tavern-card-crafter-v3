@@ -129,7 +129,7 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
 
   // Calculate the total number of characters and tokens
   const calculateTotalStats = () => {
-    const {data} = characterData.data;
+    const {data} = characterData;
     let totalChars = 0;
     let totalTokens = 0;
 

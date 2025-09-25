@@ -408,7 +408,11 @@ const Index = () => {
             tags: parsedData.data?.tags || [],
             creator: parsedData.data?.creator || "",
             character_version: parsedData.data?.character_version || "1.0",
-            group_only_greetings: parsedData.data?.group_only_greetings || "",
+            group_only_greetings: Array.isArray(parsedData.data?.group_only_greetings)
+              ? parsedData.data.group_only_greetings
+              : (typeof parsedData.data?.group_only_greetings === "string" && parsedData.data.group_only_greetings.length > 0)
+                ? [parsedData.data.group_only_greetings]
+                : [],
             creation_date: new Date().toISOString().split('T')[0],
             modification_date: new Date().toISOString().split('T')[0],
             extensions: parsedData.data?.extensions || {}
@@ -435,7 +439,11 @@ const Index = () => {
             tags: parsedData.tags || [],
             creator: parsedData.creator || "",
             character_version: "1.0",
-            group_only_greetings: parsedData.group_only_greetings || "",
+            group_only_greetings: Array.isArray(parsedData.group_only_greetings)
+              ? parsedData.group_only_greetings
+              : (typeof parsedData.group_only_greetings === "string" && parsedData.group_only_greetings.length > 0)
+                ? [parsedData.group_only_greetings]
+                : [],
             creation_date: new Date().toISOString().split('T')[0],
             modification_date: new Date().toISOString().split('T')[0],
             extensions: {}
