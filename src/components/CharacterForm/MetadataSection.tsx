@@ -26,7 +26,7 @@ const MetadataSection = ({ data, updateField }: MetadataSectionProps) => {
         />
       </div>
 
-      {/* Role Version */}
+      {/* Version */}
       <div className="form-group">
         <Label htmlFor="character_version" className="text-sm font-medium text-gray-300">Role Version</Label>
         <Input

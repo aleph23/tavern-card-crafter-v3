@@ -43,7 +43,7 @@ interface CharacterCardV3 {
     };
     system_prompt: string;
     post_history_instructions: string;
-    alt_greetings: string[];
+    alternate_greetings: string[];
     character_book?: {
       entries: CharacterBookEntry[];
     };
@@ -78,7 +78,7 @@ const Index = () => {
       creator_notes: "",
       system_prompt: "",
       post_history_instructions: "",
-      alt_greetings: [],
+      alternate_greetings: [],
       character_book: {
         entries: []
       },
@@ -403,7 +403,7 @@ const Index = () => {
             creator_notes: parsedData.data?.creator_notes || parsedData.creator_notes || "",
             system_prompt: parsedData.data?.system_prompt || "",
             post_history_instructions: parsedData.data?.post_history_instructions || "",
-            alt_greetings: parsedData.data?.alt_greetings || [],
+            alternate_greetings: parsedData.data?.alternate_greetings || [],
             character_book: parsedData.data?.character_book || { entries: [] },
             tags: parsedData.data?.tags || [],
             creator: parsedData.data?.creator || "",
@@ -430,7 +430,7 @@ const Index = () => {
             creator_notes: parsedData.creator_notes || "",
             system_prompt: "",
             post_history_instructions: "",
-            alt_greetings: parsedData.alt_greetings || [],
+            alternate_greetings: parsedData.alternate_greetings || [],
             character_book: { entries: [] },
             tags: parsedData.tags || [],
             creator: parsedData.creator || "",
@@ -579,7 +579,7 @@ const Index = () => {
                       />
 
                       <AlternateGreetings
-                        alternate_greetings={characterData.data.alt_greetings}
+                        greetings={characterData.data.alternate_greetings}
                         group_only_greetings={characterData.data.group_only_greetings}
                         updateField={updateField}
                         aiSettings={aiSettings}

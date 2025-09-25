@@ -129,7 +129,7 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
 
   // Calculate the total number of characters and tokens
   const calculateTotalStats = () => {
-    const {data} = characterData;
+    const {data} = characterData.data;
     let totalChars = 0;
     let totalTokens = 0;
 
@@ -137,7 +137,7 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
       data.name, data.nickname, data.description, data.personality,
       data.scenario, data.first_mes, data.mes_example, data.creator_notes,
       data.system_prompt, data.post_history_instructions,
-      ...(data.alt_greetings || []),
+      ...(data.alternate_greetings || []),
       ...(data.tags || []).join(', '),
       ...(data.character_book?.entries || []).map((entry: any) => entry.content).join(' ')
     ];

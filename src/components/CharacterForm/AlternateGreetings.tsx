@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface AlternateGreetingsProps {
+  greetings: string[];
   alternate_greetings: string[];
   group_only_greetings: string[];
   updateField: (field: string, value: any) => void;
@@ -18,7 +19,7 @@ interface AlternateGreetingsProps {
   characterData: any;
 }
 
-const AlternateGreetings = ({ alternate_greetings, updateField, aiSettings, characterData }: AlternateGreetingsProps) => {
+const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData }: AlternateGreetingsProps) => {
   const [newGreeting, setNewGreeting] = useState("");
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingText, setEditingText] = useState("");
@@ -29,25 +30,25 @@ const AlternateGreetings = ({ alternate_greetings, updateField, aiSettings, char
 
   const addGreeting = () => {
     if (newGreeting.trim()) {
-      updateField("alt_greetings", [...alternate_greetings, newGreeting.trim()]);
+      updateField("alternate_greetings", [...greetings, newGreeting.trim()]);
       setNewGreeting("");
     }
   };
 
   const removeGreeting = (index: number) => {
-    updateField("alt_greetings", alternate_greetings.filter((_, i) => i !== index));
+    updateField("alternate_greetings", alternate_greetings.filter((_, i) => i !== index));
   };
 
   const startEditing = (index: number) => {
     setEditingIndex(index);
-    setEditingText(alternate_greetings[index]);
+    setEditingText(greetings[index]);
   };
 
   const saveEdit = () => {
     if (editingIndex !== null) {
-      const updatedGreetings = [...alternate_greetings];
+      const updatedGreetings = [...greetings];
       updatedGreetings[editingIndex] = editingText;
-      updateField("alt_greetings", updatedGreetings);
+      updateField("alternate_greetings", updatedGreetings);
       setEditingIndex(null);
       setEditingText("");
     }
@@ -83,7 +84,7 @@ const AlternateGreetings = ({ alternate_greetings, updateField, aiSettings, char
     try {
       const prompt = generateAlternateGreeting(characterData);
       const result = await generateWithAI(aiSettings, prompt);
-      updateField("alt_greetings", [...alternate_greetings, result]);
+      updateField("alternate_greetings", [...greetings, result]);
       toast({
         title: t('generateSuccess') || "Generate successfully",
         description: t('alternateGreetingGenerated') || "Alternative greetings have been generated"
@@ -120,7 +121,7 @@ const AlternateGreetings = ({ alternate_greetings, updateField, aiSettings, char
   };
 
   const handleClearAll = () => {
-    updateField("alt_greetings", []);
+    updateField("alternate_greetings", []);
     toast({
       title: "Cleared",
       description: "All alternative greetings have been cleared"
@@ -190,7 +191,7 @@ const AlternateGreetings = ({ alternate_greetings, updateField, aiSettings, char
       </div>
 
       <div className="space-y-3">
-        {alternate_greetings.map((greeting, index) => (
+        {greetings.map((greeting, index) => (
           <div key={index} className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg relative">
             <div className="absolute top-2 left-2 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs font-medium px-2 py-1 rounded-full">
               {t('greeting') || 'Greetings'} {index + 1}

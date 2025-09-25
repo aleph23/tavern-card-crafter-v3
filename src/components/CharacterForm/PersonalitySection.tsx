@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Loader2, RefreshCcw, Trash2, X } from "lucide-react";
-import { generateWithAI, generatePersonality, generateScenario, generategreeting, generatechatEx } from "@/utils/aiGenerator";
+import { generateWithAI, generatePersonality, generateScenario, generateFirstMes, generateMesExample } from "@/utils/aiGenerator";
 import { AISettings } from "@/components/AISettings";
 import { useToast } from "@/hooks/use-toast";
 
@@ -176,7 +176,7 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
       <div>
         <div className="flex items-center justify-between mb-2">
           <Label htmlFor="first_mes" className="text-sm font-medium text-gray-300">First message *</Label>
-          {renderFieldButtons('first_mes', generategreeting, ['name', 'description', 'personality', 'scenario'])}
+          {renderFieldButtons('first_mes', generateFirstMes, ['name', 'description', 'personality', 'scenario'])}
         </div>
         <Textarea
           id="first_mes"
@@ -191,7 +191,7 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
       <div>
         <div className="flex items-center justify-between mb-2">
           <Label htmlFor="mes_example" className="text-sm font-medium text-gray-300">Dialogue example</Label>
-          {renderFieldButtons('mes_example', generatechatEx, ['name', 'description', 'personality', 'first_mes'])}
+          {renderFieldButtons('mes_example', generateMesExample, ['name', 'description', 'personality', 'first_mes'])}
         </div>
         <Textarea
           id="mes_example"
