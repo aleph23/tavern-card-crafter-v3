@@ -363,7 +363,7 @@ pause`;
                       <li>2. {language === 'en' ? 'Open terminal/command prompt in project directory' : '在项目目录打开终端/命令提示符'}</li>
                       <li>3. {language === 'en' ? 'Run: npm install' : '运行: npm install'}</li>
                       <li>4. {language === 'en' ? 'Run: npm run dev' : '运行: npm run dev'}</li>
-                      <li>5. {language === 'en' ? 'Open http://localhost:8080 in browser' : '在浏览器打开 http://localhost:8080'}</li>
+                      <li>5. {language === 'en' ? 'Open http://localhost:6090 in browser' : '在浏览器打开 http://localhost:6090'}</li>
                     </ol>
                   </div>
                 </div>

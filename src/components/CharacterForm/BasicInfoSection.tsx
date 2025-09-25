@@ -40,7 +40,7 @@ const BasicInfoSection = ({ data, updateField, characterImage, setCharacterImage
     if (!aiSettings?.apiKey && !['ollama', 'lmstudio'].includes(aiSettings?.provider?.toLowerCase() || '')) {
       toast({
         title: "Configuration error",
-        description: "Please configure the API key in the AI ​​settings first",
+        description: "Please configure the API key in the AI settings first",
         variant: "destructive"
       });
       return;
