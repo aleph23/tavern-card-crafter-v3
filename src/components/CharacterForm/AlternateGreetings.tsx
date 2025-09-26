@@ -37,7 +37,7 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
   };
 
   const removeGreeting = (index: number) => {
-    updateField("alternate_greetings", AlternateGreetings.filter((_, i) => i !== index));
+    updateField("alternate_greetings", greetings.filter((_, i) => i !== index));
   };
 
   const startEditing = (index: number) => {
