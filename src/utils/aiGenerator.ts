@@ -312,6 +312,7 @@ Role description: ${data.description}
 Character traits: ${data.personality} 
 Scene settings: ${data.scenario} 
 First message: ${data.first_mes} 
+Dialogue example: ${data.mes_example}
 
 Please generate an alternate greeting with a different style from the first message to reflect the multifaceted nature of the character. Be natural and vivid。`;
 };

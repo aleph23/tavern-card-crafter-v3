@@ -403,7 +403,11 @@ const Index = () => {
             creator_notes: parsedData.data?.creator_notes || parsedData.creator_notes || "",
             system_prompt: parsedData.data?.system_prompt || "",
             post_history_instructions: parsedData.data?.post_history_instructions || "",
-            alternate_greetings: parsedData.data?.alternate_greetings || [],
+            alternate_greetings: Array.isArray(parsedData.data?.alternate_greetings)
+              ? parsedData.data.alternate_greetings
+              : (typeof parsedData.data?.alternate_greetings === "string" && parsedData.data.alternate_greetings.length > 0)
+                ? [parsedData.data.alternate_greetings]
+                : [],
             character_book: parsedData.data?.character_book || { entries: [] },
             tags: parsedData.data?.tags || [],
             creator: parsedData.data?.creator || "",
@@ -434,7 +438,11 @@ const Index = () => {
             creator_notes: parsedData.creator_notes || "",
             system_prompt: "",
             post_history_instructions: "",
-            alternate_greetings: parsedData.alternate_greetings || [],
+            alternate_greetings: Array.isArray(parsedData.alternate_greetings)
+              ? parsedData.alternate_greetings
+              : (typeof parsedData.alternate_greetings === "string" && parsedData.alternate_greetings.length > 0)
+                ? [parsedData.alternate_greetings]
+                : [],
             character_book: { entries: [] },
             tags: parsedData.tags || [],
             creator: parsedData.creator || "",
@@ -587,7 +595,7 @@ const Index = () => {
                       />
 
                       <AlternateGreetings
-                        greetings={characterData.data.alternate_greetings}
+                        greetings={Array.isArray(characterData.data.alternate_greetings) ? characterData.data.alternate_greetings : []}
                         group_only_greetings={characterData.data.group_only_greetings}
                         updateField={updateField}
                         aiSettings={aiSettings}

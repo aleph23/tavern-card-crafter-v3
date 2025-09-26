@@ -13,6 +13,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 interface AlternateGreetingsProps {
   greetings: string[];
   alternate_greetings: string[];
+  mes_example: string[];
   group_only_greetings: string[];
   updateField: (field: string, value: any) => void;
   aiSettings: AISettings | null;
@@ -36,7 +37,7 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
   };
 
   const removeGreeting = (index: number) => {
-    updateField("alternate_greetings", alternate_greetings.filter((_, i) => i !== index));
+    updateField("alternate_greetings", AlternateGreetings.filter((_, i) => i !== index));
   };
 
   const startEditing = (index: number) => {
