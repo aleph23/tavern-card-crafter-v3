@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AISettings } from "@/components/AISettings";
 
 export interface CharacterData {
@@ -7,6 +8,7 @@ export interface CharacterData {
   scenario?: string;
   first_mes?: string;
   mes_example?: string;
+  alternative_greetings?: string[];
   system_prompt?: string;
   post_history_instructions?: string;
   tags?: string[];
@@ -204,136 +206,139 @@ export const generateDescription = (data: CharacterData): string => {
   const existingDescription = data.description.trim();
 
   if (existingDescription) {
-    return `Based on the following role information, improve and enrich character descriptions and expand on the basis of existing content:
+    return `Based on the following role information, enchance the descriptions, while remaining succinct:
 
-Role name:${data.name}
+Card name:${data.name}
 Existing description:${existingDescription}
 
-Please add descriptive content such as the character's appearance details, body characteristics, clothing style, etc. based on the existing description. Only output the role description content, do not include role names and other information. Please output the description directly, and do not add summary or additional instructions.`;
+Embellish, making sure to describe all physical qualities of the character -- body, attire and how they compose themself. This should be in non-prosaic list format.`;
   } else {
-    return `Generate a detailed character appearance description based on the character name:
+    return `Generate a list of all the physical qualities of the character -- body, attire and how they compose themself. This should be in non-prosaic CSV format riffing off of the character name:
 
-Role name:${data.name}
+Card name:${data.name}
 
 Please generate a detailed character appearance description, including the character's physical characteristics, facial features, clothing style, temperament, etc. Only output character description content, do not include character name, background story or other information. Please output the description directly, and do not add summary or additional instructions.`;
   }
 };
 
 export const generatePersonality = (data: CharacterData): string => {
-  return `Generate detailed character characteristics based on the following information:
+  return `Based on the following role information, enchance the character's persona, while remaining succinct.
 
-Role name: ${data.name}
-Role description: ${data.description}
+Card name: ${data.name}
+Physical Description: ${data.description}
 
-Please generate a detailed character description, including the character's behavioral patterns, habits, emotional characteristics, etc. Please output a description of personality traits directly, and do not include summary paragraphs or additional instructions. The content should be specific and in line with the role settings.`;
+A non-prosaic list, describing the character's traits, behavior, idiosyncracies, likes/dislikes, strengths/weaknesses, backstory.`;
 };
 
 export const generateScenario = (data: CharacterData): string => {
-  return `Generate appropriate scenario settings based on the following information:
+  return `Generate an appropriate meta-scenario based on the following information:
 
-Role name: ${data.name}
-Role description: ${data.description}
-Character traits: ${data.personality}
+Card name: ${data.name}
+Physical Description: ${data.description}
+Character Personality: ${data.personality}
 
-Please generate a detailed scene setting that describes the environment, background and situation in which the character is located. Please output the scene description directly, do not include summary paragraphs or additional instructions. The content should be specific and in line with the role settings.`;
+Generate the backstory and meta-environment in acclaimed historian's prose.`;
 };
 
 export const generateFirstMes = (data: CharacterData): string => {
-  return `Generate the first message of the character along with scene introductions for the player:
+  return `Generate the first message of the game, introducing the character to the player/user:
 
-Role name: ${data.name} 
-Role description: ${data.description} 
-Character traits: ${data.personality} 
+Card name: ${data.name}
+Physical Description: ${data.description}
+Character Personality: ${data.personality}
 Scene settings: ${data.scenario}
 
-Please generate a natural opening remark that reflects the character's personality and the scene in which you are located. Be vivid and interesting.`;
+This will be the first outward facing text, the first thing the player/user encounters when playing with the character.Somehow the character must meet the player/user. The writing should be a perfect combination of Douglas Adams, Ursula K. Le Guin, James Joyce, Anais Nin, and Philip K. Dick.`;
 };
 
 export const generateMesExample = (data: CharacterData): string => {
-  return `Generate a conversation example of a role based on the following information:
+  return `Generate a conversational example to help establish the character:
 
-Role name: ${data.name}
-Role description: ${data.description}
-Character traits: ${data.personality}
+Card name: ${data.name}
+Physical Description: ${data.description}
+Character Personality: ${data.personality}
 Scene setting: ${data.scenario}
 
-Please generate 3-4 conversation examples in standard format, each conversation example must be <START> beginning. The format is as follows:
+Please generate 2 to 3 dialogues or monologues that truly capture the spirit of the character. The format is as follows:
 
 <START>
 {{user}}: User's words
-${data.name}: The role's answer
-{{user}}: User's words
-${data.name}: The role's answer
+${data.name}: The character's answer
+${data.name}: *The character's actions.*
 
 <START>
-{{user}}: User's words
-${data.name}: The role's answer
+${data.name}: The character talks to themself and acts on their own.
 
-Make sure each conversation example starts with a <START> macro that shows how and style the character speaks. This must be consistent with the character's personality. `;
+Make sure each conversation example starts with a <START> macro. Do not include it if it doesn't help to develop the character's actions and speaking behavior. . `;
 };
 
 export const generateSystemPrompt = (data: CharacterData): string => {
-  return `Generate system prompt words based on the following information:
+  return `Generate System Prompt based on the following information:
 
-Role name: ${data.name}
-Role description: ${data.description}
-Character traits: ${data.personality}
+Card name: ${data.name}
+Physical Description: ${data.description}
+Character Personality: ${data.personality}
 Scene settings: ${data.scenario}
+Example Character Actions: ${data.mes_example}
+Story introduction: ${data.first_mes}
 
-Please generate a system prompt word to guide AI how to play this role. Be concise and clear.`;
+Write the System Prompt to instruct the AI how to accurately play the character. Be concise and clear.`;
 };
 
 export const generatePostHistoryInstructions = (data: CharacterData): string => {
-  return `Generate historical instructions based on the following information:
+  return `Generate the most important instructions for the AI based on the following information:
+  Card name: ${data.name}
+  Physical Description: ${data.description}
+  Character Personality: ${data.personality}
+  Scene settings: ${data.scenario}
+  Example Character Actions: ${data.mes_example}
+  Story introduction: ${data.first_mes}
 
-Role name: ${data.name}
-Role description: ${data.description}
-Character traits: ${data.personality}
-
-Please generate post-historical instructions to remind the AI to maintain role consistency during the conversation. Be concise and practical.`;
+  THIS MUST BE EXTREMELY BRIEF!.`;
 };
 
 export const generateTags = (data: CharacterData): string => {
-  return `Generate appropriate tags based on the following information:
+  return `Generate appropriate keywords based on the following information:
 
-Role name: ${data.name}
-Role description: ${data.description}
-Character traits: ${data.personality}
+Card name: ${data.name}
+Physical Description: ${data.description}
+Character Personality: ${data.personality}
 Scene setting: ${data.scenario}
 
-Please generate 5-10 related tags, separated by commas. Tags should include character type, personality traits, scene type, etc.`;
+Please generate 5-10 related keywords or single-word tags, separated by commas. Tags should include character type, personality traits, scene type, etc.`;
 };
 
 export const generateAlternateGreeting = (data: CharacterData): string => {
   return `Generate an alternate greeting based on the following information:
 
-Role name: ${data.name} 
-Role description: ${data.description} 
-Character traits: ${data.personality} 
-Scene settings: ${data.scenario} 
-First message: ${data.first_mes} 
+Card name: ${data.name}
+Physical Description: ${data.description}
+Character Personality: ${data.personality}
+Scene settings: ${data.scenario}
+First message: ${data.first_mes}
 Dialogue example: ${data.mes_example}
+Other alternate greetings: ${data.alternative_greetings}
 
-Please generate an alternate greeting with a different style from the first message to reflect the multifaceted nature of the character. Be natural and vivid。`;
+Please generate another completely unique Generate an additional prompt that helps break down Alexa's rapist exterior to get at the root of her present actions -- her own childhood abuse.`;
 };
 
 export const generateCharacterBookEntry = (data: CharacterData, context?: string): string => {
   return `Generate a role book entry based on the following information:
 
-Role name: ${data.name}
-Role description: ${data.description}
-Character traits: ${data.personality}
+Card name: ${data.name}
+Physical Description: ${data.description}
+Character Personality: ${data.personality}
 Scene settings: ${data.scenario}
 ${context ? `Supplementary information: ${context}` : ''}
 
 Please generate a character book entry to supplement the character's background settings or special case descriptions.
 
-Keyword requirements: Use 2-3 related core keywords, separated by commas 
-Content requirements: Generate specific setting content, such as the character's special skills, important experiences, interpersonal relationships or items, and other background information. 
+Keyword requirements: Use 2-3 related core keywords, separated by commas
+Content requirements: Generate specific setting content, such as the character's special skills, important experiences, interpersonal relationships or items, and other background information.
 
-The format is as follows: 
-Keywords: core keyword 1, core keyword 2 
-Content: Detailed settings description 
+The format is as follows:
+Keywords: core keyword 1, core keyword 2
+Content: Detailed settings description
 
 The content should be rich and helpful for role-playing.`;
 };

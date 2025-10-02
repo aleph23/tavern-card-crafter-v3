@@ -178,7 +178,7 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
   return (
     <Card className="shadow-lg border-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
       <CardHeader className="pb-4">
-        <CardTitle className="text-xl font-semibold text-gray-800 dark:text-gray-200 flex items-start justify-between flex-col gap-3">
+        <CardTitle className="text-xl font-semibold text-gray-400 dark:text-gray-200 flex items-start justify-between flex-col gap-3">
           <span>{t('jsonPreview')}</span>
           <div className="flex flex-col sm:flex-row gap-2 w-full">
             <Button onClick={copyToClipboard} size="sm" variant="outline" className="flex-1 min-w-0">

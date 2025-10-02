@@ -33,7 +33,7 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
     if (!data.name || !data.description) {
       toast({
         title: "Incomplete information",
-        description: "Please fill in the role name and role description first",
+        description: "Please fill in the Card name and role description first",
         variant: "destructive"
       });
       return;
@@ -141,7 +141,7 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-gray-800 mb-4">Character setting</h3>
+      <h3 className="text-lg font-semibold text-gray-400 mb-4">Character setting</h3>
 
       <div>
         <div className="flex items-center justify-between mb-2">
@@ -152,7 +152,7 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
           id="personality"
           value={data.personality}
           onChange={(e) => updateField("personality", e.target.value)}
-          placeholder="Describe character traits, behavior patterns and habits of a character..."
+          placeholder="In a succinct, non-prosaic list, describe the character's traits, behavior, idiosyncracies, likes/dislikes, strengths/weaknesses, backstory"
           className="mt-1 min-h-[100px]"
           showCounter={true}
         />
@@ -167,7 +167,7 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
           id="scenario"
           value={data.scenario}
           onChange={(e) => updateField("scenario", e.target.value)}
-          placeholder="Set the interactive scene and background..."
+          placeholder="Describe the backstory and meta-environment..."
           className="mt-1 min-h-[100px]"
           showCounter={true}
         />
@@ -182,7 +182,7 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
           id="first_mes"
           value={data.first_mes}
           onChange={(e) => updateField("first_mes", e.target.value)}
-          placeholder="The character's opening remarks..."
+          placeholder="This is the first outward facing component and should be written in the style of a great literary master. It is a long paragraph portraying how this character first meets the user/player in this game..."
           className="mt-1 min-h-[100px]"
           showCounter={true}
         />

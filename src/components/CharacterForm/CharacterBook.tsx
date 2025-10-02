@@ -69,7 +69,7 @@ const CharacterBook = ({ entries, updateField, aiSettings, characterData }: Char
     if (!characterData.name || !characterData.description) {
       toast({
         title: "Incomplete information",
-        description: "Please fill in the role name and role description first",
+        description: "Please fill in the Card name and role description first",
         variant: "destructive"
       });
       return;
@@ -103,7 +103,7 @@ const CharacterBook = ({ entries, updateField, aiSettings, characterData }: Char
         }
       }
 
-      // If the keyword is not parsed, use the role name as the keyword
+      // If the keyword is not parsed, use the Card name as the keyword
       if (keys.length === 0) {
         keys = [characterData.name];
       }
@@ -246,7 +246,7 @@ const CharacterBook = ({ entries, updateField, aiSettings, characterData }: Char
               <div className="text-sm font-medium text-gray-300 mb-1">
                 Keywords: {entry.keys.join(', ')}
               </div>
-              <p className="text-sm text-gray-600 mb-2">{entry.content}</p>
+              <p className="text-sm text-gray-400 mb-2">{entry.content}</p>
               <div className="text-xs text-gray-400">
                 character: {entry.content.length} | Token: {Math.ceil(entry.content.length * 0.75)}
               </div>

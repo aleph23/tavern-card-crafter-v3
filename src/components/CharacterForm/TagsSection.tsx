@@ -56,7 +56,7 @@ const TagsSection = ({ tags, updateField, aiSettings, characterData }: TagsSecti
     if (!characterData.name || !characterData.description) {
       toast({
         title: t('incompleteInfo') || "Incomplete information",
-        description: t('fillNameDesc') || "Please fill in the role name and role description first",
+        description: t('fillNameDesc') || "Please fill in the Card name and role description first",
         variant: "destructive"
       });
       return;

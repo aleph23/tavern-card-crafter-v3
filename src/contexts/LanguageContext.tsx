@@ -125,10 +125,10 @@ const translations = {
     metadata: 'Metadata',
 
     // Field labels
-    name: 'Character Name',
-    nickname: 'Nickname',
+    name: 'Card Name',
+    nickname: 'Character name',
     description: 'Character Description',
-    personalityDescription: 'Personality Description',
+    personalityDescription: 'Personality',
     scenario: 'Scenario',
     first_mes: 'First Message',
     mes_example: 'Message Example',

@@ -49,7 +49,7 @@ const BasicInfoSection = ({ data, updateField, characterImage, setCharacterImage
     if (!data.name) {
       toast({
         title: "Incomplete information",
-        description: "Please fill in the role name first",
+        description: "Please fill in the Card name first",
         variant: "destructive"
       });
       return;
@@ -224,7 +224,7 @@ const BasicInfoSection = ({ data, updateField, characterImage, setCharacterImage
           id="description"
           value={data.description}
           onChange={(e) => updateField("description", e.target.value)}
-          placeholder="Describe the appearance, background, characteristics, etc. of the character in detail..."
+          placeholder="Description: List the appearance, clothing, and body characteristics in a detailed, non-prosaic list. Body, clothing, general appearance."
           className="mt-1 min-h-[120px] w-full max-w-none"
           showCounter={true}
         />

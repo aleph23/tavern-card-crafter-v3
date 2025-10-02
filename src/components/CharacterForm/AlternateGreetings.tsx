@@ -14,7 +14,7 @@ interface AlternateGreetingsProps {
   greetings: string[];
   alternate_greetings: string[];
   mes_example: string[];
-  group_only_greetings: string[];
+  group_only_greetings: string;
   updateField: (field: string, value: any) => void;
   aiSettings: AISettings | null;
   characterData: any;
@@ -73,7 +73,7 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
     if (!characterData.name || !characterData.description) {
       toast({
         title: t('incompleteInfo') || "Incomplete information",
-        description: t('fillNameDesc') || "Please fill in the role name and role description first",
+        description: t('fillNameDesc') || "Please fill in the Card name and role description first",
         variant: "destructive"
       });
       return;

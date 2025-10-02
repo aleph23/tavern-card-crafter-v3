@@ -81,12 +81,12 @@ Please output strictly in JSON format and do not add any other text:`;
 
     const jsonFormat = `
 {
-"name": "role name",
+"name": "Card name",
 "description": "Detailed character appearance description",
 "personality": "Detailed description of personality traits",
 "scenario": "Detailed scene setting description",
 "first_mes": "The character's opening remark",
-"mes_example": "Dialogue example, format: <START>\\n{{user}}: User Discourse\\nRole name: Role answer",
+"mes_example": "Dialogue example, format: <START>\\n{{user}}: User Discourse\\nCard name: Role answer",
 "system_prompt": "System prompt word to guide AI how to play this role",
 "post_history_instructions": "post history instructions",
 "tags": ["Related tags"],
@@ -101,38 +101,38 @@ Intelligent analysis and extract role information based on the content.${jsonFor
       anime: `${baseInstructions}
 
 This is an anime character, please generate:
-- description: Describe the appearance, clothing, and body characteristics in detail
-- personality: Detailed personality traits and speaking habits
-- scenario: Anime world background settings
-- first_mes: Opening remarks that fit the anime character style
-- mes_example: A dialogue example that reflects the character's speaking style ${jsonFormat}`,
+- description: List the appearance, clothing, and body characteristics in a detailed, non-prosaic list. Body, clothing, general appearance.
+- personality: Detailed personality traits, idiosyncracies and mannerisms in a non-prosaic list.
+- scenario: The back story.
+- first_mes: How character and player/user meet. This is a public part of the card and should read like a superb piece of professional fiction.
+- mes_example: A dialogue example that reflects the character's speaking style and personality ${jsonFormat}`,
 
       game: `${baseInstructions}
 
-This is the game character, please generate:
-- description: Character appearance, equipment, special ability description
-- personality: personality traits, combat style, values
-- scenario: Game world background settings
-- first_mes: Opening remarks that match the identity of the game character
-- mes_example: A dialogue example containing multiple scenarios ${jsonFormat} `,
+This is a personified game character, please generate:
+- description: Character appearance, equipment, special ability description in a detailed, non-prosaic list. Body, clothing, general appearance.
+- personality: personality traits, combat style, values, back story in a non-prosaic list.
+- scenario: The over-arching mythos.
+- first_mes: How character and player/user meet. This is a public part of the card and should read like a superb piece of professional fiction.
+- mes_example: A dialogue example that reflects the character's speaking style and personality ${jsonFormat} `,
 
       novel: `${baseInstructions}
 
-This is the novel character, please generate:
-- description: detailed appearance description
+This character stepped right out of a timeless classic, maybe Rabelais, maybe Joyce. Please generate:
+- description: The character's appearance in a detailed, non-prosaic list. Body, clothing, general appearance.
 - personality: Deep psychological characteristics and personality complexity
 - scenario: The background and environment setting of novel era
-- first mes: Literary opening remarks
-- mes example: dialogue that reflects the depth of the character's thoughts ${jsonFormat}`,
+- first mes: This is the first outward facing component and should be written in the style of a great literary master. It is a long paragraph portraying how this character first meets the user/player in this game.
+- mes example: Monologue or dialogue that captures the character's quintessance. ${jsonFormat}`,
 
       historical: `${baseInstructions}
 
-This is a historical figure, please generate: 
-- description: Appearance and clothing description based on historical materials 
-- personality: Character traits based on history 
-- scenario: Detailed historical context 
-- first_mes: Opening remarks that match the identity of historical figures 
-- mes_example: A dialogue that embodies the wisdom of historical figures ${jsonFormat}`
+This is a historic character (real or fictional), please generate: 
+- description: List the appearance, clothing, and body characteristics in a detailed, non-prosaic list. Body, clothing, general appearance.
+- personality: Detailed personality traits, idiosyncracies and back story in a non-prosaic list.
+- scenario: The back story.
+- first_mes: How character and player/user meet. This is a public part of the card and should read like a superb piece of professional fiction.
+- mes example: Monologue or dialogue that captures the character's quintessance. ${jsonFormat}`,
     };
 
     return typeSpecificPrompts[type as keyof typeof typeSpecificPrompts] || typeSpecificPrompts.general;
@@ -200,7 +200,7 @@ This is a historical figure, please generate:
         console.error('Original results:', result);
         toast({
           title: "Analysis failed",
-          description: "The generated content format is incorrect. Please try again or check the AI ​​settings.",
+          description: "The generated content format is incorrect. Please try again or check the AI settings.",
           variant: "destructive"
         });
       }
@@ -268,7 +268,7 @@ This is a historical figure, please generate:
 
   const getFieldLabel = (field: string): string => {
     const labels: Record<string, string> = {
-      name: "role name",
+      name: "card name",
       description: "Role description",
       personality: "character traits",
       scenario: "Scene Setting",
@@ -381,7 +381,7 @@ etc..."
         {parsedData && (
           <div className="space-y-4 border-t pt-4">
             <div className="flex items-center justify-between">
-              <h4 className="font-medium text-gray-800 dark:text-gray-200">AI parsing results</h4>
+              <h4 className="font-medium text-gray-400 dark:text-gray-200">AI parsing results</h4>
               <Button
                 onClick={insertAllFields}
                 size="sm"
@@ -392,7 +392,7 @@ etc..."
               </Button>
             </div>
 
-            <div className="space-y-3 max-h-[400px] overflow-y-auto bg-gray-50 dark:bg-gray-800 rounded-lg p-3 scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-300 dark:scrollbar-track-gray-300 dark:scrollbar-thumb-gray-600 hover:scrollbar-thumb-gray-400 dark:hover:scrollbar-thumb-gray-500">
+            <div className="space-y-3 max-h-[400px] overflow-y-auto bg-gray-50 dark:bg-gray-400 rounded-lg p-3 scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-300 dark:scrollbar-track-gray-300 dark:scrollbar-thumb-gray-600 hover:scrollbar-thumb-gray-400 dark:hover:scrollbar-thumb-gray-500">
               {Object.entries(parsedData).map(([key, value]) => {
                 if (!value || (Array.isArray(value) && value.length === 0)) {
                   return null;
