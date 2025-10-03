@@ -293,10 +293,9 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
   /**
    * Tests the connection to the specified API provider and model.
    *
-   * The function first verifies the configuration settings, including the API key and URL.
-   * It then constructs the API request and handles the response, providing feedback through toast notifications
-   * based on the success or failure of the connection attempt. Error handling is implemented for various scenarios,
-   * including network issues and invalid configurations.
+   * The function verifies the configuration settings, including the API key and URL, and constructs the API request.
+   * It handles the response, providing feedback through toast notifications based on the success or failure of the connection attempt.
+   * Error handling is implemented for various scenarios, including network issues and invalid configurations.
    *
    * @returns {Promise<void>} A promise that resolves when the connection test is complete.
    * @throws {Error} Throws an error if the connection test encounters a network issue or if the API response is not successful.
