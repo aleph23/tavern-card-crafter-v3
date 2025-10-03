@@ -87,7 +87,7 @@ export const generateWithAI = async (
     console.log('Requires API key:', requiresKey);
 
     // Use a unified Open AI-compatible format
-    const headers: any = {
+    let headers: Record<string, string> = {
       'Content-Type': 'application/json',
     };
 
@@ -339,6 +339,7 @@ Content requirements: Generate specific setting content, such as the character's
 The format is as follows:
 Keywords: core keyword 1, core keyword 2
 Content: Detailed settings description
+
 
 The content should be rich and helpful for role-playing.`;
 };
