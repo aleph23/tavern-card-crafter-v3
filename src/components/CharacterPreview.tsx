@@ -41,7 +41,7 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
     if (!characterImage) {
       toast({
         title: t('hint') || "hint",
-        description: t('uploadImageHint'),
+        description: "Please upload the character avatar first, or use the \"Export JSON\" button to export the JSON file directly.",
         variant: "destructive"
       });
       return;
