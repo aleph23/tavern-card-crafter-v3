@@ -21,6 +21,15 @@ export interface AISettings {
   provider: string;
 }
 
+/**
+ * AISettings component for managing AI provider settings.
+ *
+ * This component allows users to configure API provider settings, including selecting a provider, entering an API key, and testing the connection. It intelligently builds API URLs based on the selected provider and handles fetching available models. The component also manages state for connection status and error messages, providing user feedback through toasts.
+ *
+ * @param onSettingsChange - Callback function to handle changes in settings.
+ * @param currentSettings - The current settings to initialize the component.
+ * @returns A JSX element representing the AI settings dialog.
+ */
 const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
   const { toast } = useToast();
 
@@ -281,6 +290,17 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
     }
   };
 
+  /**
+   * Tests the connection to the specified API provider and model.
+   *
+   * The function first verifies the configuration settings, including the API key and URL.
+   * It then constructs the API request and handles the response, providing feedback through toast notifications
+   * based on the success or failure of the connection attempt. Error handling is implemented for various scenarios,
+   * including network issues and invalid configurations.
+   *
+   * @returns {Promise<void>} A promise that resolves when the connection test is complete.
+   * @throws {Error} Throws an error if the connection test encounters a network issue or if the API response is not successful.
+   */
   const testConnection = async () => {
     const currentProvider = apiProviders.find(p => p.value === settings.provider);
 
@@ -433,6 +453,13 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
     }
   };
 
+  /**
+   * Fetch models from the configured API provider.
+   *
+   * This function checks for the necessary API key and URL configuration before attempting to fetch model data from the specified provider. It handles both successful and error responses, updating the available models accordingly and providing user feedback through toast notifications. The function also manages loading states and handles potential errors during the fetch operation.
+   *
+   * @returns {Promise<void>} A promise that resolves when the fetch operation is complete.
+   */
   const fetchModels = async () => {
     const currentProvider = apiProviders.find(p => p.value === settings.provider);
 
