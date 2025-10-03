@@ -36,6 +36,22 @@ const BasicInfoSection = ({ data, updateField, characterImage, setCharacterImage
     }
   };
 
+  /**
+   * Handles the AI generation of a description based on provided data.
+   *
+   * The function first checks for the presence of an API key and the validity of the AI provider.
+   * It then verifies that the card name is filled in before proceeding to generate a description using the AI.
+   * If successful, it updates the description field and displays a success message; otherwise, it handles errors appropriately.
+   *
+   * @param {Object} aiSettings - The settings for the AI generation, including the API key and provider.
+   * @param {Object} data - The data object containing the card information, including the name.
+   * @param {Function} setLoading - A function to set the loading state.
+   * @param {Function} updateField - A function to update a specific field in the data.
+   * @param {Function} toast - A function to display messages to the user.
+   * @param {Object} abortControllerRef - A reference to an AbortController for managing request cancellation.
+   * @returns {Promise<void>} A promise that resolves when the description generation process is complete.
+   * @throws {Error} If the generation fails due to an error or is canceled by the user.
+   */
   const handleAIGenerateDescription = async () => {
     if (!aiSettings?.apiKey && !['ollama', 'lmstudio'].includes(aiSettings?.provider?.toLowerCase() || '')) {
       toast({
