@@ -232,7 +232,7 @@ export const generateDescription = (data: CharacterData): string => {
   const existingDescription = data.description.trim();
 
   if (existingDescription) {
-    return `Based on the following role information, enchance the descriptions, while remaining succinct:
+    return `Based on the following information, enhance the description, while keeping it succinct:
 
 Card name:${data.name}
 Existing description:${existingDescription}
@@ -240,10 +240,7 @@ Existing description:${existingDescription}
 Embellish, making sure to describe all physical qualities of the character -- body, attire and how they compose themself. This should be in non-prosaic list format.`;
   } else {
     return `Generate a list of all the physical qualities of the character -- body, attire and how they compose themself. This should be in non-prosaic CSV format riffing off of the character name:
-
-Card name:${data.name}
-
-Please generate a detailed character appearance description, including the character's physical characteristics, facial features, clothing style, temperament, etc. Only output character description content, do not include character name, background story or other information. Please output the description directly, and do not add summary or additional instructions.`;
+Card name:${data.name} generate the character appearance, including the character's physical characteristics, facial features, clothing style, temperament, etc. Only output character description content, do not include character name, background story or other information. Please output the description directly, and do not add summary or additional instructions.`;
   }
 };
 
@@ -253,12 +250,9 @@ export const generatePersonality = (data: CharacterData): string => {
 Card name: ${data.name}
 Physical Description: ${data.description}
 
-A non-prosaic list, describing the character's traits, behavior, idiosyncracies, likes/dislikes, strengths/weaknesses, backstory.`;
+Author a non-prosaic list, describing the character's traits, behavior, idiosyncracies, likes/dislikes, strengths/weaknesses, backstory.`;
 };
 
-/**
- * Generates a meta-scenario based on character data.
- */
 export const generateScenario = (data: CharacterData): string => {
   return `Generate an appropriate meta-scenario based on the following information:
 
@@ -269,9 +263,6 @@ Character Personality: ${data.personality}
 Generate the backstory and meta-environment in acclaimed historian's prose.`;
 };
 
-/**
- * Generates the first message of the game, introducing the character to the player/user.
- */
 export const generateFirstMes = (data: CharacterData): string => {
   return `Generate the first message of the game, introducing the character to the player/user:
 
@@ -283,9 +274,6 @@ Scene settings: ${data.scenario}
 This will be the first outward facing text, the first thing the player/user encounters when playing with the character.Somehow the character must meet the player/user. The writing should be a perfect combination of Douglas Adams, Ursula K. Le Guin, James Joyce, Anais Nin, and Philip K. Dick.`;
 };
 
-/**
- * Generates a conversational example based on character data.
- */
 export const generateMesExample = (data: CharacterData): string => {
   return `Generate a conversational example to help establish the character:
 
@@ -320,9 +308,6 @@ Story introduction: ${data.first_mes}
 Write the System Prompt to instruct the AI how to accurately play the character. Be concise and clear.`;
 };
 
-/**
- * Generates brief instructions for the AI based on character data.
- */
 export const generatePostHistoryInstructions = (data: CharacterData): string => {
   return `Generate the most important instructions for the AI based on the following information:
   Card name: ${data.name}
@@ -335,9 +320,6 @@ export const generatePostHistoryInstructions = (data: CharacterData): string => 
   THIS MUST BE EXTREMELY BRIEF!.`;
 };
 
-/**
- * Generates keywords based on character data.
- */
 export const generateTags = (data: CharacterData): string => {
   return `Generate appropriate keywords based on the following information:
 
@@ -349,9 +331,6 @@ Scene setting: ${data.scenario}
 Please generate 5-10 related keywords or single-word tags, separated by commas. Tags should include character type, personality traits, scene type, etc.`;
 };
 
-/**
- * Generates an alternate greeting based on character data.
- */
 export const generateAlternateGreeting = (data: CharacterData): string => {
   return `Generate an alternate greeting based on the following information:
 
@@ -364,9 +343,6 @@ Dialogue example: ${data.mes_example}
 Other alternate greetings: ${data.alternative_greetings}`;
 };
 
-/**
- * Generates a role book entry based on character data and optional context.
- */
 export const generateCharacterBookEntry = (data: CharacterData, context?: string): string => {
   return `Generate a role book entry based on the following information:
 
