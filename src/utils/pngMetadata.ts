@@ -2,20 +2,15 @@
  * Embeds JSON metadata into a PNG file using tEXt chunks
  * This follows the PNG specification for text metadata
  */
-export async function embedMetadataInPNG(
-  imageDataUrl: string,
-  metadata: any,
+export async function embedJsonInPng(
+  arrayBuffer: ArrayBuffer,
+  jsonData: string,
   keyword: string = 'chara'
-): Promise<Blob> {
-  // Convert data URL to blob
-  const response = await fetch(imageDataUrl);
-  const blob = await response.blob();
-  const arrayBuffer = await blob.arrayBuffer();
+): Promise<ArrayBuffer> {
   const uint8Array = new Uint8Array(arrayBuffer);
 
   // Encode metadata as base64
-  const jsonString = JSON.stringify(metadata);
-  const base64Data = btoa(unescape(encodeURIComponent(jsonString)));
+  const base64Data = btoa(unescape(encodeURIComponent(jsonData)));
 
   // Create tEXt chunk
   const textChunk = createTextChunk(keyword, base64Data);
@@ -33,7 +28,7 @@ export async function embedMetadataInPNG(
   newPngData.set(textChunk, iendPosition);
   newPngData.set(uint8Array.slice(iendPosition), iendPosition + textChunk.length);
 
-  return new Blob([newPngData], { type: 'image/png' });
+  return newPngData.buffer;
 }
 
 /**
