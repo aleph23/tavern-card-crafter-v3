@@ -86,7 +86,7 @@ function findIENDPosition(data: Uint8Array): number {
 }
 
 /**
- * Computes the CRC32 checksum for a given Uint8Array/PNG chunk.
+ * Computes the CRC32 checksum for a given Uint8Array/ PNG chunk.
  */
 function calculateCRC(data: Uint8Array): number {
   let crc = 0xFFFFFFFF;
