@@ -15,6 +15,9 @@ export interface CharacterData {
 }
 
 // Token calculation function (rough estimation)
+/**
+ * Estimates the number of tokens in a given text based on character types.
+ */
 export const estimateTokens = (text: string): number => {
   // Press 1 in Chinese characters 5 tokens are calculated, English words are calculated based on average 4 characters
   const chineseChars = (text.match(/[\u4e00-\u9fff]/g) || []).length;
@@ -25,6 +28,18 @@ export const estimateTokens = (text: string): number => {
 };
 
 // Intelligently build API URL - consistent with the AISettings component
+/**
+ * Build a standardized API URL based on the base URL and provider type.
+ *
+ * The function first checks if the baseUrl is provided; if not, it returns an empty string.
+ * It then cleans the baseUrl by removing any trailing slashes. Depending on the provider,
+ * it applies specific rules for constructing the final URL, including special handling for
+ * 'ollama' and 'zhipu' providers, as well as a default case for other providers.
+ *
+ * @param baseUrl - The base URL to be processed.
+ * @param provider - The provider type that determines the URL structure.
+ * @returns The constructed API URL based on the provided baseUrl and provider.
+ */
 const buildApiUrl = (baseUrl: string, provider: string): string => {
   if (!baseUrl) { return ''; }
 
@@ -60,6 +75,16 @@ const buildApiUrl = (baseUrl: string, provider: string): string => {
   }
 };
 
+/**
+ * Generate a response using AI based on the provided settings and prompt.
+ *
+ * This function checks if the AI service requires an API key and validates the settings. It constructs the API URL, prepares the request headers and body, and sends a POST request to the AI service. The function handles various response formats and errors, ensuring that valid content is returned or appropriate errors are thrown for different failure scenarios.
+ *
+ * @param settings - The configuration settings for the AI service, including provider, model, API key, and API URL.
+ * @param prompt - The input prompt to be sent to the AI service for generating a response.
+ * @returns A promise that resolves to the generated response content from the AI service.
+ * @throws Error If the API key is missing for a non-local service, if the API URL is not configured, if the API request fails, or if the response is empty.
+ */
 export const generateWithAI = async (
   settings: AISettings,
   prompt: string
@@ -200,11 +225,14 @@ export const generateWithAI = async (
   }
 };
 
+/**
+ * Generates a character description based on provided data.
+ */
 export const generateDescription = (data: CharacterData): string => {
   const existingDescription = data.description.trim();
 
   if (existingDescription) {
-    return `Based on the following role information, enchance the descriptions, while remaining succinct:
+    return `Based on the following information, enhance the description, while keeping it succinct:
 
 Card name:${data.name}
 Existing description:${existingDescription}
@@ -212,10 +240,7 @@ Existing description:${existingDescription}
 Embellish, making sure to describe all physical qualities of the character -- body, attire and how they compose themself. This should be in non-prosaic list format.`;
   } else {
     return `Generate a list of all the physical qualities of the character -- body, attire and how they compose themself. This should be in non-prosaic CSV format riffing off of the character name:
-
-Card name:${data.name}
-
-Please generate a detailed character appearance description, including the character's physical characteristics, facial features, clothing style, temperament, etc. Only output character description content, do not include character name, background story or other information. Please output the description directly, and do not add summary or additional instructions.`;
+Card name:${data.name} generate the character appearance, including the character's physical characteristics, facial features, clothing style, temperament, etc. Only output character description content, do not include character name, background story or other information. Please output the description directly, and do not add summary or additional instructions.`;
   }
 };
 
@@ -225,7 +250,7 @@ export const generatePersonality = (data: CharacterData): string => {
 Card name: ${data.name}
 Physical Description: ${data.description}
 
-A non-prosaic list, describing the character's traits, behavior, idiosyncracies, likes/dislikes, strengths/weaknesses, backstory.`;
+Author a non-prosaic list, describing the character's traits, behavior, idiosyncracies, likes/dislikes, strengths/weaknesses, backstory.`;
 };
 
 export const generateScenario = (data: CharacterData): string => {
