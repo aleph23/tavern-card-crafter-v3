@@ -60,6 +60,16 @@ const buildApiUrl = (baseUrl: string, provider: string): string => {
   }
 };
 
+/**
+ * Generate a response from an AI service based on the provided settings and prompt.
+ *
+ * This function checks if the AI service requires an API key and validates the settings. It constructs the API URL, prepares the request body, and handles the response, including error management for various scenarios. The function also ensures that the response content is properly extracted and formatted before returning it.
+ *
+ * @param settings - The configuration settings for the AI service, including provider, model, API key, and API URL.
+ * @param prompt - The input prompt to be sent to the AI service for generating a response.
+ * @returns A promise that resolves to the generated response content from the AI service.
+ * @throws Error If the API key is missing for a non-local service, if the API URL is not configured, if the API request fails, or if the response is empty.
+ */
 export const generateWithAI = async (
   settings: AISettings,
   prompt: string
@@ -306,6 +316,9 @@ Scene setting: ${data.scenario}
 Please generate 5-10 related keywords or single-word tags, separated by commas. Tags should include character type, personality traits, scene type, etc.`;
 };
 
+/**
+ * Generates an alternate greeting based on character data.
+ */
 export const generateAlternateGreeting = (data: CharacterData): string => {
   return `Generate an alternate greeting based on the following information:
 
@@ -320,6 +333,9 @@ Other alternate greetings: ${data.alternative_greetings}
 Please generate another completely unique Generate an additional prompt that helps break down Alexa's rapist exterior to get at the root of her present actions -- her own childhood abuse.`;
 };
 
+/**
+ * Generates a role book entry based on character data and optional context.
+ */
 export const generateCharacterBookEntry = (data: CharacterData, context?: string): string => {
   return `Generate a role book entry based on the following information:
 
