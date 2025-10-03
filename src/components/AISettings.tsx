@@ -617,9 +617,9 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px] max-h-[85vh] overflow-y-auto">
-        <Dialoger>
+        <DialogHeader>
           <DialogTitle>AI Settings</DialogTitle>
-        </Dialoger>
+        </Dialogheader>
         <div className="space-y-4 py-4">
           <div className="space-y-2">
             <Label htmlFor="provider">API provider</Label>
