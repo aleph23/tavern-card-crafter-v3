@@ -67,7 +67,7 @@ const AIAssistant = ({ aiSettings, onInsertField }: AIAssistantProps) => {
   const [parsedData, setParsedData] = useState<ParsedCharacterData | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
-  
+
   const getPromptByType = (type: string, content: string) => {
     // Limit the length of input content to avoid too long prompt words
     const truncatedContent = content.length > 2000 ? content.substring(0, 2000) + "..." : content;
@@ -157,7 +157,7 @@ This is a historic character (real or fictional), please generate:
       return;
     }
 
-    // Create a new one AbortController
+    // Create a new AbortController
     abortControllerRef.current = new AbortController();
     setIsGenerating(true);
 

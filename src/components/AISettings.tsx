@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, Dialoger, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { DialogHeader } from "@/components/ui/dialog";
 import { Settings, Loader2, Check, X, RefreshCw, AlertCircle, Info } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
@@ -463,7 +464,6 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
       console.log('Provider:', settings.provider);
 
     const headers: Record<string, string> = {
-
       // Only providers that require a key will add Authorization header
       if (currentProvider?.requiresKey && settings.apiKey) {
         headers['Authorization'] = `Bearer ${settings.apiKey}`;
