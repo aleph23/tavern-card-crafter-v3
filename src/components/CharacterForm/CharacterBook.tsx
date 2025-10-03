@@ -56,6 +56,19 @@ const CharacterBook = ({ entries, updateField, aiSettings, characterData }: Char
     });
   };
 
+  /**
+   * Handles the generation of a character book entry using AI.
+   *
+   * This function checks for the necessary API key and character data before proceeding. It generates a prompt based on the character data, invokes the AI generation process, and processes the result to extract keywords and content. If the generation is successful, it updates the character book with the new entry and displays a success message. In case of errors, it handles them appropriately, including user cancellations.
+   *
+   * @param {Object} aiSettings - The settings for the AI generation, including the API key and provider.
+   * @param {Object} characterData - The data for the character, including name and description.
+   * @param {Function} updateField - A function to update the character book entries.
+   * @param {Function} setLoading - A function to set the loading state.
+   * @param {Object} abortControllerRef - A reference to the AbortController for managing request cancellation.
+   * @returns {Promise<void>} A promise that resolves when the entry generation process is complete.
+   * @throws {Error} If the generation fails or is canceled by the user.
+   */
   const handleAIGenerateEntry = async () => {
     if (!aiSettings?.apiKey && !['ollama', 'lmstudio'].includes(aiSettings?.provider?.toLowerCase() || '')) {
       toast({
