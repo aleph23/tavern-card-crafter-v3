@@ -59,6 +59,14 @@ const CHARACTER_TYPES = [
   { value: "historical", label: "historical figure", description: "real historical figure settings" }
 ];
 
+/**
+ * A component that assists in generating AI character cards based on user-provided content.
+ *
+ * This component manages the state for input text, character type, and parsed data. It provides functionality to generate character data using AI, handle user interactions for inserting fields, and manage the cancellation of ongoing generation processes. The component also formats prompts based on the selected character type and ensures robust JSON parsing of the AI's response.
+ *
+ * @param aiSettings - The settings configuration for the AI generation process.
+ * @param onInsertField - A callback function to handle the insertion of generated fields into the form.
+ */
 const AIAssistant = ({ aiSettings, onInsertField }: AIAssistantProps) => {
   const { toast } = useToast();
   const { t } = useLanguage();
@@ -68,6 +76,9 @@ const AIAssistant = ({ aiSettings, onInsertField }: AIAssistantProps) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
 
+  /**
+   * Generates a prompt based on the specified type and content.
+   */
   const getPromptByType = (type: string, content: string) => {
     // Limit the length of input content to avoid too long prompt words
     const truncatedContent = content.length > 2000 ? content.substring(0, 2000) + "..." : content;
@@ -138,6 +149,14 @@ This is a historic character (real or fictional), please generate:
     return typeSpecificPrompts[type as keyof typeof typeSpecificPrompts] || typeSpecificPrompts.general;
   };
 
+  /**
+   * Generate character data based on user input and AI settings.
+   *
+   * This function validates the input text and AI settings, then initiates the character data generation process. It constructs a prompt using the input and character type, invokes the AI generation, and handles the result by attempting to parse it as JSON. If parsing fails, it provides feedback to the user. The function also manages cancellation and error handling throughout the process.
+   *
+   * @returns {Promise<void>} A promise that resolves when the character data generation is complete.
+   * @throws Error If the input text is empty, AI settings are not configured, or if JSON parsing fails.
+   */
   const generateCharacterData = async () => {
     if (!inputText.trim()) {
       toast({
