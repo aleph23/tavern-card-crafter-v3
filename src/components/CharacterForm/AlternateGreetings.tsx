@@ -60,6 +60,17 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
     setEditingText("");
   };
 
+  /**
+   * Handles the AI generation of a greeting based on character data.
+   *
+   * This function first checks for the presence of an API key and required character information.
+   * If any checks fail, it displays an appropriate error message. If all checks pass, it generates
+   * an alternate greeting using the provided character data and updates the state with the new greeting.
+   * It also handles cancellation and errors during the AI generation process, providing feedback to the user.
+   *
+   * @returns {Promise<void>} A promise that resolves when the greeting generation process is complete.
+   * @throws {Error} If the AI generation fails or is canceled by the user.
+   */
   const handleAIGenerateGreeting = async () => {
     if (!aiSettings?.apiKey && !['ollama', 'lmstudio'].includes(aiSettings?.provider?.toLowerCase() || '')) {
       toast({
