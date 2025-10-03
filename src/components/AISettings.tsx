@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, Dialoger, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Settings, Loader2, Check, X, RefreshCw, AlertCircle, Info } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
@@ -334,7 +334,7 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
       console.log('Model:', settings.model);
 
       // Use a unified Open AI-compatible format
-      const headers: any = {
+    const headers: Record<string, string> = {
         'Content-Type': 'application/json',
       };
 
@@ -462,7 +462,7 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
       console.log('Fetching models from:', modelsUrl);
       console.log('Provider:', settings.provider);
 
-      const headers: any = {};
+    const headers: Record<string, string> = {
 
       // Only providers that require a key will add Authorization header
       if (currentProvider?.requiresKey && settings.apiKey) {
@@ -590,9 +590,9 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px] max-h-[85vh] overflow-y-auto">
-        <DialogHeader>
+        <Dialoger>
           <DialogTitle>AI Settings</DialogTitle>
-        </DialogHeader>
+        </Dialoger>
         <div className="space-y-4 py-4">
           <div className="space-y-2">
             <Label htmlFor="provider">API provider</Label>
