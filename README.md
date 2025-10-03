@@ -1,176 +1,191 @@
+# Tavern Card Crafter - AI character card maker
 
-# Tavern Card Crafter - AI角色卡制作工具
+## Project Introduction
 
-## 项目简介
+Tavern Card Crafter is a professional AI character card maker that helps users easily create and edit character cards for chatbots and roleplay. The tool offers an intuitive interface and powerful features that make character creation easy and efficient.
 
-Tavern Card Crafter 是一个专业的AI角色卡片制作工具，帮助用户轻松创建和编辑用于聊天机器人和角色扮演的角色卡片。该工具提供直观的界面和强大的功能，让角色创作变得简单高效。
+## Key features:
 
-## 主要功能
+### 🤖 AI intelligent assistant
 
-### 🤖 AI智能助手
-- **智能角色创建**: 通过AI助手快速生成角色基础信息
-- **多类型支持**: 支持动漫、游戏、小说、历史人物等不同类型角色
-- **智能内容提取**: 粘贴任意文本，AI自动提取并生成结构化角色信息
+- **Intelligent Character Creation**: Quickly generate basic character information through AI assistants
+- **Multi-genre support**: Supports different types of characters such as anime, games, novels, and historical figures
+- **Intelligent Content Extraction**: Paste any text, and AI automatically extracts and generates structured character information
 
-### ✏️ 完整角色编辑
-- **基本信息**: 姓名、描述、第一人称视角等
-- **个性特征**: 详细的性格特征和行为模式
-- **场景设定**: 背景故事和环境描述
-- **对话系统**: 示例对话、问候语、替代问候语
-- **角色书**: 世界观设定和记忆条目
-- **标签分类**: 角色标签和元数据管理
+### ✏️ Full character editing
 
-![image](image/image01.png)
----
+- **Basic information**: Name, description, first-person perspective, etc
+- **Personality Traits**: Detailed personality traits and behavior patterns
+- **Setting Setting**: Backstory and environment description
+- **Dialogue System**: Sample dialogues, greetings, alternative greetings
+- **Character Book**: Worldview setting and memory entries
+- **Tag Classification**: Role labeling and metadata management
+
+## ![image](image/image01.png)
+
 ![image](image/image02.png)
-### 📱 多平台支持
-- **Web版本**: 浏览器直接访问使用
-- **桌面应用**: 跨平台Electron桌面应用
-- **侧边栏布局**: AI助手、角色编辑、JSON预览分离式选项卡界面
 
-### 🔧 实用功能
-- **实时预览**: JSON格式实时预览，语法高亮显示
-- **多格式导出**: 支持JSON和PNG格式导出
-- **本地化界面**: 完全中文界面，操作简单直观
-- **响应式设计**: 支持各种设备和屏幕尺寸
+### \uD83D\uDCF1 Multi-platform support
+
+- **Web version**: Browser direct access and use
+- **Desktop App**: A cross-platform Electron desktop app
+- **Sidebar Layout**: AI assistant, character editing, JSON preview split tab interface
+
+### \uD83D\uDD27 Practical features
+
+- **Real-time preview**: Real-time preview in JSON format, syntax highlighting
+- **Multi-format export**: Supports JSON and PNG format export
+- **Localized Interface**: Completely Chinese interface, easy and intuitive to operate
+- **Responsive Design**: Supports a wide range of devices and screen sizes
+
 ---
+
 ![image](image/image03.png)
 
-## 技术栈
+## Technology Stack
 
-本项目基于现代Web技术构建：
+This project is built on modern web technology:
 
-- **React** - 用户界面框架
-- **TypeScript** - 类型安全的JavaScript
-- **Vite** - 快速的构建工具
-- **Electron** - 跨平台桌面应用框架
-- **Tailwind CSS** - 实用优先的CSS框架
-- **shadcn/ui** - 高质量的React组件库
+- **React** - User Interface Framework
+- **Type Script** - Type-safe Java Script
+- **Vite** - Quick build tool
+- **Electron** - Cross-platform desktop application framework
+- **Tailwind CSS** - Practical and priority CSS framework
+- **shadcn/ui** - High-quality React component library
 
-## 快速开始
+## Get started quickly
 
-### 环境要求
+### Environmental Requirements
 
-确保您的系统已安装：
-- Node.js (推荐使用 [nvm](https://github.com/nvm-sh/nvm#installing-and-updating) 安装)
-- npm 包管理器
+Make sure your system is installed:
 
-### 安装和运行
+- Node js (recommended to use [nvm](https://github.com/nvm-sh/nvm#installing-and-updating) Installation)
+- npm package manager
+
+### Install and run
 
 ```bash
-# 1. 克隆项目
+# 1. Clone project
 git clone <YOUR_GIT_URL>
 
-# 2. 进入项目目录
+# 2. Enter the project directory
 cd tavern-card-crafter-v3
 
-# 3. 安装依赖
+# 3. Installation dependencies
 npm install
 
-# 4. 启动开发服务器（Web版本）
+# 4. Start the development server (Web version)
 npm run dev
 
-# 或启动桌面应用开发模式
+# Or start desktop application development mode
 npm run electron-dev
 ```
 
-- **Web版本**：在浏览器中访问 `http://localhost:8080`
-- **桌面版本**：自动打开 Electron 桌面应用窗口
+- **Web version**: Access in the browser `http://localhost:8080`
+- **Desktop Version**: Automatically open the Electron desktop application window
 
-### 构建和运行
+### Build and run
 
-#### Web 版本
+#### Web Version
+
 ```bash
-# 构建 Web 版本
+# Build a web version
 npm run build
 
-# 预览构建结果
+# Preview build results
 npm run preview
 ```
 
-#### 桌面应用版本
+#### Desktop application version
+
 ```bash
-# 快速运行桌面应用（生产模式）
+# Quickly run desktop applications (production mode)
 npm run electron
 
-# 构建并运行桌面应用
+# Build and run desktop applications
 npm run electron-pack
 
-# 构建桌面应用安装包
+# Build a desktop application installation package
 npm run electron-build
 ```
 
-## 使用指南
+## User Guide
 
-### 🚀 快速开始
-1. **启动应用**: 使用 `npm run electron-dev`（开发）或 `npm run electron`（生产）
-2. **选择工作模式**: 使用左侧选项卡在三个功能间切换
+### 🚀 Start quickly
 
-### 📋 功能详解
+1. **Start the application**: use `npm run electron-dev`(Development) or `npm run electron`(Production)
+2. **Select working mode**: Use the left tab to switch between the three functions
 
-#### 🤖 AI角色卡助手
-1. **粘贴内容**: 将角色相关的任意文本粘贴到输入框
-2. **选择类型**: 选择角色类型（动漫、游戏、小说、历史人物等）
-3. **AI生成**: 点击"AI分析生成"，AI将智能提取并生成结构化信息
-4. **一键填入**: 选择生成的字段，一键填入到角色编辑器
+### 📋 Detailed explanation of functions
 
-#### ✏️ 角色信息编辑
-1. **基本信息**: 填写角色姓名、描述、头像等基础信息
-2. **个性设定**: 详细描述角色的性格特征和行为模式
-3. **对话系统**: 编写首条消息、对话示例和替代问候语
-4. **世界观设定**: 添加角色书条目，丰富背景设定
-5. **标签管理**: 为角色添加相关标签便于分类
+#### 🤖 AI character card assistant
 
-#### 📄 JSON 预览
-1. **实时预览**: 查看生成的JSON格式角色卡
-2. **语法高亮**: 彩色显示JSON结构，便于阅读
-3. **统计信息**: 显示总字符数和Token数量
-4. **导出功能**:
-   - **JSON导出**: 标准JSON格式文件
-   - **PNG导出**: 将角色卡嵌入图片中（需上传头像）
-   - **复制到剪贴板**: 快速复制JSON内容
+1. **Paste content**: Paste any character-related text into the input box
+2. **Select type**: Select character type (animation, games, novels, historical characters, etc.)
+3. **AI Generation**: Click "AI Analysis Generation", and AI will intelligently extract and generate structured information
+4. **Fill in**: with one click: Select the generated field and fill in the role editor with one click
 
-### 💡 使用技巧
-- **AI助手**: 可以粘贴角色介绍、小说片段、游戏资料等任意相关文本
-- **分步编辑**: 使用选项卡分别专注于AI生成、手动编辑和预览导出
-- **实时同步**: 三个选项卡的数据实时同步，随时切换查看效果
+#### ✏️ Character information editing
 
-## 项目结构
+1. **Basic Information**: Fill in the basic information such as character name, description, avatar, etc.
+2. **Personality Setting**: Describe the character characteristics and behavior patterns of the character in detail
+3. **Dialogue System**: Write first message, conversation examples and alternative greetings
+4. **Worldview Settings**: Add character book entries to enrich background settings
+5. **Tag management**: Adding relevant tags to roles is easy to classify
+
+#### 📄 JSON Preview
+
+1. **Real-time preview**: View the generated JSON format role card
+2. **Syntax Highlight**: Color displays JSON structure for easy reading
+3. **Statistics**: Display the total number of characters and tokens
+4. **Export function**:
+
+- **JSON Export**: Standard JSON format file
+- **PNG Export**: Embed the character card into the picture (need to upload the avatar)
+- **Copy to clipboard**: Quickly copy JSON content
+
+### 💡 Usage Tips
+
+- **AI Assistant**: You can paste any related text such as character introduction, novel clips, game information, etc.
+- **Step editing**: Use tabs to focus on AI generation, manual editing, and preview export respectively
+- **Real-time synchronization**: The data of three tabs is synchronized in real time, and the effect can be switched to view at any time.
+
+## Project structure
 
 ```
 src/
-├── components/          # React组件
-│   ├── CharacterForm/   # 角色编辑表单组件
-│   │   ├── AIAssistant.tsx      # AI角色卡助手
-│   │   ├── BasicInfoSection.tsx # 基本信息编辑
-│   │   ├── PersonalitySection.tsx # 个性特征编辑
+├── components/          # React Components
+│   ├── CharacterForm/   # Role Edit Form Component
+│   │   ├── AIAssistant.tsx      # AI character card assistant
+│   │   ├── BasicInfoSection.tsx # Basic information edit
+│   │   ├── PersonalitySection.tsx # Personality traits Edit
 │   │   └── ...
-│   ├── CharacterPreview.tsx     # JSON预览组件
-│   ├── AISettings.tsx           # AI设置组件
-│   ├── ui/             # 基础UI组件（shadcn/ui）
+│   ├── CharacterPreview.tsx     # JSON preview component
+│   ├── AISettings.tsx           # AI Setup Components
+│   ├── ui/             # Basic UI components (shadcn/ui）
 │   └── ...
-├── pages/              # 页面组件
-│   └── Index.tsx       # 主页面（侧边栏选项卡布局）
-├── contexts/           # React上下文
-│   ├── LanguageContext.tsx     # 多语言支持
-│   └── ThemeContext.tsx        # 主题切换
-├── hooks/              # 自定义Hook
-├── utils/              # 工具函数
-│   └── aiGenerator.ts  # AI生成相关工具
-├── lib/                # 库文件
-└── electron/           # Electron主进程文件
-    ├── main.cjs        # 主进程入口
-    └── preload.js      # 预加载脚本
+├── pages/              # Page Components
+│   └── Index.tsx       # Main page (sidebar tab layout)
+├── contexts/           # React context
+│   ├── LanguageContext.tsx     # Multilingual support
+│   └── ThemeContext.tsx        # Topic Switch
+├── hooks/              # Custom Hook
+├── utils/              # Tool functions
+│   └── aiGenerator.ts  # AI generation related tools
+├── lib/                # Library files
+└── electron/           # Electron main process file
+    ├── main.cjs        # Main process entry
+    └── preload.js      # Preload scripts
 ```
 
-## 贡献指南
+## Contribution Guide
 
-欢迎提交Issue和Pull Request来帮助改进项目！
+Welcome to submit Issue and Pull Request to help improve your project!
 
-## 许可证
+## License
 
-本项目采用MIT许可证。详情请查看LICENSE文件。
+This project adopts a MIT license. For details, please see the LICENSE file.
 
 ---
 
-*让AI角色创作变得更简单、更高效！*
+_Make AI character creation simpler and more efficient! _

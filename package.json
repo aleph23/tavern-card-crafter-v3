@@ -2,7 +2,7 @@
   "name": "vite_react_shadcn_ts",
   "private": true,
   "version": "0.0.0",
-  "description": "Tavern Card Crafter - AI角色卡制作工具",
+  "description": "Tavern Card Crafter - AI character card creation tool",
   "author": "Tavern Card Crafter Team",
   "type": "module",
   "main": "electron/main.cjs",
@@ -14,7 +14,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "electron": "cross-env NODE_ENV=production electron .",
-    "electron-dev": "concurrently \"npm run dev\" \"wait-on http://localhost:8080 && cross-env NODE_ENV=development electron .\"",
+    "electron-dev": "concurrently \"npm run dev\" \"wait-on http://localhost:6090 && cross-env NODE_ENV=development electron .\"",
     "electron-build": "npm run build && electron-builder",
     "electron-pack": "npm run build && cross-env NODE_ENV=production electron .",
     "dist": "npm run build && electron-builder --publish=never"
@@ -75,24 +75,24 @@
   "devDependencies": {
     "@eslint/js": "^9.9.0",
     "@tailwindcss/typography": "^0.5.15",
-    "cross-env": "^7.0.3",
-    "electron": "^36.4.0",
-    "electron-builder": "^26.0.12",
-    "electron-reload": "^2.0.0-alpha.1",
     "@types/node": "^22.5.5",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react-swc": "^3.5.0",
     "autoprefixer": "^10.4.20",
+    "cross-env": "^7.0.3",
+    "electron": "^36.4.0",
+    "electron-builder": "^26.0.12",
+    "electron-reload": "^2.0.0-alpha.1",
     "eslint": "^9.9.0",
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
     "eslint-plugin-react-refresh": "^0.4.9",
     "globals": "^15.9.0",
     "lovable-tagger": "^1.1.7",
     "postcss": "^8.4.47",
-    "tailwindcss": "^3.4.11",
+    "tailwindcss": "^3.4.18",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",
-    "vite": "^5.4.1"
+    "vite": "^7.1.7"
   }
 }

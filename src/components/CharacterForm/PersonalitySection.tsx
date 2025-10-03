@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useState, useRef } from "react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Loader2, RefreshCcw, Trash2, X } from "lucide-react";
-import { generateWithAI, generatePersonality, generateScenario, generateFirstMessage, generateMessageExample } from "@/utils/aiGenerator";
+import { generateWithAI, generatePersonality, generateScenario, generateFirstMes, generateMesExample } from "@/utils/aiGenerator";
 import { AISettings } from "@/components/AISettings";
 import { useToast } from "@/hooks/use-toast";
 
@@ -22,8 +23,8 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
   const handleAIGenerate = async (field: string, promptGenerator: (data: any) => string) => {
     if (!aiSettings?.apiKey && !['ollama', 'lmstudio'].includes(aiSettings?.provider?.toLowerCase() || '')) {
       toast({
-        title: "配置错误",
-        description: "请先在AI设置中配置API密钥",
+        title: "Configuration error",
+        description: "Please configure the API key in the AI settings first",
         variant: "destructive"
       });
       return;
@@ -31,8 +32,8 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
 
     if (!data.name || !data.description) {
       toast({
-        title: "信息不完整",
-        description: "请先填写角色名称和角色描述",
+        title: "Incomplete information",
+        description: "Please fill in the Card name and role description first",
         variant: "destructive"
       });
       return;
@@ -40,25 +41,25 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
 
     abortControllerRefs.current[field] = new AbortController();
     setLoading(prev => ({ ...prev, [field]: true }));
-    
+
     try {
       const prompt = promptGenerator(data);
       const result = await generateWithAI(aiSettings, prompt);
       updateField(field, result);
       toast({
-        title: "生成成功",
-        description: `${field} 已生成完成`
+        title: "Generate successfully",
+        description: `${field} Generated completed`
       });
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
         toast({
-          title: "已取消",
-          description: "AI生成已被用户取消"
+          title: "Canceled",
+          description: "AI generation has been canceled by the user"
         });
       } else {
         toast({
-          title: "生成失败",
-          description: error instanceof Error ? error.message : "未知错误",
+          title: "Generation failed",
+          description: error instanceof Error ? error.message : "Unknown error",
           variant: "destructive"
         });
       }
@@ -74,8 +75,8 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
       setLoading(prev => ({ ...prev, [field]: false }));
       abortControllerRefs.current[field] = null;
       toast({
-        title: "已取消",
-        description: "AI生成已取消"
+        title: "Canceled",
+        description: "AI generation has been canceled"
       });
     }
   };
@@ -83,8 +84,8 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
   const handleClearField = (field: string) => {
     updateField(field, "");
     toast({
-      title: "已清空",
-      description: `${field} 已清空`
+      title: "Cleared",
+      description: `${field} Cleared`
     });
   };
 
@@ -103,7 +104,7 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
             className="h-8 px-2 text-xs"
           >
             <RefreshCcw className="w-3 h-3 mr-1" />
-            重新生成
+            Regenerate
           </Button>
         )}
         <Button
@@ -116,12 +117,12 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
           {isLoading ? (
             <>
               <X className="w-3 h-3 mr-1" />
-              取消
+              Cancel
             </>
           ) : (
             <>
               <Sparkles className="w-3 h-3 mr-1" />
-              AI生成
+              AI generation
             </>
           )}
         </Button>
@@ -132,7 +133,7 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
           className="h-8 px-2 text-xs"
         >
           <Trash2 className="w-3 h-3 mr-1" />
-          清空
+          Clear
         </Button>
       </div>
     );
@@ -140,18 +141,18 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-gray-800 mb-4">性格设定</h3>
-      
+      <h3 className="text-lg font-semibold text-gray-400 mb-4">Character setting</h3>
+
       <div>
         <div className="flex items-center justify-between mb-2">
-          <Label htmlFor="personality" className="text-sm font-medium text-gray-700">性格特征 *</Label>
+          <Label htmlFor="personality" className="text-sm font-medium text-gray-300">Character traits *</Label>
           {renderFieldButtons('personality', generatePersonality, ['name', 'description'])}
         </div>
         <Textarea
           id="personality"
           value={data.personality}
           onChange={(e) => updateField("personality", e.target.value)}
-          placeholder="描述角色的性格特点、行为模式和习惯..."
+          placeholder="In a succinct, non-prosaic list, describe the character's traits, behavior, idiosyncracies, likes/dislikes, strengths/weaknesses, backstory"
           className="mt-1 min-h-[100px]"
           showCounter={true}
         />
@@ -159,14 +160,14 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
 
       <div>
         <div className="flex items-center justify-between mb-2">
-          <Label htmlFor="scenario" className="text-sm font-medium text-gray-700">场景设定 *</Label>
+          <Label htmlFor="scenario" className="text-sm font-medium text-gray-300">Scene setting *</Label>
           {renderFieldButtons('scenario', generateScenario, ['name', 'description', 'personality'])}
         </div>
         <Textarea
           id="scenario"
           value={data.scenario}
           onChange={(e) => updateField("scenario", e.target.value)}
-          placeholder="设定交互的场景和背景..."
+          placeholder="Describe the backstory and meta-environment..."
           className="mt-1 min-h-[100px]"
           showCounter={true}
         />
@@ -174,14 +175,14 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
 
       <div>
         <div className="flex items-center justify-between mb-2">
-          <Label htmlFor="first_mes" className="text-sm font-medium text-gray-700">首条消息 *</Label>
-          {renderFieldButtons('first_mes', generateFirstMessage, ['name', 'description', 'personality', 'scenario'])}
+          <Label htmlFor="first_mes" className="text-sm font-medium text-gray-300">First message *</Label>
+          {renderFieldButtons('first_mes', generateFirstMes, ['name', 'description', 'personality', 'scenario'])}
         </div>
         <Textarea
           id="first_mes"
           value={data.first_mes}
           onChange={(e) => updateField("first_mes", e.target.value)}
-          placeholder="角色的开场白..."
+          placeholder="This is the first outward facing component and should be written in the style of a great literary master. It is a long paragraph portraying how this character first meets the user/player in this game..."
           className="mt-1 min-h-[100px]"
           showCounter={true}
         />
@@ -189,14 +190,14 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
 
       <div>
         <div className="flex items-center justify-between mb-2">
-          <Label htmlFor="mes_example" className="text-sm font-medium text-gray-700">对话示例</Label>
-          {renderFieldButtons('mes_example', generateMessageExample, ['name', 'description', 'personality', 'first_mes'])}
+          <Label htmlFor="mes_example" className="text-sm font-medium text-gray-300">Dialogue example</Label>
+          {renderFieldButtons('mes_example', generateMesExample, ['name', 'description', 'personality', 'first_mes'])}
         </div>
         <Textarea
           id="mes_example"
           value={data.mes_example}
           onChange={(e) => updateField("mes_example", e.target.value)}
-          placeholder="示例对话，帮助定义角色的说话方式..."
+          placeholder="Sample dialogue that helps define how a character speaks..."
           className="mt-1 min-h-[120px]"
           showCounter={true}
         />

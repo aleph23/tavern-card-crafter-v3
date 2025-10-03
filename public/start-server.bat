@@ -23,7 +23,7 @@ if %errorlevel% neq 0 (
 
 echo.
 echo Starting development server...
-echo The application will be available at http://localhost:8080
+echo The application will be available at http://localhost:6090
 echo Press Ctrl+C to stop the server
 echo.
 call npm run dev

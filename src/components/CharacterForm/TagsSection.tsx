@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useState, useRef } from "react";
 import { Label } from "@/components/ui/label";
@@ -45,8 +46,8 @@ const TagsSection = ({ tags, updateField, aiSettings, characterData }: TagsSecti
   const handleAIGenerateTags = async () => {
     if (!aiSettings?.apiKey && !['ollama', 'lmstudio'].includes(aiSettings?.provider?.toLowerCase() || '')) {
       toast({
-        title: t('configError') || "配置错误",
-        description: t('configApiKey') || "请先在AI设置中配置API密钥",
+        title: t('configError') || "Configuration error",
+        description: t('configApiKey') || "Please configure the API key in the AI settings first",
         variant: "destructive"
       });
       return;
@@ -54,8 +55,8 @@ const TagsSection = ({ tags, updateField, aiSettings, characterData }: TagsSecti
 
     if (!characterData.name || !characterData.description) {
       toast({
-        title: t('incompleteInfo') || "信息不完整",
-        description: t('fillNameDesc') || "请先填写角色名称和角色描述",
+        title: t('incompleteInfo') || "Incomplete information",
+        description: t('fillNameDesc') || "Please fill in the Card name and role description first",
         variant: "destructive"
       });
       return;
@@ -63,30 +64,30 @@ const TagsSection = ({ tags, updateField, aiSettings, characterData }: TagsSecti
 
     abortControllerRef.current = new AbortController();
     setLoading(true);
-    
+
     try {
       const prompt = generateTags(characterData);
       const result = await generateWithAI(aiSettings, prompt);
-      
-      // 解析AI返回的标签字符串
+
+      // Parses tag strings returned by AI
       const newTags = result.split(/[,，]/).map(tag => tag.trim()).filter(tag => tag);
       const uniqueTags = [...new Set([...tags, ...newTags])];
-      
+
       updateField("tags", uniqueTags);
       toast({
-        title: t('generateSuccess') || "生成成功",
-        description: t('tagsGenerated') || "标签已生成完成"
+        title: t('generateSuccess') || "Generate successfully",
+        description: t('tagsGenerated') || "Tag generation completed"
       });
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
         toast({
-          title: "已取消",
-          description: "AI生成已被用户取消"
+          title: "Canceled",
+          description: "AI generation has been canceled by the user"
         });
       } else {
         toast({
-          title: t('generateError') || "生成失败",
-          description: error instanceof Error ? error.message : t('unknownError') || "未知错误",
+          title: t('generateError') || "Generation failed",
+          description: error instanceof Error ? error.message : t('unknownError') || "Unknown error",
           variant: "destructive"
         });
       }
@@ -102,8 +103,8 @@ const TagsSection = ({ tags, updateField, aiSettings, characterData }: TagsSecti
       setLoading(false);
       abortControllerRef.current = null;
       toast({
-        title: "已取消",
-        description: "AI生成已取消"
+        title: "Canceled",
+        description: "AI generation has been canceled"
       });
     }
   };
@@ -111,8 +112,8 @@ const TagsSection = ({ tags, updateField, aiSettings, characterData }: TagsSecti
   const handleClearAll = () => {
     updateField("tags", []);
     toast({
-      title: "已清空",
-      description: "所有标签已清空"
+      title: "Cleared",
+      description: "All tags have been cleared"
     });
   };
 
@@ -129,7 +130,7 @@ const TagsSection = ({ tags, updateField, aiSettings, characterData }: TagsSecti
               className="h-8 px-2 text-xs"
             >
               <RefreshCcw className="w-3 h-3 mr-1" />
-              重新生成
+              Regenerate
             </Button>
           )}
           <Button
@@ -142,12 +143,12 @@ const TagsSection = ({ tags, updateField, aiSettings, characterData }: TagsSecti
             {loading ? (
               <>
                 <X className="w-3 h-3 mr-1" />
-                取消
+                Cancel
               </>
             ) : (
               <>
                 <Sparkles className="w-3 h-3 mr-1" />
-                AI生成标签
+                AI Generate Tags
               </>
             )}
           </Button>
@@ -158,17 +159,17 @@ const TagsSection = ({ tags, updateField, aiSettings, characterData }: TagsSecti
             className="h-8 px-2 text-xs"
           >
             <Trash2 className="w-3 h-3 mr-1" />
-            清空
+            Clear
           </Button>
         </div>
       </div>
-      
+
       <div className="flex gap-2">
         <Input
           value={newTag}
           onChange={(e) => setNewTag(e.target.value)}
           onKeyPress={handleKeyPress}
-          placeholder={t('enterTag') || "输入标签..."}
+          placeholder={t('enterTag') || "Enter a tag..."}
           className="flex-1"
         />
         <Button onClick={addTag} size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground">

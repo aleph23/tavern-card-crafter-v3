@@ -1,17 +1,17 @@
 
 const { contextBridge, ipcRenderer } = require('electron');
 
-// 暴露安全的 API 给渲染进程
+// Exposed safe API Give rendering process
 contextBridge.exposeInMainWorld('electronAPI', {
-  // 菜单事件监听
-  onMenuAction: (callback) => {
+  // Menu event listening
+    onMenuAction: (callback) => {
     ipcRenderer.on('menu-new-character', callback);
     ipcRenderer.on('menu-import', callback);
     ipcRenderer.on('menu-export', callback);
   },
   
-  // 移除监听器
-  removeAllListeners: (channel) => {
+  // Remove the listener
+    removeAllListeners: (channel) => {
     ipcRenderer.removeAllListeners(channel);
   }
 });

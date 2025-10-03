@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AISettings } from "@/components/AISettings";
 
 export interface CharacterData {
@@ -7,50 +8,51 @@ export interface CharacterData {
   scenario?: string;
   first_mes?: string;
   mes_example?: string;
+  alternative_greetings?: string[];
   system_prompt?: string;
   post_history_instructions?: string;
   tags?: string[];
 }
 
-// Token计算函数（粗略估算）
+// Token calculation function (rough estimation)
 export const estimateTokens = (text: string): number => {
-  // 中文字符按1.5个token计算，英文单词按平均4个字符计算
+  // Press 1 in Chinese characters 5 tokens are calculated, English words are calculated based on average 4 characters
   const chineseChars = (text.match(/[\u4e00-\u9fff]/g) || []).length;
   const englishWords = (text.match(/[a-zA-Z]+/g) || []).length;
   const otherChars = text.length - chineseChars - (text.match(/[a-zA-Z]/g) || []).length;
-  
+
   return Math.ceil(chineseChars * 1.5 + englishWords + otherChars * 0.5);
 };
 
-// 智能构建API URL - 与AISettings组件保持一致
+// Intelligently build API URL - consistent with the AISettings component
 const buildApiUrl = (baseUrl: string, provider: string): string => {
-  if (!baseUrl) return '';
-  
-  // 移除末尾的斜杠
+  if (!baseUrl) { return ''; }
+
+  // Remove the end slash
   const cleanUrl = baseUrl.replace(/\/+$/, '');
-  
-  // Ollama特殊处理
+
+  // Ollama special treatment
   if (provider === 'ollama') {
     if (baseUrl.includes('/v1/chat/completions')) {
       return cleanUrl;
     }
     return `${cleanUrl}/v1/chat/completions`;
   }
-  
-  // 智谱GLM特殊处理
+
+  // Special processing of Zhipu GLM
   if (provider === 'zhipu') {
     if (baseUrl.includes('/chat/completions')) {
       return cleanUrl;
     }
     return `${cleanUrl}/chat/completions`;
   }
-  
-  // 其他提供商的标准处理
+
+  // Standard processing from other providers
   if (baseUrl.includes('/chat/completions')) {
     return cleanUrl;
   }
-  
-  // 智能添加端点
+
+  // Smartly add endpoints
   if (cleanUrl.includes('/v1')) {
     return `${cleanUrl}/chat/completions`;
   } else {
@@ -62,34 +64,34 @@ export const generateWithAI = async (
   settings: AISettings,
   prompt: string
 ): Promise<string> => {
-  // 明定定义不需要密钥的本地服务
+  // Definition of local services that do not require a key
   const localServices = ['ollama', 'lmstudio'];
   const requiresKey = !localServices.includes(settings.provider.toLowerCase());
-  
-  // 只有非本地服务才检查密钥
+
+  // Only non-local services check the key
   if (requiresKey && !settings.apiKey) {
-    throw new Error("请先在AI设置中配置API密钥");
+    throw new Error("Please configure the API key in the AI settings first");
   }
 
   if (!settings.apiUrl) {
-    throw new Error("请先在AI设置中配置API地址");
+    throw new Error("Please configure the API address in the AI settings first");
   }
 
   try {
-    // 智能构建API地址
+    // Intelligently build API addresses
     const apiUrl = buildApiUrl(settings.apiUrl, settings.provider);
-    
+
     console.log('Generating with AI using URL:', apiUrl);
     console.log('Provider:', settings.provider);
     console.log('Model:', settings.model);
     console.log('Requires API key:', requiresKey);
 
-    // 使用统一的OpenAI兼容格式
+    // Use a unified Open AI-compatible format
     let headers: any = {
       'Content-Type': 'application/json',
     };
 
-    // 只有需要密钥的服务才添加Authorization头
+    // Only services that require a key will add Authorization header
     if (requiresKey && settings.apiKey) {
       headers['Authorization'] = `Bearer ${settings.apiKey}`;
     }
@@ -107,7 +109,7 @@ export const generateWithAI = async (
       method: 'POST',
       headers,
       body: JSON.stringify(requestBody),
-      signal: AbortSignal.timeout(60000) // 60秒超时
+      signal: AbortSignal.timeout(60000) // 60 seconds timeout
     });
 
     console.log('Response status:', response.status);
@@ -115,9 +117,9 @@ export const generateWithAI = async (
     if (!response.ok) {
       const errorText = await response.text();
       console.error('API Error Response:', errorText);
-      
-      let errorMessage = `API请求失败: ${response.status} ${response.statusText}`;
-      
+
+      let errorMessage = `API request failed: ${response.status} ${response.statusText}`;
+
       try {
         const errorData = JSON.parse(errorText);
         if (errorData.error?.message) {
@@ -130,23 +132,23 @@ export const generateWithAI = async (
           errorMessage += ` - ${errorText}`;
         }
       }
-      
-      // 针对本地服务的特殊错误提示
+
+      // Special error prompts for local services
       if (localServices.includes(settings.provider.toLowerCase())) {
         if (response.status === 400 || errorText.includes('model')) {
-          errorMessage = `模型"${settings.model}"不存在或未加载。请在AI设置中获取可用模型列表，或确保已下载/加载该模型。`;
+          errorMessage = `Model"${settings.model}"Not present or not loaded. Please get a list of available models in the AI settings or make sure it has been downloaded/Load the model.`;
         }
       }
-      
+
       throw new Error(errorMessage);
     }
 
     const data = await response.json();
     console.log('API Response:', data);
-    
-    // 改进的响应内容解析 - 处理空响应和多种响应格式
+
+    // Improved response content analysis - Handle empty responses and multiple response formats
     let content = '';
-    
+
     if (data.choices && data.choices.length > 0) {
       const choice = data.choices[0];
       if (choice.message && choice.message.content) {
@@ -157,8 +159,8 @@ export const generateWithAI = async (
         content = choice.text;
       }
     }
-    
-    // 如果仍然没有内容，尝试其他可能的响应格式
+
+    // If there is still no content, try other possible response formats
     if (!content) {
       if (data.response) {
         content = data.response;
@@ -168,171 +170,175 @@ export const generateWithAI = async (
         content = data.content;
       }
     }
-    
-    // 检查是否获取到有效内容
+
+    // Check whether valid content is obtained
     if (!content || content.trim() === '') {
       console.error('Empty response received:', data);
-      throw new Error("API返回空响应，可能是配额不足或模型过载，请稍后重试或更换模型");
+      throw new Error("The API returns an empty response, which may be due to insufficient quota or overloading of the model. Please try again or replace the model later.");
     }
-    
-    // 清理生成内容的格式问题
+
+    // Clean up the format of generated content
     return content.trim().replace(/^\s*\n+/, '');
   } catch (error) {
-    console.error('AI生成错误:', error);
-    
+    console.error('AI generation error:', error);
+
     if (error instanceof Error) {
-      // 处理特定错误类型
+      // Handle specific error types
       if (error.name === 'TimeoutError') {
-        throw new Error('请求超时，请检查网络连接或API服务状态');
+        throw new Error('Request timeout, please check the network connection or API service status');
       }
       if (error.message.includes('Failed to fetch')) {
         if (settings.provider === 'ollama') {
-          throw new Error('无法连接到Ollama服务，请确保Ollama已启动并运行在正确端口。可尝试执行: ollama serve');
+          throw new Error('Unable to connect to the Ollama service, make sure Ollama is up and running on the correct port. Can try to execute: ollama serve');
         } else if (settings.provider === 'lmstudio') {
-          throw new Error('无法连接到LM Studio服务，请确保LM Studio已启动本地服务器');
+          throw new Error('Unable to connect to LM Studio service, please make sure LM Studio has started the local server');
         }
-        throw new Error('网络连接失败，请检查API地址是否正确或服务是否运行');
+        throw new Error('The network connection failed. Please check whether the API address is correct or whether the service is running.');
       }
       throw error;
     }
-    
-    throw new Error(`生成失败: 未知错误`);
+
+    throw new Error(`Generation failed: Unknown error`);
   }
 };
 
 export const generateDescription = (data: CharacterData): string => {
   const existingDescription = data.description.trim();
-  
+
   if (existingDescription) {
-    return `根据以下角色信息，完善和丰富角色描述，保持现有内容的基础上进行扩展：
+    return `Based on the following role information, enchance the descriptions, while remaining succinct:
 
-角色名称：${data.name}
-现有描述：${existingDescription}
+Card name:${data.name}
+Existing description:${existingDescription}
 
-请在现有描述的基础上，补充角色的外观细节、身体特征、服装风格等描述性内容。只输出角色描述内容，不要包含角色名称和其他信息。请直接输出描述内容，不要添加总结或额外说明。请用中文回答。`;
+Embellish, making sure to describe all physical qualities of the character -- body, attire and how they compose themself. This should be in non-prosaic list format.`;
   } else {
-    return `根据角色名称生成详细的角色外观描述：
+    return `Generate a list of all the physical qualities of the character -- body, attire and how they compose themself. This should be in non-prosaic CSV format riffing off of the character name:
 
-角色名称：${data.name}
+Card name:${data.name}
 
-请生成一个详细的角色外观描述，包括角色的身体特征、面部特征、服装风格、气质等。只输出角色描述内容，不要包含角色名称、背景故事或其他信息。请直接输出描述内容，不要添加总结或额外说明。请用中文回答。`;
+Please generate a detailed character appearance description, including the character's physical characteristics, facial features, clothing style, temperament, etc. Only output character description content, do not include character name, background story or other information. Please output the description directly, and do not add summary or additional instructions.`;
   }
 };
 
 export const generatePersonality = (data: CharacterData): string => {
-  return `根据以下信息生成详细的角色性格特征：
+  return `Based on the following role information, enchance the character's persona, while remaining succinct.
 
-角色名称：${data.name}
-角色描述：${data.description}
+Card name: ${data.name}
+Physical Description: ${data.description}
 
-请生成一个详细的性格描述，包括角色的行为模式、习惯、情感特征等。请直接输出性格特征描述，不要包含总结段落或额外说明。请用中文回答，内容要具体且符合角色设定。`;
+A non-prosaic list, describing the character's traits, behavior, idiosyncracies, likes/dislikes, strengths/weaknesses, backstory.`;
 };
 
 export const generateScenario = (data: CharacterData): string => {
-  return `根据以下信息生成合适的场景设定：
+  return `Generate an appropriate meta-scenario based on the following information:
 
-角色名称：${data.name}
-角色描述：${data.description}
-性格特征：${data.personality}
+Card name: ${data.name}
+Physical Description: ${data.description}
+Character Personality: ${data.personality}
 
-请生成一个详细的场景设定，描述角色所处的环境、背景和情境。请直接输出场景描述，不要包含总结段落或额外说明。请用中文回答，内容要具体且符合角色设定。`;
+Generate the backstory and meta-environment in acclaimed historian's prose.`;
 };
 
-export const generateFirstMessage = (data: CharacterData): string => {
-  return `根据以下信息生成角色的首条消息（开场白）：
+export const generateFirstMes = (data: CharacterData): string => {
+  return `Generate the first message of the game, introducing the character to the player/user:
 
-角色名称：${data.name}
-角色描述：${data.description}
-性格特征：${data.personality}
-场景设定：${data.scenario}
+Card name: ${data.name}
+Physical Description: ${data.description}
+Character Personality: ${data.personality}
+Scene settings: ${data.scenario}
 
-请生成一个自然的开场白，体现角色的性格和所处的场景。请用中文回答，要生动有趣。`;
+This will be the first outward facing text, the first thing the player/user encounters when playing with the character.Somehow the character must meet the player/user. The writing should be a perfect combination of Douglas Adams, Ursula K. Le Guin, James Joyce, Anais Nin, and Philip K. Dick.`;
 };
 
-export const generateMessageExample = (data: CharacterData): string => {
-  return `根据以下信息生成角色的对话示例：
+export const generateMesExample = (data: CharacterData): string => {
+  return `Generate a conversational example to help establish the character:
 
-角色名称：${data.name}
-角色描述：${data.description}
-性格特征：${data.personality}
-场景设定：${data.scenario}
+Card name: ${data.name}
+Physical Description: ${data.description}
+Character Personality: ${data.personality}
+Scene setting: ${data.scenario}
 
-请生成3-4段标准格式的对话示例，每个对话示例都必须以 <START> 开头。格式如下：
-
-<START>
-{{user}}: 用户的话
-${data.name}: 角色的回答
-{{user}}: 用户的话
-${data.name}: 角色的回答
+Please generate 2 to 3 dialogues or monologues that truly capture the spirit of the character. The format is as follows:
 
 <START>
-{{user}}: 用户的话
-${data.name}: 角色的回答
+{{user}}: User's words
+${data.name}: The character's answer
+${data.name}: *The character's actions.*
 
-请确保每个对话示例都以 <START> 宏开头，展示角色的说话方式和风格。请用中文回答，要符合角色性格。`;
+<START>
+${data.name}: The character talks to themself and acts on their own.
+
+Make sure each conversation example starts with a <START> macro. Do not include it if it doesn't help to develop the character's actions and speaking behavior. . `;
 };
 
 export const generateSystemPrompt = (data: CharacterData): string => {
-  return `根据以下信息生成系统提示词：
+  return `Generate System Prompt based on the following information:
 
-角色名称：${data.name}
-角色描述：${data.description}
-性格特征：${data.personality}
-场景设定：${data.scenario}
+Card name: ${data.name}
+Physical Description: ${data.description}
+Character Personality: ${data.personality}
+Scene settings: ${data.scenario}
+Example Character Actions: ${data.mes_example}
+Story introduction: ${data.first_mes}
 
-请生成一个系统提示词，指导AI如何扮演这个角色。请用中文回答，要简洁明确。`;
+Write the System Prompt to instruct the AI how to accurately play the character. Be concise and clear.`;
 };
 
 export const generatePostHistoryInstructions = (data: CharacterData): string => {
-  return `根据以下信息生成历史后指令：
+  return `Generate the most important instructions for the AI based on the following information:
+  Card name: ${data.name}
+  Physical Description: ${data.description}
+  Character Personality: ${data.personality}
+  Scene settings: ${data.scenario}
+  Example Character Actions: ${data.mes_example}
+  Story introduction: ${data.first_mes}
 
-角色名称：${data.name}
-角色描述：${data.description}
-性格特征：${data.personality}
-
-请生成历史后指令，提醒AI在对话过程中保持角色一致性。请用中文回答，要简洁实用。`;
+  THIS MUST BE EXTREMELY BRIEF!.`;
 };
 
 export const generateTags = (data: CharacterData): string => {
-  return `根据以下信息生成合适的标签：
+  return `Generate appropriate keywords based on the following information:
 
-角色名称：${data.name}
-角色描述：${data.description}
-性格特征：${data.personality}
-场景设定：${data.scenario}
+Card name: ${data.name}
+Physical Description: ${data.description}
+Character Personality: ${data.personality}
+Scene setting: ${data.scenario}
 
-请生成5-10个相关标签，用逗号分隔。标签应该包括角色类型、性格特点、场景类型等。请用中文回答。`;
+Please generate 5-10 related keywords or single-word tags, separated by commas. Tags should include character type, personality traits, scene type, etc.`;
 };
 
 export const generateAlternateGreeting = (data: CharacterData): string => {
-  return `根据以下信息生成一个备用问候语：
+  return `Generate an alternate greeting based on the following information:
 
-角色名称：${data.name}
-角色描述：${data.description}
-性格特征：${data.personality}
-场景设定：${data.scenario}
-首条消息：${data.first_mes}
+Card name: ${data.name}
+Physical Description: ${data.description}
+Character Personality: ${data.personality}
+Scene settings: ${data.scenario}
+First message: ${data.first_mes}
+Dialogue example: ${data.mes_example}
+Other alternate greetings: ${data.alternative_greetings}
 
-请生成一个与首条消息不同风格的备用问候语，体现角色的多面性。请用中文回答，要自然生动。`;
+Please generate another completely unique Generate an additional prompt that helps break down Alexa's rapist exterior to get at the root of her present actions -- her own childhood abuse.`;
 };
 
 export const generateCharacterBookEntry = (data: CharacterData, context?: string): string => {
-  return `根据以下信息生成一个角色书条目：
+  return `Generate a role book entry based on the following information:
 
-角色名称：${data.name}
-角色描述：${data.description}
-性格特征：${data.personality}
-场景设定：${data.scenario}
-${context ? `补充信息：${context}` : ''}
+Card name: ${data.name}
+Physical Description: ${data.description}
+Character Personality: ${data.personality}
+Scene settings: ${data.scenario}
+${context ? `Supplementary information: ${context}` : ''}
 
-请生成一个角色书条目，用于补充角色的背景设定或特殊情况说明。
+Please generate a character book entry to supplement the character's background settings or special case descriptions.
 
-关键词要求：使用2-3个相关的核心关键词，用逗号分隔
-内容要求：生成具体的设定内容，如角色的特殊技能、重要经历、人际关系或物品等背景信息
+Keyword requirements: Use 2-3 related core keywords, separated by commas
+Content requirements: Generate specific setting content, such as the character's special skills, important experiences, interpersonal relationships or items, and other background information.
 
-格式如下：
-关键词: 核心关键词1,核心关键词2
-内容: 详细的设定内容描述
+The format is as follows:
+Keywords: core keyword 1, core keyword 2
+Content: Detailed settings description
 
-请用中文回答，内容要丰富且有助于角色扮演。`;
+The content should be rich and helpful for role-playing.`;
 };
