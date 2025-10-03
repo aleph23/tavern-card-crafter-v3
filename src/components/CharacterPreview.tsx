@@ -7,6 +7,7 @@ import { Copy, Download, ImageIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { estimateTokens } from "@/utils/aiGenerator";
+import { embedJsonInPng } from "@/utils/pngMetadata";
 
 interface CharacterPreviewProps {
   characterData: any;
