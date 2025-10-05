@@ -7,6 +7,7 @@ import { Copy, Download, ImageIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { estimateTokens } from "@/utils/aiGenerator";
+import { embedJsonInPng } from "@/utils/pngMetadata";
 
 interface CharacterPreviewProps {
   characterData: any;
@@ -36,92 +37,47 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
     linkElement.click();
   };
 
-  const downloadWithImage = () => {
+  const downloadWithImage = async () => {
     if (!characterImage) {
       toast({
         title: t('hint') || "hint",
-        description: t('uploadImageHint'),
+        description: "Please upload the character avatar first, or use the \"Export JSON\" button to export the JSON file directly.",
         variant: "destructive"
       });
       return;
     }
 
     try {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      const img = new Image();
+      // Fetch the image as a blob
+      const response = await fetch(characterImage);
+      const blob = await response.blob();
+      const arrayBuffer = await blob.arrayBuffer();
 
-      img.onload = () => {
-        // Set the canvas size
-        canvas.width = img.width;
-        canvas.height = img.height;
+      // Embed JSON data into PNG using proper tEXt chunk
+      const jsonData = JSON.stringify(characterData);
+      const pngWithMetadata = await embedJsonInPng(arrayBuffer, jsonData);
 
-        // Draw pictures
-        ctx?.drawImage(img, 0, 0);
+      // Create download link
+      const url = URL.createObjectURL(new Blob([pngWithMetadata], { type: 'image/png' }));
+      const link = document.createElement('a');
+      link.href = url;
+      const characterName =
+        (characterData.data && characterData.data.name) ||
+        characterData.name ||
+        'character';
+      link.download = `${characterName}_card.png`;
+      link.click();
+      URL.revokeObjectURL(url);
 
-        // Embed role card data into PNG
-        const jsonData = JSON.stringify(characterData);
-        const canvas2 = document.createElement('canvas');
-        const ctx2 = canvas2.getContext('2d');
-
-        canvas2.width = canvas.width;
-        canvas2.height = canvas.height;
-
-        // Copy the original image
-        ctx2?.drawImage(canvas, 0, 0);
-
-        // Get image data
-        const imageData = ctx2?.getImageData(0, 0, canvas2.width, canvas2.height);
-        if (imageData) {
-          // Encode JSON data into the last few pixels of the image (this is a simplified implementation)
-          const jsonBytes = new TextEncoder().encode(jsonData);
-          const dataView = new DataView(imageData.data.buffer);
-
-          // Store JSON length and data at the end of the image data
-          let offset = imageData.data.length - 4;
-          dataView.setUint32(offset, jsonBytes.length, true);
-
-          // Storing JSON data (there is simplified here, there should be a more complex encoding scheme in fact)
-          for (let i = 0; i < Math.min(jsonBytes.length, 1000); i++) {
-            if (offset - i * 4 >= 0) {
-              imageData.data[offset - i * 4 - 4] = jsonBytes[i];
-            }
-          }
-
-          ctx2?.putImageData(imageData, 0, 0);
-        }
-
-        // Export PNG file
-        canvas2.toBlob((blob) => {
-          if (blob) {
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `${characterData.data.name || 'character'}_card.png`;
-            link.click();
-            URL.revokeObjectURL(url);
-
-            toast({
-              title: "Export successfully",
-              description: "PNG format role card has been exported"
-            });
-          }
-        }, 'image/png');
-      };
-
-      img.onerror = () => {
-        toast({
-          title: "Export failed",
-          description: "Image processing failed, please try again",
-          variant: "destructive"
-        });
-      };
-
-      img.src = characterImage;
+      toast({
+        title: "Export successfully",
+        description: "PNG format role card has been exported with embedded character data"
+      });
     } catch (error) {
+      console.error('PNG export error:', error);
       toast({
         title: "Export failed",
-        description: "An error occurred during PNG export",
+        description: "An error occurred during PNG export: " + (error instanceof Error ? error.message : String(error)),
         variant: "destructive"
       });
     }

@@ -87,7 +87,7 @@ export const generateWithAI = async (
     console.log('Requires API key:', requiresKey);
 
     // Use a unified Open AI-compatible format
-    let headers: any = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
     };
 
@@ -134,11 +134,10 @@ export const generateWithAI = async (
       }
 
       // Special error prompts for local services
-      if (localServices.includes(settings.provider.toLowerCase())) {
-        if (response.status === 400 || errorText.includes('model')) {
-          errorMessage = `Model"${settings.model}"Not present or not loaded. Please get a list of available models in the AI settings or make sure it has been downloaded/Load the model.`;
-        }
+      if (localServices.includes(settings.provider.toLowerCase()) && (response.status === 400 || errorText.includes('model'))) {
+            errorMessage = `Model"${settings.model}"Not present or not loaded. Please get a list of available models in the AI settings or make sure it has been downloaded/Load the model.`;
       }
+
 
       throw new Error(errorMessage);
     }
@@ -286,13 +285,14 @@ Write the System Prompt to instruct the AI how to accurately play the character.
 };
 
 export const generatePostHistoryInstructions = (data: CharacterData): string => {
-  return `Generate the most important instructions for the AI based on the following information:
+  return `Generate High Priority instructions for the AI based on the following information:
   Card name: ${data.name}
   Physical Description: ${data.description}
   Character Personality: ${data.personality}
   Scene settings: ${data.scenario}
   Example Character Actions: ${data.mes_example}
   Story introduction: ${data.first_mes}
+  SYSTEM PROMPT: ${data.system_prompt}
 
   THIS MUST BE EXTREMELY BRIEF!.`;
 };
@@ -319,7 +319,7 @@ First message: ${data.first_mes}
 Dialogue example: ${data.mes_example}
 Other alternate greetings: ${data.alternative_greetings}
 
-Please generate another completely unique Generate an additional prompt that helps break down Alexa's rapist exterior to get at the root of her present actions -- her own childhood abuse.`;
+This should be another, chronologically later interaction between the play/user and this character. It must be entirely unique from any previous greetings. `;
 };
 
 export const generateCharacterBookEntry = (data: CharacterData, context?: string): string => {
@@ -339,6 +339,7 @@ Content requirements: Generate specific setting content, such as the character's
 The format is as follows:
 Keywords: core keyword 1, core keyword 2
 Content: Detailed settings description
+
 
 The content should be rich and helpful for role-playing.`;
 };
