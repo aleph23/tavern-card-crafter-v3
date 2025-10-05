@@ -61,7 +61,11 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
       const url = URL.createObjectURL(new Blob([pngWithMetadata], { type: 'image/png' }));
       const link = document.createElement('a');
       link.href = url;
-      link.download = `${characterData.data.name || 'character'}_card.png`;
+      const characterName =
+        (characterData.data && characterData.data.name) ||
+        characterData.name ||
+        'character';
+      link.download = `${characterName}_card.png`;
       link.click();
       URL.revokeObjectURL(url);
 
