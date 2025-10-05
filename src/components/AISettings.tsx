@@ -360,9 +360,7 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
       console.log('Model:', settings.model);
 
       // Use a unified Open AI-compatible format
-    let headers: Record<string, string> = {
-        'Content-Type': 'application/json',
-      };
+      let headers: Record<string, string> = {'Content-Type': 'application/json',};
 
       // Only providers that require a key will add Authorization header
       if (currentProvider?.requiresKey && settings.apiKey) {
@@ -488,7 +486,8 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
       console.log('Fetching models from:', modelsUrl);
       console.log('Provider:', settings.provider);
 
-    let headers: Record<string, string> = {
+      let headers: Record<string, string> = {};
+      
       // Only providers that require a key will add Authorization header
       if (currentProvider?.requiresKey && settings.apiKey) {
         headers['Authorization'] = `Bearer ${settings.apiKey}`;
