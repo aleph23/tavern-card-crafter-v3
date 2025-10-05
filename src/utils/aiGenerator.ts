@@ -150,7 +150,7 @@ export const generateWithAI = async (
 
       // Special error prompts for local services
       if (localServices.includes(settings.provider.toLowerCase()) && (response.status === 400 || errorText.includes('model'))) {
-            errorMessage = `Model"${settings.model}"Not present or not loaded. Please get a list of available models in the AI settings or make sure it has been downloaded/Load the model.`;
+        errorMessage = `Model"${settings.model}"Not present or not loaded. Please get a list of available models in the AI settings or make sure it has been downloaded/Load the model.`;
       }
 
 
@@ -324,17 +324,20 @@ Please generate 5-10 related keywords or single-word tags, separated by commas. 
 };
 
 export const generateAlternateGreeting = (data: CharacterData): string => {
-  return `Generate an alternate greeting based on the following information:
+  return `Basic story chapter and story information:
 
 Card name: ${data.name}
 Physical Description: ${data.description}
 Character Personality: ${data.personality}
 Scene settings: ${data.scenario}
-First message: ${data.first_mes}
 Dialogue example: ${data.mes_example}
-Other alternate greetings: ${data.alternative_greetings}
 
-This should be another, chronologically later interaction between the play/user and this character. It must be entirely unique from any previous greetings. `;
+The chapters that have already been written: 
+
+First Chapter Beginning: ${data.first_mes}
+Subsequent chapters (if any): ${data.alternative_greetings}
+
+Write the beginning of a new chapter. It must include the character and some encounter with the player/user and must be at least one day after any prior chapters. Merge the writing styles of James Joyce, Douglas Adams, Francois Rabelais, and Anais Nin.`;
 };
 
 export const generateCharacterBookEntry = (data: CharacterData, context?: string): string => {
