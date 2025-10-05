@@ -59,6 +59,16 @@ const CHARACTER_TYPES = [
   { value: "historical", label: "historical figure", description: "real historical figure settings" }
 ];
 
+/**
+ * A component that assists in generating AI character cards based on user-provided content.
+ *
+ * This component manages the state for input text, character type, and parsed data. It provides functionality to generate character data by creating prompts based on the selected character type and input content. The generated data can be inserted into a form, and the component handles user interactions, including cancellation of generation and displaying results. It also includes error handling for various scenarios, such as empty input or invalid AI settings.
+ *
+ * @param {AIAssistantProps} props - The properties for the AIAssistant component.
+ * @param {Object} props.aiSettings - The settings for the AI generation.
+ * @param {Function} props.onInsertField - Callback function to insert generated fields into a form.
+ * @returns {JSX.Element} The rendered AIAssistant component.
+ */
 const AIAssistant = ({ aiSettings, onInsertField }: AIAssistantProps) => {
   const { toast } = useToast();
   const { t } = useLanguage();
@@ -68,6 +78,9 @@ const AIAssistant = ({ aiSettings, onInsertField }: AIAssistantProps) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
 
+  /**
+   * Generates a prompt based on the specified type and content.
+   */
   const getPromptByType = (type: string, content: string) => {
     // Limit the length of input content to avoid too long prompt words
     const truncatedContent = content.length > 2000 ? content.substring(0, 2000) + "..." : content;
@@ -138,6 +151,14 @@ This is a historic character (real or fictional), please generate:
     return typeSpecificPrompts[type as keyof typeof typeSpecificPrompts] || typeSpecificPrompts.general;
   };
 
+  /**
+   * Generate character data based on user input and AI settings.
+   *
+   * The function first checks if the input text and AI settings are provided, displaying hints if not. It then creates an AbortController and sets a generating state. The prompt is generated based on the character type and input text, which is passed to the AI for processing. The result is parsed as JSON, with error handling for both parsing and generation failures, providing user feedback through toast notifications.
+   *
+   * @returns {Promise<void>} A promise that resolves when the character data generation is complete.
+   * @throws Error If the input text is empty, AI settings are not configured, or if JSON parsing fails.
+   */
   const generateCharacterData = async () => {
     if (!inputText.trim()) {
       toast({
