@@ -15,6 +15,9 @@ export interface CharacterData {
 }
 
 // Token calculation function (rough estimation)
+/**
+ * Estimates the number of tokens in a given text based on character types.
+ */
 export const estimateTokens = (text: string): number => {
   // Press 1 in Chinese characters 5 tokens are calculated, English words are calculated based on average 4 characters
   const chineseChars = (text.match(/[\u4e00-\u9fff]/g) || []).length;
@@ -25,6 +28,18 @@ export const estimateTokens = (text: string): number => {
 };
 
 // Intelligently build API URL - consistent with the AISettings component
+/**
+ * Build a complete API URL based on the base URL and provider type.
+ *
+ * The function first cleans the base URL by removing any trailing slashes.
+ * It then applies specific logic for the 'ollama' and 'zhipu' providers to determine
+ * if an endpoint should be appended. For other providers, it checks for existing
+ * endpoints and appends them accordingly, ensuring a valid API URL is returned.
+ *
+ * @param baseUrl - The base URL to be processed.
+ * @param provider - The provider type which influences the URL structure.
+ * @returns The constructed API URL based on the provided base URL and provider.
+ */
 const buildApiUrl = (baseUrl: string, provider: string): string => {
   if (!baseUrl) { return ''; }
 
@@ -220,6 +235,9 @@ Please generate a detailed character appearance description, including the chara
   }
 };
 
+/**
+ * Generates a personality description based on character data.
+ */
 export const generatePersonality = (data: CharacterData): string => {
   return `Based on the following role information, enchance the character's persona, while remaining succinct.
 
@@ -229,6 +247,9 @@ Physical Description: ${data.description}
 A non-prosaic list, describing the character's traits, behavior, idiosyncracies, likes/dislikes, strengths/weaknesses, backstory.`;
 };
 
+/**
+ * Generates a meta-scenario based on character data.
+ */
 export const generateScenario = (data: CharacterData): string => {
   return `Generate an appropriate meta-scenario based on the following information:
 
@@ -239,6 +260,9 @@ Character Personality: ${data.personality}
 Generate the backstory and meta-environment in acclaimed historian's prose.`;
 };
 
+/**
+ * Generates the first message of the game, introducing the character to the player/user.
+ */
 export const generateFirstMes = (data: CharacterData): string => {
   return `Generate the first message of the game, introducing the character to the player/user:
 
@@ -250,6 +274,9 @@ Scene settings: ${data.scenario}
 This will be the first outward facing text, the first thing the player/user encounters when playing with the character.Somehow the character must meet the player/user. The writing should be a perfect combination of Douglas Adams, Ursula K. Le Guin, James Joyce, Anais Nin, and Philip K. Dick.`;
 };
 
+/**
+ * Generates a conversational example based on the provided character data.
+ */
 export const generateMesExample = (data: CharacterData): string => {
   return `Generate a conversational example to help establish the character:
 
@@ -297,6 +324,9 @@ export const generatePostHistoryInstructions = (data: CharacterData): string => 
   THIS MUST BE EXTREMELY BRIEF!.`;
 };
 
+/**
+ * Generates a string of keywords based on character data.
+ */
 export const generateTags = (data: CharacterData): string => {
   return `Generate appropriate keywords based on the following information:
 
@@ -308,6 +338,9 @@ Scene setting: ${data.scenario}
 Please generate 5-10 related keywords or single-word tags, separated by commas. Tags should include character type, personality traits, scene type, etc.`;
 };
 
+/**
+ * Generates an alternate greeting based on character data.
+ */
 export const generateAlternateGreeting = (data: CharacterData): string => {
   return `Generate an alternate greeting based on the following information:
 
@@ -322,6 +355,9 @@ Other alternate greetings: ${data.alternative_greetings}
 This should be another, chronologically later interaction between the play/user and this character. It must be entirely unique from any previous greetings. `;
 };
 
+/**
+ * Generates a role book entry based on character data and optional context.
+ */
 export const generateCharacterBookEntry = (data: CharacterData, context?: string): string => {
   return `Generate a role book entry based on the following information:
 
