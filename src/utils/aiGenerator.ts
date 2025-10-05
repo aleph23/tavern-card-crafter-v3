@@ -15,6 +15,9 @@ export interface CharacterData {
 }
 
 // Token calculation function (rough estimation)
+/**
+ * Estimates the number of tokens in a given text based on character types.
+ */
 export const estimateTokens = (text: string): number => {
   // Press 1 in Chinese characters 5 tokens are calculated, English words are calculated based on average 4 characters
   const chineseChars = (text.match(/[\u4e00-\u9fff]/g) || []).length;
@@ -25,6 +28,18 @@ export const estimateTokens = (text: string): number => {
 };
 
 // Intelligently build API URL - consistent with the AISettings component
+/**
+ * Build a complete API URL based on the base URL and provider type.
+ *
+ * The function first cleans the base URL by removing any trailing slashes.
+ * It then applies specific logic for the 'ollama' and 'zhipu' providers to determine
+ * if an endpoint should be appended. For other providers, it checks for existing
+ * endpoints and appends them accordingly, ensuring a valid API URL is returned.
+ *
+ * @param baseUrl - The base URL to be processed.
+ * @param provider - The provider type which influences the URL structure.
+ * @returns The constructed API URL based on the provided base URL and provider.
+ */
 const buildApiUrl = (baseUrl: string, provider: string): string => {
   if (!baseUrl) { return ''; }
 
@@ -109,7 +124,7 @@ export const generateWithAI = async (
       method: 'POST',
       headers,
       body: JSON.stringify(requestBody),
-      signal: AbortSignal.timeout(60000) // 60 seconds timeout
+      signal: AbortSignal.timeout(120000) // 120 seconds timeout
     });
 
     console.log('Response status:', response.status);
@@ -343,3 +358,4 @@ Content: Detailed settings description
 
 The content should be rich and helpful for role-playing.`;
 };
+

@@ -21,6 +21,15 @@ export interface AISettings {
   provider: string;
 }
 
+/**
+ * AISettings component for managing API settings and testing connections.
+ *
+ * This component handles the configuration of various AI API providers, including their URLs, models, and keys. It manages the state of settings, connection status, and available models, while providing functions to test connections and fetch model lists. The component also includes error handling for API responses and user notifications through toast messages.
+ *
+ * @param onSettingsChange - Callback function to handle changes in settings.
+ * @param currentSettings - The current settings to initialize the component state.
+ * @returns JSX.Element representing the AISettings component.
+ */
 const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
   const { toast } = useToast();
 
@@ -281,6 +290,22 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
     }
   };
 
+  /**
+   * Tests the connection to the specified API provider using the provided settings.
+   *
+   * The function first verifies the presence of required configurations such as the API key and URL.
+   * It then checks if the selected model is available and constructs the request to test the connection.
+   * Depending on the response, it updates the connection status and displays appropriate messages to the user.
+   *
+   * @param {Object} settings - The configuration settings for the API connection.
+   * @param {string} settings.provider - The API provider to connect to.
+   * @param {string} settings.apiKey - The API key for authentication, if required.
+   * @param {string} settings.apiUrl - The URL of the API to connect to.
+   * @param {string} settings.model - The model to be used for the connection.
+   * @param {Array} availableModels - The list of models available for the selected provider.
+   * @returns {Promise<void>} A promise that resolves when the connection test is complete.
+   * @throws {Error} Throws an error if the connection test fails due to network issues or invalid configurations.
+   */
   const testConnection = async () => {
     const currentProvider = apiProviders.find(p => p.value === settings.provider);
 
