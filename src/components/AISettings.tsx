@@ -24,11 +24,13 @@ export interface AISettings {
 /**
  * AISettings component for managing API settings and testing connections.
  *
- * This component handles the configuration of various AI API providers, including their URLs, models, and keys. It manages the state of settings, connection status, and available models, while providing functions to test connections and fetch model lists. The component also includes error handling for API responses and user notifications through toast messages.
+ * This component handles the configuration of various AI API providers, including their URLs, models, and keys.
+ * It manages the state of settings, connection status, and available models, while providing functions to test connections
+ * and fetch model lists. The component also includes error handling for API responses and user notifications through toast messages.
  *
- * @param onSettingsChange - Callback function to handle changes in settings.
- * @param currentSettings - The current settings to initialize the component state.
- * @returns JSX.Element representing the AISettings component.
+ * @param {function} onSettingsChange - Callback function to handle changes in settings.
+ * @param {AISettings} currentSettings - The current settings to initialize the component state.
+ * @returns {JSX.Element} representing the AISettings component.
  */
 const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
   const { toast } = useToast();
@@ -293,9 +295,7 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
   /**
    * Tests the connection to the specified API provider using the provided settings.
    *
-   * The function first verifies the presence of required configurations such as the API key and URL.
-   * It then checks if the selected model is available and constructs the request to test the connection.
-   * Depending on the response, it updates the connection status and displays appropriate messages to the user.
+   * The function verifies the presence of required configurations such as the API key and URL, checks if the selected model is available, and constructs the request to test the connection. It handles various response statuses and updates the connection status accordingly, displaying appropriate messages to the user. Additionally, it manages errors related to network issues and invalid configurations.
    *
    * @param {Object} settings - The configuration settings for the API connection.
    * @param {string} settings.provider - The API provider to connect to.
@@ -456,6 +456,15 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
     }
   };
 
+  /**
+   * Fetch models from the configured API provider.
+   *
+   * The function first checks if the API key and URL are provided, displaying error messages if they are missing.
+   * It then constructs the request headers based on the provider's requirements and fetches the models from the API.
+   * Depending on the response, it either updates the available models or falls back to a preset list, handling errors appropriately.
+   *
+   * @returns {Promise<void>} A promise that resolves when the fetch operation is complete.
+   */
   const fetchModels = async () => {
     const currentProvider = apiProviders.find(p => p.value === settings.provider);
 
