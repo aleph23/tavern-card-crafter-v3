@@ -74,7 +74,9 @@ function createTextChunk(keyword: string, text: string): Uint8Array {
 /**
  * Finds the position of the IEND chunk in a PNG file.
  *
- * This function searches through the provided Uint8Array data to locate the IEND chunk, which is always positioned at the end of the PNG file. It checks for the IEND signature (0x49, 0x45, 0x4E, 0x44) starting from the calculated position and returns the index just before the length field of the chunk. If the IEND chunk is not found, it returns -1.
+ * This function searches through the provided Uint8Array data to locate the IEND chunk, which is always positioned at the end of the PNG file. 
+ * It checks for the IEND signature (0x49, 0x45, 0x4E, 0x44) starting from the calculated position and returns the index just before the length 
+ * field of the chunk. If the IEND chunk is not found, it returns -1.
  *
  * @param data - The Uint8Array containing the PNG file data.
  */
@@ -90,7 +92,7 @@ function findIENDPosition(data: Uint8Array): number {
 }
 
 /**
- * Calculates the CRC32 checksum for a given Uint8Array.
+ * Calculates the CRC32 checksum for a given Uint8Array / PNG Chunk.
  */
 function calculateCRC(data: Uint8Array): number {
   let crc = 0xFFFFFFFF;
