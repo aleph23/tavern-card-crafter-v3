@@ -22,6 +22,9 @@ type ChartContextProps = {
 
 const ChartContext = React.createContext<ChartContextProps | null>(null)
 
+/**
+ * Retrieves the ChartContext from the nearest ChartContainer.
+ */
 function useChart() {
   const context = React.useContext(ChartContext)
 
@@ -65,6 +68,18 @@ const ChartContainer = React.forwardRef<
 })
 ChartContainer.displayName = "Chart"
 
+/**
+ * Renders a style element for chart colors based on the provided configuration.
+ *
+ * The function filters the configuration entries to find those with a theme or color defined.
+ * If no valid color configurations are found, it returns null. Otherwise, it generates a style
+ * block that sets CSS custom properties for each color configuration based on the themes defined
+ * in the THEMES object, applying them to the specified chart ID.
+ *
+ * @param {Object} param0 - The parameters object.
+ * @param {string} param0.id - The unique identifier for the chart.
+ * @param {ChartConfig} param0.config - The configuration object containing theme and color settings.
+ */
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   const colorConfig = Object.entries(config).filter(
     ([_, config]) => config.theme || config.color
@@ -315,6 +330,18 @@ const ChartLegendContent = React.forwardRef<
 ChartLegendContent.displayName = "ChartLegend"
 
 // Helper to extract item config from a payload.
+/**
+ * Retrieve the configuration value from a payload based on a specified key.
+ *
+ * The function first checks if the payload is a valid object. It then attempts to extract the nested payload if available.
+ * Depending on the presence of the key in either the payload or the nested payload, it determines the appropriate configuration label key
+ * and retrieves the corresponding value from the config object.
+ *
+ * @param config - The ChartConfig object containing configuration values.
+ * @param payload - The input payload from which to extract the configuration value.
+ * @param key - The key used to look up the configuration value in the payload or config.
+ * @returns The configuration value associated with the specified key, or undefined if not found.
+ */
 function getPayloadConfigFromPayload(
   config: ChartConfig,
   payload: unknown,
