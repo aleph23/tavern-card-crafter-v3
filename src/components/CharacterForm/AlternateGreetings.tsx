@@ -29,6 +29,7 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
   const { toast } = useToast();
   const { t } = useLanguage();
 
+  /** Adds a new greeting to the list if it is not empty. */
   const addGreeting = () => {
     if (newGreeting.trim()) {
       updateField("alternate_greetings", [...greetings, newGreeting.trim()]);
@@ -36,6 +37,9 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
     }
   };
 
+  /**
+   * Removes a greeting at the specified index from the alternate greetings.
+   */
   const removeGreeting = (index: number) => {
     updateField("alternate_greetings", greetings.filter((_, i) => i !== index));
   };
@@ -55,6 +59,7 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
     }
   };
 
+  /** Cancels the edit by resetting the editing index and text. */
   const cancelEdit = () => {
     setEditingIndex(null);
     setEditingText("");
@@ -121,6 +126,9 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
     }
   };
 
+  /**
+   * Clears all alternative greetings and shows a toast notification.
+   */
   const handleClearAll = () => {
     updateField("alternate_greetings", []);
     toast({

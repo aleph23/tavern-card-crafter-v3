@@ -196,6 +196,17 @@ const translations = {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
+/**
+ * Provides language context to its children components.
+ *
+ * The LanguageProvider component manages the current language state, defaulting to 'en'.
+ * It retrieves a saved language from localStorage on mount and updates the state accordingly.
+ * The component also provides a method to set the language and a translation function to access
+ * localized strings based on the current language. The context value includes the current language,
+ * the setLanguage function, and the translation function.
+ *
+ * @param {React.ReactNode} children - The child components that will have access to the language context.
+ */
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [language, setLanguageState] = useState<'zh' | 'en'>('en');
 
@@ -206,11 +217,17 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   }, []);
 
+  /**
+   * Sets the application language and stores it in local storage.
+   */
   const setLanguage = (lang: 'zh' | 'en') => {
     setLanguageState(lang);
     localStorage.setItem('language', lang);
   };
 
+  /**
+   * Retrieves the translation for a given key based on the current language.
+   */
   const t = (key: string): string => {
     return translations[language][key as keyof typeof translations['zh']] || key;
   };

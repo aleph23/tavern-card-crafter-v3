@@ -1,6 +1,9 @@
 // Note: Any fields defaulted to null are optional
 // https://github.com/zer0thgear/character-card-editor/blob/master/src/utils/v3CardPrototype.js
 
+/**
+ * Creates a card object with specified properties.
+ */
 export const Card = () => {return({
     spec: "chara_card_v3",
     spec_version: "3.0",
@@ -43,6 +46,9 @@ export const CharacterBook = () => {return({
     entries: [CharacterBookEntry]
 })};
 
+/**
+ * Creates a character book entry object with default properties.
+ */
 export const CharacterBookEntry = () => {return( 
     {
         keys: [""],
@@ -69,6 +75,9 @@ export const CharacterBookEntry = () => {return(
     });
 };
 
+/**
+ * Creates an asset object with default properties.
+ */
 export const Asset = () => {return({
     type: "",
     uri: "",

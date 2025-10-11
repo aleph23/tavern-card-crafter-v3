@@ -163,6 +163,9 @@ const ContextMenuSeparator = React.forwardRef<
 ))
 ContextMenuSeparator.displayName = ContextMenuPrimitive.Separator.displayName
 
+/**
+ * Renders a span element with customizable className and props.
+ */
 const ContextMenuShortcut = ({
   className,
   ...props

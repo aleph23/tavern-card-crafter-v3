@@ -15,11 +15,31 @@ interface PromptsSectionProps {
   aiSettings: AISettings | null;
 }
 
+/**
+ * Renders a section for managing AI prompt settings with various functionalities.
+ *
+ * This component handles the generation of prompts using AI, manages loading states, and provides options to clear or cancel ongoing operations. It validates the necessary fields before generating prompts and displays appropriate toast notifications based on the operation's success or failure. The component also includes buttons for regenerating prompts and clearing fields, ensuring a user-friendly interface for prompt management.
+ *
+ * @param data - An object containing the current prompt data.
+ * @param updateField - A function to update the specific field in the prompt data.
+ * @param aiSettings - An object containing the AI configuration settings, including the API key and provider.
+ * @returns A JSX element representing the prompts section.
+ */
 const PromptsSection = ({ data, updateField, aiSettings }: PromptsSectionProps) => {
   const [loading, setLoading] = useState<{ [key: string]: boolean }>({});
   const abortControllerRefs = useRef<{ [key: string]: AbortController | null }>({});
   const { toast } = useToast();
 
+  /**
+   * Handles the AI generation process for a specified field.
+   *
+   * This function checks for the necessary API key and required data fields before proceeding with the AI generation.
+   * It utilizes a prompt generator to create a prompt based on the provided data, then calls the generateWithAI function.
+   * It manages loading states and handles errors, including user cancellations and other exceptions, while providing feedback via toast notifications.
+   *
+   * @param field - The field for which AI generation is to be handled.
+   * @param promptGenerator - A function that generates a prompt string based on the provided data.
+   */
   const handleAIGenerate = async (field: string, promptGenerator: (data: any) => string) => {
     if (!aiSettings?.apiKey && !['ollama', 'lmstudio'].includes(aiSettings?.provider?.toLowerCase() || '')) {
       toast({
@@ -69,6 +89,9 @@ const PromptsSection = ({ data, updateField, aiSettings }: PromptsSectionProps) 
     }
   };
 
+  /**
+   * Cancels the AI generation process for the specified field.
+   */
   const cancelGeneration = (field: string) => {
     if (abortControllerRefs.current[field]) {
       abortControllerRefs.current[field]!.abort();
@@ -81,6 +104,9 @@ const PromptsSection = ({ data, updateField, aiSettings }: PromptsSectionProps) 
     }
   };
 
+  /**
+   * Clears the specified field and shows a toast notification.
+   */
   const handleClearField = (field: string) => {
     updateField(field, "");
     toast({
@@ -89,6 +115,14 @@ const PromptsSection = ({ data, updateField, aiSettings }: PromptsSectionProps) 
     });
   };
 
+  /**
+   * Renders a set of buttons for field actions including regeneration, AI generation, and clearing the field.
+   * The function checks the loading state of the field and whether the necessary data is available to enable the buttons.
+   * It utilizes the `handleAIGenerate`, `cancelGeneration`, and `handleClearField` functions to manage the respective actions.
+   *
+   * @param {string} field - The identifier for the field being rendered.
+   * @param {(data: any) => string} promptGenerator - A function that generates a prompt based on the provided data.
+   */
   const renderFieldButtons = (field: string, promptGenerator: (data: any) => string) => {
     const isLoading = loading[field];
     const canGenerate = data.name && data.description && data.personality;

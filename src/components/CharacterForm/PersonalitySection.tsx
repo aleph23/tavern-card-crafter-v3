@@ -15,6 +15,16 @@ interface PersonalitySectionProps {
   aiSettings: AISettings | null;
 }
 
+/**
+ * Renders the personality section of a character setting interface.
+ *
+ * This component manages the state of various fields related to character traits, scene settings, and dialogue examples. It provides functionality to generate content using AI based on user input, handle loading states, and clear fields. The component also ensures that necessary dependencies are met before allowing AI generation and displays appropriate toast notifications for user feedback.
+ *
+ * @param {Object} props - The properties for the PersonalitySection component.
+ * @param {Object} props.data - The current data for the personality section.
+ * @param {Function} props.updateField - Function to update a specific field in the data.
+ * @param {Object} props.aiSettings - Configuration settings for AI generation.
+ */
 const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectionProps) => {
   const [loading, setLoading] = useState<{ [key: string]: boolean }>({});
   const abortControllerRefs = useRef<{ [key: string]: AbortController | null }>({});
@@ -69,6 +79,9 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
     }
   };
 
+  /**
+   * Cancels the AI generation process for the specified field.
+   */
   const cancelGeneration = (field: string) => {
     if (abortControllerRefs.current[field]) {
       abortControllerRefs.current[field]!.abort();
@@ -81,6 +94,9 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
     }
   };
 
+  /**
+   * Clears the specified field and shows a toast notification.
+   */
   const handleClearField = (field: string) => {
     updateField(field, "");
     toast({
@@ -89,6 +105,16 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
     });
   };
 
+  /**
+   * Renders a set of buttons for field actions including regeneration, cancellation, and clearing.
+   * The function checks the loading state of the field and whether all dependencies are satisfied
+   * before enabling the respective buttons. It utilizes the promptGenerator to handle AI generation
+   * and manages the loading state to provide user feedback through button variants and labels.
+   *
+   * @param field - The identifier for the field being rendered.
+   * @param promptGenerator - A function that generates a prompt based on the provided data.
+   * @param dependencies - An optional array of dependencies that must be satisfied for button actions.
+   */
   const renderFieldButtons = (field: string, promptGenerator: (data: any) => string, dependencies?: string[]) => {
     const isLoading = loading[field];
     const canGenerate = dependencies ? dependencies.every(dep => data[dep]) : true;

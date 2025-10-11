@@ -154,7 +154,7 @@ This is a historic character (real or fictional), please generate:
   /**
    * Generate character data based on user input and AI settings.
    *
-   * The function first checks if the input text and AI settings are provided, displaying hints if not. It then creates an AbortController and sets a generating state. The prompt is generated based on the character type and input text, which is passed to the AI for processing. The result is parsed as JSON, with error handling for both parsing and generation failures, providing user feedback through toast notifications.
+   * The function validates the input text and AI settings, providing hints if either is missing. It creates an AbortController and sets a generating state before generating a prompt based on the character type and input text. The result is processed through the AI, with robust error handling for JSON parsing and generation failures, ensuring user feedback via toast notifications.
    *
    * @returns {Promise<void>} A promise that resolves when the character data generation is complete.
    * @throws Error If the input text is empty, AI settings are not configured, or if JSON parsing fails.
@@ -246,6 +246,9 @@ This is a historic character (real or fictional), please generate:
     }
   };
 
+  /**
+   * Cancels the ongoing AI generation process.
+   */
   const cancelGeneration = () => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -258,6 +261,15 @@ This is a historic character (real or fictional), please generate:
     }
   };
 
+  /**
+   * Inserts all fields from parsedData into the role card form.
+   *
+   * The function checks if parsedData is available and iterates over its entries.
+   * For each entry, it verifies if the value is valid (non-empty or non-whitespace)
+   * before calling onInsertField to insert the field. It tracks the number of
+   * successfully inserted fields and displays a toast notification indicating
+   * the result of the operation.
+   */
   const insertAllFields = () => {
     if (!parsedData) {
       return;
@@ -287,6 +299,9 @@ This is a historic character (real or fictional), please generate:
     }
   };
 
+  /**
+   * Retrieves the label for a given field.
+   */
   const getFieldLabel = (field: string): string => {
     const labels: Record<string, string> = {
       name: "card name",
@@ -304,6 +319,9 @@ This is a historic character (real or fictional), please generate:
     return labels[field] || field;
   };
 
+  /**
+   * Returns a preview text from the given value, truncating if necessary.
+   */
   const getPreviewText = (value: any) => {
     if (Array.isArray(value)) {
       return value.join(", ");

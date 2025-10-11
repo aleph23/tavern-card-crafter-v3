@@ -35,6 +35,9 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
     });
   };
 
+  /**
+   * Downloads character data as a JSON file.
+   */
   const downloadJson = () => {
     const dataStr = JSON.stringify(characterData, null, 2);
     const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
@@ -49,7 +52,7 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
   /**
    * Downloads a PNG image with embedded character data.
    *
-   * The function first checks if a character image is provided. If not, it displays a toast notification prompting the user to upload an avatar or export JSON directly. If the image is available, it fetches the image as a blob, embeds the character data into the PNG, creates a download link, and triggers the download. In case of an error during the process, it logs the error and shows a notification with the error message.
+   * The function checks if a character image is provided; if not, it displays a toast notification prompting the user to upload an avatar or export JSON. If the image is available, it fetches the image as a blob, embeds the character data into the PNG, creates a download link, and triggers the download. In case of an error, it logs the error and shows a notification with the error message.
    *
    * @param characterImage - The URL of the character image to be downloaded.
    * @param characterData - The data associated with the character to be embedded in the PNG.
@@ -103,6 +106,14 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
   };
 
   // Calculate the total number of characters and tokens
+  /**
+   * Calculates the total character count and token estimate from character data fields.
+   *
+   * This function extracts various fields from the characterData object, including name, nickname,
+   * description, and others. It iterates through these fields, checking if they are non-empty strings,
+   * and accumulates their lengths for totalChars and estimates tokens using the estimateTokens function
+   * for totalTokens. The results are returned as an object containing both totals.
+   */
   const calculateTotalStats = () => {
     const {data} = characterData;
     let totalChars = 0;
@@ -130,6 +141,14 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
   const { totalChars, totalTokens } = calculateTotalStats();
 
   // JSON syntax highlighting function
+  /**
+   * Highlights syntax in a JSON string by wrapping elements in HTML span tags with appropriate classes.
+   * The function uses a regular expression to identify JSON elements such as keys, string values, booleans,
+   * and null values, applying specific CSS classes for each type. The matched elements are then returned
+   * as a formatted string suitable for display with syntax highlighting.
+   *
+   * @param json - The JSON string to be highlighted.
+   */
   const syntaxHighlight = (json: string) => {
     return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\\-]?\d+)?)/g, (match) => {
       let cls = 'text-yellow-300'; // Default color - Numbers and others
