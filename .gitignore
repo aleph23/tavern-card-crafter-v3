@@ -31,3 +31,4 @@ dist-ssr
 .vs/tavern-card-crafter-v3/v17/DocumentLayout.json
 .vscode/launch.json
 /.vscode/launch.json
+/appmap.yml
