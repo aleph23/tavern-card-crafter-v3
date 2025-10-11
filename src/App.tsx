@@ -12,6 +12,9 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+/**
+ * Renders the main application component with routing and providers.
+ */
 const App = () => {
   // Check if it is Electron In the environment
   const isElectron = typeof window !== 'undefined' && window.location.protocol === 'file:';
