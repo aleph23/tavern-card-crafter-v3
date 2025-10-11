@@ -1,6 +1,9 @@
 // Note: Any fields defaulted to null are optional
 // https://github.com/zer0thgear/character-card-editor/blob/master/src/utils/v2CardPrototype.js
 
+/**
+ * Creates a v2 character card object.
+ */
 export const v2Card = () => {return({
     spec: "chara_card_v2",
     spec_version: "2.0",
@@ -25,6 +28,9 @@ export const v2Card = () => {return({
     }
 })};
 
+/**
+ * Creates a character book object with default properties.
+ */
 export const v2CharacterBook = () => {return({
     name: undefined,//"",
     description: undefined,//"",
@@ -35,6 +41,9 @@ export const v2CharacterBook = () => {return({
     entries: [v2CharacterBookEntry]
 })};
 
+/**
+ * Creates a character book entry object with default values.
+ */
 export const v2CharacterBookEntry = () => {return ({
     keys: [""],
     content: "",
