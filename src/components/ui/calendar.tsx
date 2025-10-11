@@ -7,6 +7,9 @@ import { buttonVariants } from "@/components/ui/button";
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>;
 
+/**
+ * Renders a calendar component using DayPicker with customizable styles and options.
+ */
 function Calendar({
   className,
   classNames,
