@@ -1,6 +1,5 @@
 /**
- * Embeds JSON metadata into a PNG file using tEXt chunks
- * This follows the PNG specification for text metadata
+ * Embeds JSON metadata into a PNG file using tEXt chunks.
  */
 export async function embedJsonInPng(
   arrayBuffer: ArrayBuffer,
@@ -33,6 +32,9 @@ export async function embedJsonInPng(
 
 /**
  * Creates a PNG tEXt chunk with the specified keyword and text.
+ * @param {string} keyword - The keyword for the tEXt chunk.
+ * @param {string} text - The text associated with the keyword.
+ * @returns {Uint8Array} The created PNG tEXt chunk.
  */
 function createTextChunk(keyword: string, text: string): Uint8Array {
   // Encode keyword and text
@@ -92,7 +94,7 @@ function findIENDPosition(data: Uint8Array): number {
 }
 
 /**
- * Calculates the CRC32 checksum for a given Uint8Array / PNG Chunk.
+ * Calculates the CRC32 checksum for a given Uint8Array.
  */
 function calculateCRC(data: Uint8Array): number {
   let crc = 0xFFFFFFFF;
