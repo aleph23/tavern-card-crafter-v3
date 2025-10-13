@@ -1,5 +1,6 @@
 /**
- * Embeds JSON metadata into a PNG file using tEXt chunks.
+ * Embeds JSON metadata into a PNG file using tEXt chunks
+ * This follows the PNG specification for text metadata
  */
 export async function embedJsonInPng(
   arrayBuffer: ArrayBuffer,
@@ -94,7 +95,7 @@ function findIENDPosition(data: Uint8Array): number {
 }
 
 /**
- * Calculates the CRC32 checksum for a given Uint8Array.
+ * Computes the CRC32 checksum for a given Uint8Array/ PNG chunk.
  */
 function calculateCRC(data: Uint8Array): number {
   let crc = 0xFFFFFFFF;

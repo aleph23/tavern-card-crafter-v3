@@ -52,7 +52,9 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
   /**
    * Downloads a PNG image with embedded character data.
    *
-   * The function checks if a character image is provided; if not, it displays a toast notification prompting the user to upload an avatar or export JSON. If the image is available, it fetches the image as a blob, embeds the character data into the PNG, creates a download link, and triggers the download. In case of an error, it logs the error and shows a notification with the error message.
+   * The function checks if a character image is provided; if not, it displays a toast notification prompting the user to upload an avatar.
+   * It fetches the image as a blob, embeds JSON character data into the PNG, creates a download link, and triggers the download.
+   * In case of an error during the process, it logs the error and displays a failure notification.
    *
    * @param characterImage - The URL of the character image to be downloaded.
    * @param characterData - The data associated with the character to be embedded in the PNG.

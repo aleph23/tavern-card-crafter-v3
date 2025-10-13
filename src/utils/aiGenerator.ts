@@ -111,7 +111,7 @@ export const generateWithAI = async (
     console.log('Requires API key:', requiresKey);
 
     // Use a unified Open AI-compatible format
-    const headers: Record<string, string> = {
+    let headers: Record<string, string> = {
       'Content-Type': 'application/json',
     };
 
@@ -323,11 +323,8 @@ Story introduction: ${data.first_mes}
 Write the System Prompt to instruct the AI how to accurately play the character. Be concise and clear.`;
 };
 
-/**
- * Generates high priority instructions for the AI based on character data.
- */
 export const generatePostHistoryInstructions = (data: CharacterData): string => {
-  return `Generate High Priority instructions for the AI based on the following information:
+  return `Generate the most important instructions for the AI based on the following information:
   Card name: ${data.name}
   Physical Description: ${data.description}
   Character Personality: ${data.personality}
@@ -350,6 +347,8 @@ Scene setting: ${data.scenario}
 Please generate 5-10 related keywords or single-word tags, separated by commas. Tags should include character type, personality traits, scene type, etc.`;
 };
 
+export const generateAlternateGreeting = (data: CharacterData): string => {
+  return `Generate an alternate greeting based on the following information:
 /**
  * Generates an alternate greeting based on character data.
  */
@@ -360,6 +359,9 @@ Card name: ${data.name}
 Physical Description: ${data.description}
 Character Personality: ${data.personality}
 Scene settings: ${data.scenario}
+First message: ${data.first_mes}
+Dialogue example: ${data.mes_example}
+Other alternate greetings: ${data.alternative_greetings}`;
 Dialogue example: ${data.mes_example}
 
 The chapters that have already been written: 
@@ -388,6 +390,8 @@ The format is as follows:
 Keywords: core keyword 1, core keyword 2
 Content: Detailed settings description
 
+The content should be rich and helpful for role-playing.`;
+};
 
 The content should be rich and helpful for role-playing.`;
 };
