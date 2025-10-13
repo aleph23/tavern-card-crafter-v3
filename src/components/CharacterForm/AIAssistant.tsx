@@ -62,10 +62,12 @@ const CHARACTER_TYPES = [
 /**
  * A component that assists in generating AI character cards based on user-provided content.
  *
- * This component manages the state for input text, character type, and parsed data. It provides functionality to generate character data using AI, handle user interactions for inserting fields, and manage the cancellation of ongoing generation processes. The component also formats prompts based on the selected character type and ensures robust JSON parsing of the AI's response.
+ * This component manages the state for input text, character type, and parsed data. It provides functionality to generate character data by creating prompts based on the selected character type and input content. The generated data can be inserted into a form, and the component handles user interactions, including cancellation of generation and displaying results. It also includes error handling for various scenarios, such as empty input or invalid AI settings.
  *
- * @param aiSettings - The settings configuration for the AI generation process.
- * @param onInsertField - A callback function to handle the insertion of generated fields into the form.
+ * @param {AIAssistantProps} props - The properties for the AIAssistant component.
+ * @param {Object} props.aiSettings - The settings for the AI generation.
+ * @param {Function} props.onInsertField - Callback function to insert generated fields into a form.
+ * @returns {JSX.Element} The rendered AIAssistant component.
  */
 const AIAssistant = ({ aiSettings, onInsertField }: AIAssistantProps) => {
   const { toast } = useToast();
@@ -152,7 +154,7 @@ This is a historic character (real or fictional), please generate:
   /**
    * Generate character data based on user input and AI settings.
    *
-   * This function validates the input text and AI settings, then initiates the character data generation process. It constructs a prompt using the input and character type, invokes the AI generation, and handles the result by attempting to parse it as JSON. If parsing fails, it provides feedback to the user. The function also manages cancellation and error handling throughout the process.
+   * The function validates the input text and AI settings, providing hints if either is missing. It creates an AbortController and sets a generating state before generating a prompt based on the character type and input text. The result is processed through the AI, with robust error handling for JSON parsing and generation failures, ensuring user feedback via toast notifications.
    *
    * @returns {Promise<void>} A promise that resolves when the character data generation is complete.
    * @throws Error If the input text is empty, AI settings are not configured, or if JSON parsing fails.
@@ -244,6 +246,9 @@ This is a historic character (real or fictional), please generate:
     }
   };
 
+  /**
+   * Cancels the ongoing AI generation process.
+   */
   const cancelGeneration = () => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -256,6 +261,15 @@ This is a historic character (real or fictional), please generate:
     }
   };
 
+  /**
+   * Inserts all fields from parsedData into the role card form.
+   *
+   * The function checks if parsedData is available and iterates over its entries.
+   * For each entry, it verifies if the value is valid (non-empty or non-whitespace)
+   * before calling onInsertField to insert the field. It tracks the number of
+   * successfully inserted fields and displays a toast notification indicating
+   * the result of the operation.
+   */
   const insertAllFields = () => {
     if (!parsedData) {
       return;
@@ -285,6 +299,9 @@ This is a historic character (real or fictional), please generate:
     }
   };
 
+  /**
+   * Retrieves the label for a given field.
+   */
   const getFieldLabel = (field: string): string => {
     const labels: Record<string, string> = {
       name: "card name",
@@ -302,6 +319,9 @@ This is a historic character (real or fictional), please generate:
     return labels[field] || field;
   };
 
+  /**
+   * Returns a preview text from the given value, truncating if necessary.
+   */
   const getPreviewText = (value: any) => {
     if (Array.isArray(value)) {
       return value.join(", ");

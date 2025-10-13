@@ -23,6 +23,9 @@ Command.displayName = CommandPrimitive.displayName
 
 interface CommandDialogProps extends DialogProps { }
 
+/**
+ * Renders a CommandDialog component with specified children and props.
+ */
 const CommandDialog = ({ children, ...props }: CommandDialogProps) => {
   return (
     <Dialog {...props}>
@@ -124,6 +127,9 @@ const CommandItem = React.forwardRef<
 
 CommandItem.displayName = CommandPrimitive.Item.displayName
 
+/**
+ * Renders a span element with custom classes and props.
+ */
 const CommandShortcut = ({
   className,
   ...props

@@ -1,5 +1,8 @@
 import { cn } from "@/lib/utils"
 
+/**
+ * Renders a skeleton loading component with optional className and props.
+ */
 function Skeleton({
   className,
   ...props

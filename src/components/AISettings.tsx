@@ -22,13 +22,15 @@ export interface AISettings {
 }
 
 /**
- * AISettings component for managing AI provider settings.
+ * AISettings component for managing API settings and testing connections.
  *
- * This component allows users to configure API provider settings, including selecting a provider, entering an API key, and testing the connection. It intelligently builds API URLs based on the selected provider and handles fetching available models. The component also manages state for connection status and error messages, providing user feedback through toasts.
+ * This component handles the configuration of various AI API providers, including their URLs, models, and keys.
+ * It manages the state of settings, connection status, and available models, while providing functions to test connections
+ * and fetch model lists. The component also includes error handling for API responses and user notifications through toast messages.
  *
- * @param onSettingsChange - Callback function to handle changes in settings.
- * @param currentSettings - The current settings to initialize the component.
- * @returns A JSX element representing the AI settings dialog.
+ * @param {function} onSettingsChange - Callback function to handle changes in settings.
+ * @param {AISettings} currentSettings - The current settings to initialize the component state.
+ * @returns {JSX.Element} representing the AISettings component.
  */
 const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
   const { toast } = useToast();
@@ -167,6 +169,13 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
     }
   }, [settings.provider]);
 
+  /**
+   * Handles changes to the selected API provider.
+   *
+   * This function updates the settings based on the selected provider's value. It searches for the provider in the apiProviders array and, if found, updates the settings with the provider's URL, model, and API key. Additionally, it sets the available models based on the selected provider or defaults to a predefined set of models if none are available.
+   *
+   * @param {string} providerValue - The value of the selected provider.
+   */
   const handleProviderChange = (providerValue: string) => {
     const provider = apiProviders.find(p => p.value === providerValue);
     if (provider) {
@@ -183,6 +192,18 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
   };
 
   // Intelligently build API URL - Special treatment for different providers
+  /**
+   * Build a complete API URL based on the base URL and provider type.
+   *
+   * The function first checks if the baseUrl is provided; if not, it returns an empty string.
+   * It then cleans the baseUrl by removing any trailing slashes. Depending on the provider,
+   * it applies specific rules for constructing the final URL, including special handling for
+   * 'ollama' and 'zhipu' providers, and a default behavior for others.
+   *
+   * @param baseUrl - The base URL to be processed.
+   * @param provider - The provider type, defaults to settings.provider.
+   * @returns The constructed API URL based on the provided baseUrl and provider.
+   */
   const buildApiUrl = (baseUrl: string, provider: string = settings.provider): string => {
     if (!baseUrl) {
       return '';
@@ -221,6 +242,17 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
   };
 
   // Build the model API address
+  /**
+   * Build a models URL based on the provided base URL and provider.
+   *
+   * The function first checks if the baseUrl is valid. It then cleans the URL by removing trailing slashes.
+   * Depending on the provider, it applies specific rules for constructing the final URL, particularly for 'ollama'
+   * and other providers, ensuring the correct endpoint structure is returned.
+   *
+   * @param baseUrl - The base URL to be processed.
+   * @param provider - The provider to determine specific URL formatting (defaults to settings.provider).
+   * @returns The constructed models URL based on the input parameters.
+   */
   const buildModelsUrl = (baseUrl: string, provider: string = settings.provider): string => {
     if (!baseUrl) {
       return '';
@@ -249,6 +281,17 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
   };
 
   // Parsing API error message
+  /**
+   * Parse and return a user-friendly error message from an API error.
+   *
+   * The function checks the type of the error and matches it against known error patterns to provide specific messages.
+   * If the error is an object, it attempts to extract the message from the error's structure.
+   * In case of unexpected formats or exceptions, a generic error message is returned.
+   *
+   * @param error - The error object or message received from the API.
+   * @param response - An optional Response object that may provide additional context.
+   * @returns A user-friendly error message based on the provided error.
+   */
   const parseApiError = (error: any, response?: Response): string => {
     try {
       if (typeof error === 'string') {
@@ -291,15 +334,18 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
   };
 
   /**
-   * Tests the connection to the specified API provider and model.
+   * Tests the connection to the specified API provider using the provided settings.
    *
-   * The function first verifies the configuration settings, including the API key and URL.
-   * It then constructs the API request and handles the response, providing feedback through toast notifications
-   * based on the success or failure of the connection attempt. Error handling is implemented for various scenarios,
-   * including network issues and invalid configurations.
+   * The function verifies the presence of required configurations such as the API key and URL, checks if the selected model is available, and constructs the request to test the connection. It handles various response statuses, updates the connection status accordingly, and displays appropriate messages to the user. Additionally, it manages errors related to network issues and invalid configurations, providing specific guidance based on the provider.
    *
+   * @param {Object} settings - The configuration settings for the API connection.
+   * @param {string} settings.provider - The API provider to connect to.
+   * @param {string} settings.apiKey - The API key for authentication, if required.
+   * @param {string} settings.apiUrl - The URL of the API to connect to.
+   * @param {string} settings.model - The model to be used for the connection.
+   * @param {Array} availableModels - The list of models available for the selected provider.
    * @returns {Promise<void>} A promise that resolves when the connection test is complete.
-   * @throws {Error} Throws an error if the connection test encounters a network issue or if the API response is not successful.
+   * @throws {Error} Throws an error if the connection test fails due to network issues or invalid configurations.
    */
   const testConnection = async () => {
     const currentProvider = apiProviders.find(p => p.value === settings.provider);
@@ -355,9 +401,7 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
       console.log('Model:', settings.model);
 
       // Use a unified Open AI-compatible format
-    const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
-      };
+      let headers: Record<string, string> = {'Content-Type': 'application/json',};
 
       // Only providers that require a key will add Authorization header
       if (currentProvider?.requiresKey && settings.apiKey) {
@@ -456,7 +500,9 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
   /**
    * Fetch models from the configured API provider.
    *
-   * This function checks for the necessary API key and URL configuration before attempting to fetch model data from the specified provider. It handles both successful and error responses, updating the available models accordingly and providing user feedback through toast notifications. The function also manages loading states and handles potential errors during the fetch operation.
+   * The function checks for the presence of the API key and URL, displaying error messages if they are missing.
+   * It constructs the request headers based on the provider's requirements and fetches the models from the API.
+   * Depending on the response, it updates the available models or falls back to a preset list, handling errors and timeouts appropriately.
    *
    * @returns {Promise<void>} A promise that resolves when the fetch operation is complete.
    */
@@ -490,7 +536,8 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
       console.log('Fetching models from:', modelsUrl);
       console.log('Provider:', settings.provider);
 
-    const headers: Record<string, string> = {
+      let headers: Record<string, string> = {};
+      
       // Only providers that require a key will add Authorization header
       if (currentProvider?.requiresKey && settings.apiKey) {
         headers['Authorization'] = `Bearer ${settings.apiKey}`;
@@ -555,6 +602,14 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
     }
   };
 
+  /**
+   * Handles the saving of settings for the API configuration.
+   *
+   * This function checks if the necessary fields are filled, including the API key and API URL.
+   * If any required fields are missing, it displays a toast notification to the user.
+   * It then constructs the final settings object, saves it to local storage,
+   * triggers a settings change callback, and closes the settings modal.
+   */
   const handleSave = () => {
     const currentProvider = apiProviders.find(p => p.value === settings.provider);
 
@@ -592,6 +647,13 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
     });
   };
 
+  /**
+   * Retrieves the appropriate connection icon based on the current connection status.
+   *
+   * The function first checks if the connection is in a testing state, returning a loading icon if true.
+   * If not, it evaluates the connectionStatus and returns a success icon for 'success',
+   * an error icon for 'error', or null for any other status.
+   */
   const getConnectionIcon = () => {
     if (isTestingConnection) {
       return <Loader2 className="w-4 h-4 animate-spin" />;
@@ -617,9 +679,9 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px] max-h-[85vh] overflow-y-auto">
-        <Dialoger>
+        <DialogHeader>
           <DialogTitle>AI Settings</DialogTitle>
-        </Dialoger>
+        </DialogHeader>
         <div className="space-y-4 py-4">
           <div className="space-y-2">
             <Label htmlFor="provider">API provider</Label>

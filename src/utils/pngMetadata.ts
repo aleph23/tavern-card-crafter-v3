@@ -32,7 +32,10 @@ export async function embedJsonInPng(
 }
 
 /**
- * Creates a PNG tEXt chunk with the given keyword and text
+ * Creates a PNG tEXt chunk with the specified keyword and text.
+ * @param {string} keyword - The keyword for the tEXt chunk.
+ * @param {string} text - The text associated with the keyword.
+ * @returns {Uint8Array} The created PNG tEXt chunk.
  */
 function createTextChunk(keyword: string, text: string): Uint8Array {
   // Encode keyword and text
@@ -72,7 +75,13 @@ function createTextChunk(keyword: string, text: string): Uint8Array {
 }
 
 /**
- * Finds the position of the IEND chunk in a PNG file
+ * Finds the position of the IEND chunk in a PNG file.
+ *
+ * This function searches through the provided Uint8Array data to locate the IEND chunk, which is always positioned at the end of the PNG file. 
+ * It checks for the IEND signature (0x49, 0x45, 0x4E, 0x44) starting from the calculated position and returns the index just before the length 
+ * field of the chunk. If the IEND chunk is not found, it returns -1.
+ *
+ * @param data - The Uint8Array containing the PNG file data.
  */
 function findIENDPosition(data: Uint8Array): number {
   // IEND chunk is always at the end: length(4) + "IEND"(4) + CRC(4) = 12 bytes

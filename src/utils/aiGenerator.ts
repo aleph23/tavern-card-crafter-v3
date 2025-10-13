@@ -15,6 +15,9 @@ export interface CharacterData {
 }
 
 // Token calculation function (rough estimation)
+/**
+ * Estimates the number of tokens in a given text based on character types.
+ */
 export const estimateTokens = (text: string): number => {
   // Press 1 in Chinese characters 5 tokens are calculated, English words are calculated based on average 4 characters
   const chineseChars = (text.match(/[\u4e00-\u9fff]/g) || []).length;
@@ -25,6 +28,17 @@ export const estimateTokens = (text: string): number => {
 };
 
 // Intelligently build API URL - consistent with the AISettings component
+/**
+ * Build a complete API URL based on the base URL and provider type.
+ *
+ * The function first checks if the base URL is provided and cleans it by removing any trailing slashes.
+ * It then applies specific logic for the 'ollama' and 'zhipu' providers to determine if an endpoint should be appended.
+ * For other providers, it checks for existing endpoints and appends them accordingly, ensuring a valid API URL is returned.
+ *
+ * @param baseUrl - The base URL to be processed.
+ * @param provider - The provider type which influences the URL structure.
+ * @returns The constructed API URL based on the provided base URL and provider.
+ */
 const buildApiUrl = (baseUrl: string, provider: string): string => {
   if (!baseUrl) { return ''; }
 
@@ -60,6 +74,16 @@ const buildApiUrl = (baseUrl: string, provider: string): string => {
   }
 };
 
+/**
+ * Generate a response from an AI service based on the provided settings and prompt.
+ *
+ * This function checks if the AI service requires an API key and validates the settings. It constructs the API URL, prepares the request body, and handles the response, including error management for various scenarios. The function also ensures that the response content is properly extracted and formatted before returning it.
+ *
+ * @param settings - The configuration settings for the AI service, including provider, model, API key, and API URL.
+ * @param prompt - The input prompt to be sent to the AI service for generating a response.
+ * @returns A promise that resolves to the generated response content from the AI service.
+ * @throws Error If the API key is missing for a non-local service, if the API URL is not configured, if the API request fails, or if the response is empty.
+ */
 export const generateWithAI = async (
   settings: AISettings,
   prompt: string
@@ -109,7 +133,7 @@ export const generateWithAI = async (
       method: 'POST',
       headers,
       body: JSON.stringify(requestBody),
-      signal: AbortSignal.timeout(60000) // 60 seconds timeout
+      signal: AbortSignal.timeout(120000) // 120 seconds timeout
     });
 
     console.log('Response status:', response.status);
@@ -137,6 +161,7 @@ export const generateWithAI = async (
       if (localServices.includes(settings.provider.toLowerCase()) && (response.status === 400 || errorText.includes('model'))) {
         errorMessage = `Model"${settings.model}"Not present or not loaded. Please get a list of available models in the AI settings or make sure it has been downloaded/Load the model.`;
       }
+
 
       throw new Error(errorMessage);
     }
@@ -200,6 +225,9 @@ export const generateWithAI = async (
   }
 };
 
+/**
+ * Generates a character description based on provided data.
+ */
 export const generateDescription = (data: CharacterData): string => {
   const existingDescription = data.description.trim();
 
@@ -219,6 +247,9 @@ Please generate a detailed character appearance description, including the chara
   }
 };
 
+/**
+ * Generates a personality description based on character data.
+ */
 export const generatePersonality = (data: CharacterData): string => {
   return `Based on the following role information, enchance the character's persona, while remaining succinct.
 
@@ -228,6 +259,9 @@ Physical Description: ${data.description}
 A non-prosaic list, describing the character's traits, behavior, idiosyncracies, likes/dislikes, strengths/weaknesses, backstory.`;
 };
 
+/**
+ * Generates a meta-scenario based on character data.
+ */
 export const generateScenario = (data: CharacterData): string => {
   return `Generate an appropriate meta-scenario based on the following information:
 
@@ -249,6 +283,9 @@ Scene settings: ${data.scenario}
 This will be the first outward facing text, the first thing the player/user encounters when playing with the character.Somehow the character must meet the player/user. The writing should be a perfect combination of Douglas Adams, Ursula K. Le Guin, James Joyce, Anais Nin, and Philip K. Dick.`;
 };
 
+/**
+ * Generates a conversational example based on character data.
+ */
 export const generateMesExample = (data: CharacterData): string => {
   return `Generate a conversational example to help establish the character:
 
@@ -270,6 +307,9 @@ ${data.name}: The character talks to themself and acts on their own.
 Make sure each conversation example starts with a <START> macro. Do not include it if it doesn't help to develop the character's actions and speaking behavior. . `;
 };
 
+/**
+ * Generates a system prompt based on character data.
+ */
 export const generateSystemPrompt = (data: CharacterData): string => {
   return `Generate System Prompt based on the following information:
 
@@ -291,6 +331,7 @@ export const generatePostHistoryInstructions = (data: CharacterData): string => 
   Scene settings: ${data.scenario}
   Example Character Actions: ${data.mes_example}
   Story introduction: ${data.first_mes}
+  SYSTEM PROMPT: ${data.system_prompt}
 
   THIS MUST BE EXTREMELY BRIEF!.`;
 };
@@ -308,6 +349,11 @@ Please generate 5-10 related keywords or single-word tags, separated by commas. 
 
 export const generateAlternateGreeting = (data: CharacterData): string => {
   return `Generate an alternate greeting based on the following information:
+/**
+ * Generates an alternate greeting based on character data.
+ */
+export const generateAlternateGreeting = (data: CharacterData): string => {
+  return `Basic story chapter and story information:
 
 Card name: ${data.name}
 Physical Description: ${data.description}
@@ -316,6 +362,14 @@ Scene settings: ${data.scenario}
 First message: ${data.first_mes}
 Dialogue example: ${data.mes_example}
 Other alternate greetings: ${data.alternative_greetings}`;
+Dialogue example: ${data.mes_example}
+
+The chapters that have already been written: 
+
+First Chapter Beginning: ${data.first_mes}
+Subsequent chapters (if any): ${data.alternative_greetings}
+
+Write the beginning of a new chapter. It must include the character and some encounter with the player/user and must be at least one day after any prior chapters. Merge the writing styles of James Joyce, Douglas Adams, Francois Rabelais, and Anais Nin.`;
 };
 
 export const generateCharacterBookEntry = (data: CharacterData, context?: string): string => {
@@ -338,3 +392,7 @@ Content: Detailed settings description
 
 The content should be rich and helpful for role-playing.`;
 };
+
+The content should be rich and helpful for role-playing.`;
+};
+

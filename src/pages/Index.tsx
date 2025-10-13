@@ -58,6 +58,13 @@ interface CharacterCardV3 {
   };
 }
 
+/**
+ * Main component for managing AI character card functionality.
+ *
+ * This component handles the import of character data from JSON and PNG files, manages AI settings, and provides a user interface for editing character information. It utilizes various hooks to manage state and effects, including loading saved settings from local storage and updating character data based on user input. The component also features a tabbed interface for different functionalities such as editing and previewing character data.
+ *
+ * @returns JSX.Element representing the character card interface.
+ */
 const Index = () => {
   const { toast } = useToast();
   const { t } = useLanguage();
@@ -107,6 +114,9 @@ const Index = () => {
     }
   }, []);
 
+  /**
+   * Updates AI settings and displays a toast notification.
+   */
   const handleAISettingsChange = (newSettings: AISettingsType) => {
     setAISettings(newSettings);
     toast({
@@ -115,6 +125,9 @@ const Index = () => {
     });
   };
 
+  /**
+   * Updates a specified field in the character data with a new value and sets the modification date.
+   */
   const updateField = (field: string, value: any) => {
     setCharacterData(prev => ({
       ...prev,
@@ -137,6 +150,18 @@ const Index = () => {
     }
   };
 
+  /**
+   * Extract character data from a PNG file.
+   *
+   * This function reads a PNG file and searches for character data within it using multiple methods:
+   * first by locating the tEXt chunk, then by performing a string search for JSON patterns,
+   * and finally by searching for base64 encoded data. If character data is found, it resolves the promise
+   * with the parsed data; otherwise, it rejects with an error.
+   *
+   * @param file - The PNG file from which to extract character data.
+   * @returns A promise that resolves with the extracted character data.
+   * @throws Error If the file cannot be read or if no character data is found.
+   */
   const extractPNGCharacterData = async (file: File): Promise<any> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();

@@ -9,6 +9,9 @@ interface TextCounterProps {
   showTokens?: boolean;
 }
 
+/**
+ * Renders a text counter displaying character and optional token counts.
+ */
 const TextCounter = ({ text, className, showTokens = true }: TextCounterProps) => {
   const { t } = useLanguage();
   const charCount = text.length;
