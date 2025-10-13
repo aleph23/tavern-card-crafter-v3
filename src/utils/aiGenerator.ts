@@ -77,7 +77,7 @@ const buildApiUrl = (baseUrl: string, provider: string): string => {
 /**
  * Generate a response from an AI service based on the provided settings and prompt.
  *
- * This function checks if the AI service requires an API key and validates the settings. It constructs the API URL, prepares the request body, and handles the response, including error management for various scenarios. The function also ensures that the response content is properly extracted and formatted before returning it.
+ * This function checks if the AI service requires an API key and validates the settings. It constructs the API URL, prepares the request body, and handles the response, including error management for various scenarios. The function ensures that the response content is properly extracted and formatted before returning it, while also managing specific error cases for local services and network issues.
  *
  * @param settings - The configuration settings for the AI service, including provider, model, API key, and API URL.
  * @param prompt - The input prompt to be sent to the AI service for generating a response.
@@ -323,6 +323,9 @@ Story introduction: ${data.first_mes}
 Write the System Prompt to instruct the AI how to accurately play the character. Be concise and clear.`;
 };
 
+/**
+ * Generates brief instructions for the AI based on character data.
+ */
 export const generatePostHistoryInstructions = (data: CharacterData): string => {
   return `Generate the most important instructions for the AI based on the following information:
   Card name: ${data.name}
@@ -347,6 +350,16 @@ Scene setting: ${data.scenario}
 Please generate 5-10 related keywords or single-word tags, separated by commas. Tags should include character type, personality traits, scene type, etc.`;
 };
 
+/**
+ * Generates an alternate greeting based on character data.
+ *
+ * This function constructs a detailed greeting string using various attributes from the provided
+ * CharacterData object. It includes the character's name, physical description, personality traits,
+ * scene settings, and examples of dialogue. The output is designed to facilitate the writing of
+ * a new chapter that incorporates the character and their interactions with the player/user.
+ *
+ * @param {CharacterData} data - The character data used to generate the greeting.
+ */
 export const generateAlternateGreeting = (data: CharacterData): string => {
   return `Generate an alternate greeting based on the following information:
 /**
@@ -372,6 +385,9 @@ Subsequent chapters (if any): ${data.alternative_greetings}
 Write the beginning of a new chapter. It must include the character and some encounter with the player/user and must be at least one day after any prior chapters. Merge the writing styles of James Joyce, Douglas Adams, Francois Rabelais, and Anais Nin.`;
 };
 
+/**
+ * Generates a role book entry based on character data and optional context.
+ */
 export const generateCharacterBookEntry = (data: CharacterData, context?: string): string => {
   return `Generate a role book entry based on the following information:
 
