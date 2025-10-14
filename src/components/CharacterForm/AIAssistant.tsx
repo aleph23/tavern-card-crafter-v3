@@ -66,12 +66,7 @@ const CHARACTER_TYPES = [
 /**
  * A component that assists in generating AI character cards based on user-provided content.
  *
- * This component manages the state for input text, character type, and parsed data.
- * It provides functionality to generate character data by creating prompts based
- * on the selected character type and input content. The generated data can be
- * inserted into a form, and the component handles user interactions, including
- * cancellation of generation and displaying results. It also includes error handling
- * for various scenarios, such as empty input or invalid AI settings.
+ * This component manages the state for input text, character type, and parsed data. It provides functionality to generate character data by creating prompts based on the selected character type and input content. The generated data can be inserted into a form, and the component handles user interactions, including cancellation of generation and displaying results. It also includes error handling for various scenarios, such as empty input or invalid AI settings.
  *
  * @param {AIAssistantProps} props - The properties for the AIAssistant component.
  * @param {Object} props.aiSettings - The settings for the AI generation.
