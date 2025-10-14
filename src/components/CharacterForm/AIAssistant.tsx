@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+﻿/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -62,7 +62,12 @@ const CHARACTER_TYPES = [
 /**
  * A component that assists in generating AI character cards based on user-provided content.
  *
- * This component manages the state for input text, character type, and parsed data. It provides functionality to generate character data by creating prompts based on the selected character type and input content. The generated data can be inserted into a form, and the component handles user interactions, including cancellation of generation and displaying results. It also includes error handling for various scenarios, such as empty input or invalid AI settings.
+ * This component manages the state for input text, character type, and parsed data.
+ * It provides functionality to generate character data by creating prompts based
+ * on the selected character type and input content. The generated data can be
+ * inserted into a form, and the component handles user interactions, including
+ * cancellation of generation and displaying results. It also includes error handling
+ * for various scenarios, such as empty input or invalid AI settings.
  *
  * @param {AIAssistantProps} props - The properties for the AIAssistant component.
  * @param {Object} props.aiSettings - The settings for the AI generation.
@@ -114,19 +119,23 @@ Intelligent analysis and extract role information based on the content.${jsonFor
       anime: `${baseInstructions}
 
 This is an anime character, please generate:
-- description: List the appearance, clothing, and body characteristics in a detailed, non-prosaic list. Body, clothing, general appearance.
+- description: List the appearance, clothing, and body characteristics in a
+detailed, non-prosaic list. Body, clothing, general appearance.
 - personality: Detailed personality traits, idiosyncracies and mannerisms in a non-prosaic list.
 - scenario: The back story.
-- first_mes: How character and player/user meet. This is a public part of the card and should read like a superb piece of professional fiction.
+- first_mes: How character and player/user meet. This is a public part of the card
+and should read like a superb piece of professional fiction.
 - mes_example: A dialogue example that reflects the character's speaking style and personality ${jsonFormat}`,
 
       game: `${baseInstructions}
 
 This is a personified game character, please generate:
-- description: Character appearance, equipment, special ability description in a detailed, non-prosaic list. Body, clothing, general appearance.
+- description: Character appearance, equipment, special ability description in a
+detailed, non-prosaic list. Body, clothing, general appearance.
 - personality: personality traits, combat style, values, back story in a non-prosaic list.
 - scenario: The over-arching mythos.
-- first_mes: How character and player/user meet. This is a public part of the card and should read like a superb piece of professional fiction.
+- first_mes: How character and player/user meet. This is a public part of the card
+and should read like a superb piece of professional fiction.
 - mes_example: A dialogue example that reflects the character's speaking style and personality ${jsonFormat} `,
 
       novel: `${baseInstructions}
@@ -135,16 +144,19 @@ This character stepped right out of a timeless classic, maybe Rabelais, maybe Jo
 - description: The character's appearance in a detailed, non-prosaic list. Body, clothing, general appearance.
 - personality: Deep psychological characteristics and personality complexity
 - scenario: The background and environment setting of novel era
-- first mes: This is the first outward facing component and should be written in the style of a great literary master. It is a long paragraph portraying how this character first meets the user/player in this game.
+- first mes: This is the first outward facing component and should be written in the style
+of a great literary master. It is a long paragraph portraying how this character first meets the user/player in this game.
 - mes example: Monologue or dialogue that captures the character's quintessance. ${jsonFormat}`,
 
       historical: `${baseInstructions}
 
-This is a historic character (real or fictional), please generate: 
-- description: List the appearance, clothing, and body characteristics in a detailed, non-prosaic list. Body, clothing, general appearance.
+This is a historic character (real or fictional), please generate:
+- description: List the appearance, clothing, and body characteristics in a detailed,
+non-prosaic list. Body, clothing, general appearance.
 - personality: Detailed personality traits, idiosyncracies and back story in a non-prosaic list.
 - scenario: The back story.
-- first_mes: How character and player/user meet. This is a public part of the card and should read like a superb piece of professional fiction.
+- first_mes: How character and player/user meet. This is a public part of the card and should
+read like a superb piece of professional fiction.
 - mes example: Monologue or dialogue that captures the character's quintessance. ${jsonFormat}`,
     };
 
@@ -154,7 +166,11 @@ This is a historic character (real or fictional), please generate:
   /**
    * Generate character data based on user input and AI settings.
    *
-   * The function validates the input text and AI settings, providing hints if either is missing. It creates an AbortController and sets a generating state before generating a prompt based on the character type and input text. The result is processed through the AI, with robust error handling for JSON parsing and generation failures, ensuring user feedback via toast notifications.
+   * The function first checks if the input text and AI settings are provided, displaying
+   * hints if not. It then creates an AbortController and sets a generating state.
+   * The prompt is generated based on the character type and input text, which is passed
+   * to the AI for processing. The result is parsed as JSON, with error handling for both
+   * parsing and generation failures, providing user feedback through toast notifications.
    *
    * @returns {Promise<void>} A promise that resolves when the character data generation is complete.
    * @throws Error If the input text is empty, AI settings are not configured, or if JSON parsing fails.
@@ -343,9 +359,9 @@ This is a historic character (real or fictional), please generate:
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
           <div className="md:col-span-1">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
               Role Type
             </label>
             <Select value={characterType} onValueChange={setCharacterType}>
@@ -366,18 +382,18 @@ This is a historic character (real or fictional), please generate:
           </div>
 
           <div className="md:col-span-3">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
               Text content
             </label>
             <Textarea
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               placeholder="Paste the text content related to the role here:
-• Role Introduction Article 
-• Wikipedia page 
-• Character description of novels 
-• Game character information 
-• Introduction to cartoon characters 
+• Role Introduction Article
+• Wikipedia page
+• Character description of novels
+• Game character information
+• Introduction to cartoon characters
 etc..."
               className="min-h-[200px] text-sm"
               showCounter={true}
@@ -395,12 +411,12 @@ etc..."
           >
             {isGenerating ? (
               <>
-                <X className="w-4 h-4 mr-2" />
+                <X className="mr-2 h-4 w-4" />
                 Cancel Generate
               </>
             ) : (
               <>
-                <Wand className="w-4 h-4 mr-2" />
+                <Wand className="mr-2 h-4 w-4" />
                 {`AI analysis generation(${selectedType?.label})`}
               </>
             )}
@@ -412,7 +428,7 @@ etc..."
               variant="outline"
               title="Regenerate"
             >
-              <RefreshCcw className="w-4 h-4" />
+              <RefreshCcw className="h-4 w-4" />
             </Button>
           )}
         </div>
@@ -426,23 +442,23 @@ etc..."
                 size="sm"
                 className="bg-green-600 hover:bg-green-700"
               >
-                <Download className="w-4 h-4 mr-2" />
+                <Download className="mr-2 h-4 w-4" />
                 Insert all with one click
               </Button>
             </div>
 
-            <div className="space-y-3 max-h-[400px] overflow-y-auto bg-gray-50 dark:bg-gray-400 rounded-lg p-3 scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-300 dark:scrollbar-track-gray-300 dark:scrollbar-thumb-gray-600 hover:scrollbar-thumb-gray-400 dark:hover:scrollbar-thumb-gray-500">
+            <div className="scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-300 max-h-[400px] space-y-3 overflow-y-auto rounded-lg bg-gray-50 p-3 hover:scrollbar-thumb-gray-400 dark:scrollbar-track-gray-300 dark:scrollbar-thumb-gray-600 dark:bg-gray-400 dark:hover:scrollbar-thumb-gray-500">
               {Object.entries(parsedData).map(([key, value]) => {
                 if (!value || (Array.isArray(value) && value.length === 0)) {
                   return null;
                 }
 
                 return (
-                  <div key={key} className="border-b border-gray-200 dark:border-gray-300 pb-2 last:border-b-0">
-                    <div className="font-medium text-sm text-gray-300 dark:text-gray-300 mb-1">
+                  <div key={key} className="border-b border-gray-200 pb-2 last:border-b-0 dark:border-gray-300">
+                    <div className="mb-1 text-sm font-medium text-gray-300 dark:text-gray-300">
                       {getFieldLabel(key)}
                     </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400 break-words leading-relaxed">
+                    <div className="break-words text-sm leading-relaxed text-gray-600 dark:text-gray-400">
                       {getPreviewText(value)}
                     </div>
                   </div>
@@ -450,7 +466,7 @@ etc..."
               })}
             </div>
 
-            <div className="text-xs text-gray-500 dark:text-gray-400 bg-blue-50 dark:bg-blue-900/20 p-2 rounded">
+            <div className="rounded bg-blue-50 p-2 text-xs text-gray-500 dark:bg-blue-900/20 dark:text-gray-400">
               Click "Insert All with One Click" to automatically fill all the parsing results into the corresponding form fields. You can further edit and improve them in the form below.
             </div>
           </div>
