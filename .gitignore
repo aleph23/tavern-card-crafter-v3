@@ -8,7 +8,6 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
-dist
 dist-ssr
 *.local
 
@@ -25,10 +24,12 @@ dist-ssr
 *.sw?
 .vs/*
 .vs/**/*
-.vs/tavern-card-crafter-v3/v17/.wsuo
-.vs/VSWorkspaceState.json
-.vs/tavern-card-crafter-v3/v17/DocumentLayout.backup.json
-.vs/tavern-card-crafter-v3/v17/DocumentLayout.json
-.vscode/launch.json
+.vs/
+.vscode/
 /.vscode/launch.json
 /appmap.yml
+.continue/
+portable-build/**/*
+tmp/
+portable-build/Tavern-Card-Crafter/package.json
+portable-build/Tavern-Card-Crafter/package.json

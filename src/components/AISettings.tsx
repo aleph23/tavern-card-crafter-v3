@@ -1,13 +1,15 @@
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { DialogHeader } from "@/components/ui/dialog";
-import { Settings, Loader2, Check, X, RefreshCw, AlertCircle, Info } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+/* eslint-disable prefer-const */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { DialogHeader } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useToast } from '@/hooks/use-toast';
+import { AlertCircle, Check, Info, Loader2, RefreshCw, Settings, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface AISettingsProps {
   onSettingsChange: (settings: AISettings) => void;
@@ -36,7 +38,7 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
   const { toast } = useToast();
 
   // API provider preset configuration
-  const apiProviders = [
+  const apiProviders = useMemo(() => [
     {
       name: "OpenAI official",
       value: "openai",
@@ -127,7 +129,7 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
       requiresKey: true,
       tips: "Customize Open AI-compatible interface, please manually configure the API address and model name"
     }
-  ];
+  ]);
 
   const [settings, setSettings] = useState<AISettings>(
     currentSettings || {
@@ -145,13 +147,23 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
   const [lastError, setLastError] = useState<string>("");
 
   // Default model list (used when the model list cannot be obtained)
-  const defaultModels = [
+  let defaultModels = useMemo(() => [
     "gpt-4o", "gpt-4o-mini", "gpt-4-turbo", "gpt-4", "gpt-3.5-turbo",
-    "deepseek-chat", "deepseek-coder",
-    "moonshot-v1-8k", "moonshot-v1-32k", "moonshot-v1-128k",
-    "glm-4-plus", "glm-4", "glm-4-air", "glm-4-flash",
-    "yi-large", "yi-medium", "llama3.2", "llama3.1", "qwen2.5"
-  ];
+    "deepseek-chat",
+    "deepseek-coder",
+    "moonshot-v1-8k",
+    "moonshot-v1-32k",
+    "moonshot-v1-128k",
+    "glm-4-plus",
+    "glm-4",
+    "glm-4-air",
+    "glm-4-flash",
+    "yi-large",
+    "yi-medium",
+    "llama3.2",
+    "llama3.1",
+    "qwen2.5"
+  ], []);
 
   useEffect(() => {
     const currentProvider = apiProviders.find(p => p.value === settings.provider);
@@ -167,7 +179,7 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
     } else {
       setAvailableModels(defaultModels);
     }
-  }, [settings.provider]);
+  }, [apiProviders, defaultModels, settings.model, settings.provider]);
 
   /**
    * Handles changes to the selected API provider.
@@ -401,7 +413,7 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
       console.log('Model:', settings.model);
 
       // Use a unified Open AI-compatible format
-      let headers: Record<string, string> = {'Content-Type': 'application/json',};
+      let headers: Record<string, string> = { 'Content-Type': 'application/json', };
 
       // Only providers that require a key will add Authorization header
       if (currentProvider?.requiresKey && settings.apiKey) {
@@ -537,7 +549,7 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
       console.log('Provider:', settings.provider);
 
       let headers: Record<string, string> = {};
-      
+
       // Only providers that require a key will add Authorization header
       if (currentProvider?.requiresKey && settings.apiKey) {
         headers['Authorization'] = `Bearer ${settings.apiKey}`;

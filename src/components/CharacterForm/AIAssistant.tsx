@@ -1,14 +1,14 @@
 ﻿/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useRef } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
-import { useLanguage } from "@/contexts/LanguageContext";
-import { Wand, RefreshCcw, Download, X } from "lucide-react";
-import { generateWithAI } from "@/utils/aiGenerator";
-import { AISettings } from "@/components/AISettings";
+import { AISettings } from '@/components/AISettings';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useToast } from '@/hooks/use-toast';
+import { generateWithAI } from '@/utils/aiGenerator';
+import { Download, RefreshCcw, Wand, X } from 'lucide-react';
+import { useRef, useState } from 'react';
 
 interface ParsedCharacterData {
   name?: string;
@@ -16,12 +16,16 @@ interface ParsedCharacterData {
   personality?: string;
   scenario?: string;
   first_mes?: string;
+  alternate_greetings?: string[];
   mes_example?: string;
   system_prompt?: string;
   post_history_instructions?: string;
+  group_only_greetings?: string[];
   tags?: string[];
   creator?: string;
   creator_notes?: string;
+  character_book?: any
+  assets?: any;
 }
 
 interface AIAssistantProps {
@@ -321,10 +325,12 @@ read like a superb piece of professional fiction.
   const getFieldLabel = (field: string): string => {
     const labels: Record<string, string> = {
       name: "card name",
+      nickname: "nickname",
       description: "Role description",
       personality: "character traits",
       scenario: "Scene Setting",
       first_mes: "First message",
+      alternate_greetings: "Alternate greetings",
       mes_example: "Conversation Example",
       system_prompt: "system prompt word",
       post_history_instructions: "Post history instructions",

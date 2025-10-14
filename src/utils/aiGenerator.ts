@@ -1,8 +1,10 @@
+/* eslint-disable prefer-const */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AISettings } from "@/components/AISettings";
+import { AISettings } from '@/components/AISettings';
 
 export interface CharacterData {
   name: string;
+  nickname?: string;
   description: string;
   personality?: string;
   scenario?: string;
@@ -11,6 +13,7 @@ export interface CharacterData {
   alternative_greetings?: string[];
   system_prompt?: string;
   post_history_instructions?: string;
+  character_book?: string[];
   tags?: string[];
 }
 
@@ -345,6 +348,7 @@ export const generateTags = (data: CharacterData): string => {
 Card name: ${data.name}
 Physical Description: ${data.description}
 Character Personality: ${data.personality}
+Example actions: ${data.mes_example}
 Scene setting: ${data.scenario}
 
 Please generate 5-10 related keywords or single-word tags, separated by commas. Tags should include character type, personality traits, scene type, etc.`;
@@ -360,13 +364,11 @@ Please generate 5-10 related keywords or single-word tags, separated by commas. 
  *
  * @param {CharacterData} data - The character data used to generate the greeting.
  */
-export const generateAlternateGreeting = (data: CharacterData): string => {
-  return `Generate an alternate greeting based on the following information:
 /**
  * Generates an alternate greeting based on character data.
  */
 export const generateAlternateGreeting = (data: CharacterData): string => {
-  return `Basic story chapter and story information:
+  return `Generate the start of the next chapter of the story based on the following information:
 
 Card name: ${data.name}
 Physical Description: ${data.description}
@@ -374,40 +376,35 @@ Character Personality: ${data.personality}
 Scene settings: ${data.scenario}
 First message: ${data.first_mes}
 Dialogue example: ${data.mes_example}
-Other alternate greetings: ${data.alternative_greetings}`;
-Dialogue example: ${data.mes_example}
 
 The chapters that have already been written: 
 
 First Chapter Beginning: ${data.first_mes}
-Subsequent chapters (if any): ${data.alternative_greetings}
+Subsequent chapters(if any): ${data.alternative_greetings}
 
-Write the beginning of a new chapter. It must include the character and some encounter with the player/user and must be at least one day after any prior chapters. Merge the writing styles of James Joyce, Douglas Adams, Francois Rabelais, and Anais Nin.`;
+Write the beginning of a new chapter.It must include the character and some encounter with the player / user and must be at least one day after any prior chapters.Merge the writing styles of James Joyce, Philip K. Dick, Francois Rabelais, and Anais Nin.`;
 };
 
 /**
- * Generates a role book entry based on character data and optional context.
+ * Generates a character book entry based on character data and optional context.
  */
-export const generateCharacterBookEntry = (data: CharacterData, context?: string): string => {
-  return `Generate a role book entry based on the following information:
+export const generateCharacterBookEntry = (data: CharacterData): string => {
+  return `Generate specific important character information entries based on the following information:
 
 Card name: ${data.name}
 Physical Description: ${data.description}
 Character Personality: ${data.personality}
 Scene settings: ${data.scenario}
-${context ? `Supplementary information: ${context}` : ''}
 
-Please generate a character book entry to supplement the character's background settings or special case descriptions.
+You are constructing what is referred to as a lorebook. When certain keywords are mentioned in the chat, it triggers a longer definition to be sent to the AI and considered in it's response. It can work like an important memory of the character's or an important fact about the character. It should be something quite unique and important to be worth including. 
 
-Keyword requirements: Use 2-3 related core keywords, separated by commas
+The parameters are:
+Keyword requirements: Use at least 2 - 3 related core keywords/synonyms, separated by commas.
 Content requirements: Generate specific setting content, such as the character's special skills, important experiences, interpersonal relationships or items, and other background information.
 
 The format is as follows:
-Keywords: core keyword 1, core keyword 2
-Content: Detailed settings description
-
-The content should be rich and helpful for role-playing.`;
-};
+  Keywords: keyword1, keyword2, keyword3, keyword4, ...
+  Content: The detailed description.
 
 The content should be rich and helpful for role-playing.`;
 };

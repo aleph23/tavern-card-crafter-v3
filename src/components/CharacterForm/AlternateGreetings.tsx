@@ -1,20 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { AISettings } from '@/components/AISettings';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useToast } from '@/hooks/use-toast';
+import { generateAlternateGreeting, generateWithAI } from '@/utils/aiGenerator';
+import { Check, Edit2, Loader2, Plus, RefreshCcw, Sparkles, Trash2, X } from 'lucide-react';
+import { useRef, useState } from 'react';
 
-import { useState, useRef } from "react";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { Plus, X, Edit2, Check, Sparkles, Loader2, RefreshCcw, Trash2 } from "lucide-react";
-import { generateWithAI, generateAlternateGreeting } from "@/utils/aiGenerator";
-import { AISettings } from "@/components/AISettings";
-import { useToast } from "@/hooks/use-toast";
-import { useLanguage } from "@/contexts/LanguageContext";
 
 interface AlternateGreetingsProps {
   greetings: string[];
   alternate_greetings: string[];
   mes_example: string[];
-  group_only_greetings: string;
+  group_only_greetings: string[];
   updateField: (field: string, value: any) => void;
   aiSettings: AISettings | null;
   characterData: any;

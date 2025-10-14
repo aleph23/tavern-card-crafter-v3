@@ -1,22 +1,24 @@
-import { useState, useRef, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Upload, Bot, User, FileText } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { useLanguage } from "@/contexts/LanguageContext";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import AISettings, { AISettings as AISettingsType } from "@/components/AISettings";
-import Toolbar from "@/components/Toolbar";
-import BasicInfoSection from "@/components/CharacterForm/BasicInfoSection";
-import PersonalitySection from "@/components/CharacterForm/PersonalitySection";
-import PromptsSection from "@/components/CharacterForm/PromptsSection";
-import AlternateGreetings from "@/components/CharacterForm/AlternateGreetings";
-import CharacterBook from "@/components/CharacterForm/CharacterBook";
-import TagsSection from "@/components/CharacterForm/TagsSection";
-import MetadataSection from "@/components/CharacterForm/MetadataSection";
-import CharacterPreview from "@/components/CharacterPreview";
-import AIAssistant from "@/components/CharacterForm/AIAssistant";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import AISettings, { AISettings as AISettingsType } from '@/components/AISettings';
+import AIAssistant from '@/components/CharacterForm/AIAssistant';
+import AlternateGreetings from '@/components/CharacterForm/AlternateGreetings';
+import BasicInfoSection from '@/components/CharacterForm/BasicInfoSection';
+import CharacterBook from '@/components/CharacterForm/CharacterBook';
+import MetadataSection from '@/components/CharacterForm/MetadataSection';
+import PersonalitySection from '@/components/CharacterForm/PersonalitySection';
+import PromptsSection from '@/components/CharacterForm/PromptsSection';
+import TagsSection from '@/components/CharacterForm/TagsSection';
+import CharacterPreview from '@/components/CharacterPreview';
+import Toolbar from '@/components/Toolbar';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useToast } from '@/hooks/use-toast';
+import { Bot, FileText, Upload, User } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+
 import { CharacterData } from '../utils/aiGenerator';
 
 interface CharacterBookEntry {
@@ -50,7 +52,7 @@ interface CharacterCardV3 {
     tags: string[];
     creator: string;
     character_version: string;
-    group_only_greetings: [],
+    group_only_greetings: string[];
     creation_date?: string;
     modification_date?: string;
     source?: string;
@@ -545,8 +547,8 @@ const Index = () => {
                 <button
                   onClick={() => setActiveTab("assistant")}
                   className={`w-full flex items-center gap-3 px-3 py-3 text-left rounded-lg transition-all duration-200 ${activeTab === "assistant"
-                      ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-md"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                    ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-md"
+                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                     }`}
                 >
                   <Bot className="w-5 h-5" />
@@ -555,8 +557,8 @@ const Index = () => {
                 <button
                   onClick={() => setActiveTab("editor")}
                   className={`w-full flex items-center gap-3 px-3 py-3 text-left rounded-lg transition-all duration-200 ${activeTab === "editor"
-                      ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-md"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                    ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-md"
+                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                     }`}
                 >
                   <User className="w-5 h-5" />
@@ -565,8 +567,8 @@ const Index = () => {
                 <button
                   onClick={() => setActiveTab("preview")}
                   className={`w-full flex items-center gap-3 px-3 py-3 text-left rounded-lg transition-all duration-200 ${activeTab === "preview"
-                      ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-md"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                    ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-md"
+                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                     }`}
                 >
                   <FileText className="w-5 h-5" />
@@ -620,8 +622,20 @@ const Index = () => {
                       />
 
                       <AlternateGreetings
-                        greetings={Array.isArray(characterData.data.alternate_greetings) ? characterData.data.alternate_greetings : []}
-                        group_only_greetings={characterData.data.group_only_greetings}
+                        greetings={
+                          Array.isArray(characterData.data.alternate_greetings)
+                            ? characterData.data.alternate_greetings as string[]
+                            : typeof characterData.data.alternate_greetings === "string"
+                              ? [characterData.data.alternate_greetings]
+                              : []
+                        }
+                        group_only_greetings={
+                          Array.isArray(characterData.data.group_only_greetings)
+                            ? characterData.data.group_only_greetings as string[]
+                            : typeof characterData.data.group_only_greetings === "string"
+                              ? [characterData.data.group_only_greetings]
+                              : []
+                        }
                         updateField={updateField}
                         aiSettings={aiSettings}
                         characterData={characterData.data}
