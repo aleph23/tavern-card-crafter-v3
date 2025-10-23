@@ -18,12 +18,34 @@ interface BasicInfoSectionProps {
   aiSettings: AISettings | null;
 }
 
+/**
+ * Renders the Basic Information section for a character, including image upload, name, nickname, and description.
+ *
+ * This component manages the state for loading, image upload, and AI-generated descriptions. It validates the AI settings and character name before generating a description. The component also provides functionality to clear the description and cancel ongoing AI generation requests.
+ *
+ * @param {Object} props - The properties for the BasicInfoSection component.
+ * @param {Object} props.data - The character data including name, nickname, and description.
+ * @param {Function} props.updateField - Function to update a specific field in the character data.
+ * @param {string} props.characterImage - The URL of the character's avatar image.
+ * @param {Function} props.setCharacterImage - Function to set the character's avatar image.
+ * @param {Object} props.aiSettings - The settings for AI generation, including API key and provider.
+ * @returns {JSX.Element} The rendered Basic Information section.
+ */
 const BasicInfoSection = ({ data, updateField, characterImage, setCharacterImage, aiSettings }: BasicInfoSectionProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
   const { toast } = useToast();
 
+  /**
+   * Handles the image upload from an input element.
+   *
+   * This function retrieves the first file from the input event, reads it as a data URL using a FileReader,
+   * and sets the character image with the result once the file is successfully loaded.
+   * It ensures that the file exists before attempting to read it, preventing potential errors.
+   *
+   * @param event - The change event from the input element containing the uploaded file.
+   */
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -36,6 +58,22 @@ const BasicInfoSection = ({ data, updateField, characterImage, setCharacterImage
     }
   };
 
+  /**
+   * Handles the AI generation of a description based on provided data.
+   *
+   * The function first checks for the presence of an API key and the provider's validity.
+   * It then verifies that the card name is filled in before proceeding to generate a description using AI.
+   * If successful, it updates the description field and displays a success message; otherwise, it handles errors appropriately.
+   *
+   * @param {Object} aiSettings - The settings for the AI generation, including the API key and provider.
+   * @param {Object} data - The data object containing the card information, including the name.
+   * @param {Function} setLoading - A function to set the loading state.
+   * @param {Function} updateField - A function to update a specific field in the data.
+   * @param {Function} toast - A function to display messages to the user.
+   * @param {Object} abortControllerRef - A reference to an AbortController for managing request cancellation.
+   * @returns {Promise<void>} A promise that resolves when the description generation process is complete.
+   * @throws {Error} If the generation fails or is canceled.
+   */
   const handleAIGenerateDescription = async () => {
     if (!aiSettings?.apiKey && !['ollama', 'lmstudio'].includes(aiSettings?.provider?.toLowerCase() || '')) {
       toast({
@@ -85,6 +123,9 @@ const BasicInfoSection = ({ data, updateField, characterImage, setCharacterImage
     }
   };
 
+  /**
+   * Cancels the ongoing AI generation process.
+   */
   const cancelGeneration = () => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -97,6 +138,9 @@ const BasicInfoSection = ({ data, updateField, characterImage, setCharacterImage
     }
   };
 
+  /**
+   * Clears the character description and shows a toast notification.
+   */
   const handleClearDescription = () => {
     updateField("description", "");
     toast({

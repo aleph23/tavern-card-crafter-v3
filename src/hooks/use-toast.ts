@@ -55,6 +55,9 @@ interface State {
 
 const toastTimeouts = new Map<string, ReturnType<typeof setTimeout>>()
 
+/**
+ * Adds a toast ID to the removal queue with a timeout.
+ */
 const addToRemoveQueue = (toastId: string) => {
   if (toastTimeouts.has(toastId)) {
     return
@@ -71,6 +74,17 @@ const addToRemoveQueue = (toastId: string) => {
   toastTimeouts.set(toastId, timeout)
 }
 
+/**
+ * Reducer function to manage the state of toasts in the application.
+ *
+ * This function handles various actions related to toasts, including adding, updating, dismissing, and removing toasts.
+ * It modifies the state based on the action type and ensures that the number of toasts does not exceed the defined TOAST_LIMIT.
+ * Side effects are managed within the Dismiss action to handle toast removal appropriately.
+ *
+ * @param state - The current state of the application containing toasts.
+ * @param action - The action object that describes the type of operation to perform on the state.
+ * @returns The updated state after applying the action.
+ */
 export const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case "ADD_TOAST":
@@ -130,6 +144,9 @@ const listeners: Array<(state: State) => void> = []
 
 let memoryState: State = { toasts: [] }
 
+/**
+ * Dispatches an action and notifies all listeners with the updated memory state.
+ */
 function dispatch(action: Action) {
   memoryState = reducer(memoryState, action)
   listeners.forEach((listener) => {
@@ -139,9 +156,15 @@ function dispatch(action: Action) {
 
 type Toast = Omit<ToasterToast, "id">
 
+/**
+ * Creates and manages a toast notification.
+ */
 function toast({ ...props }: Toast) {
   const id = genId()
 
+  /**
+   * Updates the toast with the given properties.
+   */
   const update = (props: ToasterToast) =>
     dispatch({
       type: "UPDATE_TOAST",
@@ -170,6 +193,9 @@ function toast({ ...props }: Toast) {
   }
 }
 
+/**
+ * Custom hook to manage toast notifications state.
+ */
 function useToast() {
   const [state, setState] = React.useState<State>(memoryState)
 

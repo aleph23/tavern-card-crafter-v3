@@ -26,6 +26,13 @@ interface CharacterBookEntry {
   enabled: boolean;
 }
 
+interface Asset {
+  type: string;
+  uri: string;
+  name: string;
+  ext: string;
+}
+
 interface CharacterCardV3 {
   spec: string;
   spec_version: string;
@@ -34,61 +41,73 @@ interface CharacterCardV3 {
     nickname?: string;
     description: string;
     personality: string;
+    mes_example: string;
     scenario: string;
     first_mes: string;
-    mes_example: string;
+    alternate_greetings: string[];
+    tags: string[];
+    creator: string;
+    character_version: string;
     creator_notes: string;
     creator_notes_multilingual?: {
       [key: string]: string;
     };
     system_prompt: string;
     post_history_instructions: string;
-    alternate_greetings: string[];
     character_book?: {
       entries: CharacterBookEntry[];
     };
-    tags: string[];
-    creator: string;
-    character_version: string;
-    group_only_greetings: [],
+    group_only_greetings: string[];
     creation_date?: string;
     modification_date?: string;
     source?: string;
     extensions: Record<string, any>;
+    assets: Asset[];
   };
 }
 
+/**
+ * Main component for managing AI character card functionality.
+ *
+ * This component handles the import of character data from JSON and PNG files, manages AI settings, and provides a user interface for editing character information. It utilizes various hooks to manage state and effects, including loading saved settings from local storage and updating character data based on user input. The component also features a tabbed interface for different functionalities such as editing and previewing character data.
+ *
+ * @returns JSX.Element representing the character card interface.
+ */
 const Index = () => {
   const { toast } = useToast();
   const { t } = useLanguage();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [activeTab, setActiveTab] = useState("assistant");
   const [aiSettings, setAISettings] = useState<AISettingsType | null>(null);
+  const today = new Date().toISOString().split("T")[0];
 
   const [characterData, setCharacterData] = useState<CharacterCardV3>({
     spec: "chara_card_v3",
     spec_version: "3.0",
     data: {
       name: "",
+      nickname: "",
       description: "",
       personality: "",
+      mes_example: "",
       scenario: "",
       first_mes: "",
-      mes_example: "",
+      alternate_greetings: [],
+      tags: [],
+      creator: "",
+      character_version: "",
       creator_notes: "",
       system_prompt: "",
       post_history_instructions: "",
-      alternate_greetings: [],
       character_book: {
         entries: []
       },
-      tags: [],
-      creator: "",
-      character_version: "1.0",
       group_only_greetings: [],
-      creation_date: new Date().toISOString().split('T')[0],
-      modification_date: new Date().toISOString().split('T')[0],
-      extensions: {}
+// sourcery skip: simplify-ternary
+      creation_date: "" ? "" : today, // if you later load data, keep it
+      modification_date: today,
+      extensions: {},
+      assets: []
     }
   });
 
@@ -107,6 +126,9 @@ const Index = () => {
     }
   }, []);
 
+  /**
+   * Updates AI settings and displays a toast notification.
+   */
   const handleAISettingsChange = (newSettings: AISettingsType) => {
     setAISettings(newSettings);
     toast({
@@ -115,6 +137,9 @@ const Index = () => {
     });
   };
 
+  /**
+   * Updates a specified field in the character data with a new value and sets the modification date.
+   */
   const updateField = (field: string, value: any) => {
     setCharacterData(prev => ({
       ...prev,
@@ -137,6 +162,18 @@ const Index = () => {
     }
   };
 
+  /**
+   * Extract character data from a PNG file.
+   *
+   * This function reads a PNG file and searches for character data within it using multiple methods:
+   * first by locating the tEXt chunk, then by performing a string search for JSON patterns,
+   * and finally by searching for base64 encoded data. If character data is found, it resolves the promise
+   * with the parsed data; otherwise, it rejects with an error.
+   *
+   * @param file - The PNG file from which to extract character data.
+   * @returns A promise that resolves with the extracted character data.
+   * @throws Error If the file cannot be read or if no character data is found.
+   */
   const extractPNGCharacterData = async (file: File): Promise<any> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -419,7 +456,12 @@ const Index = () => {
                 : [],
             creation_date: new Date().toISOString().split('T')[0],
             modification_date: new Date().toISOString().split('T')[0],
-            extensions: parsedData.data?.extensions || {}
+            extensions: parsedData.data?.extensions || {},
+            assets: Array.isArray(parsedData.data?.assets)
+              ? parsedData.data.assets
+              : (typeof parsedData.data?.assets === "string" && parsedData.data.assets.length > 0)
+              ? [parsedData.data.assets]
+              : []
           }
         };
         setCharacterData(v3Data);
@@ -454,7 +496,12 @@ const Index = () => {
                 : [],
             creation_date: new Date().toISOString().split('T')[0],
             modification_date: new Date().toISOString().split('T')[0],
-            extensions: {}
+            extensions: {},
+            assets: Array.isArray(parsedData.assets)
+              ? parsedData.assets
+              : (typeof parsedData.assets === "string" && parsedData.assets.length > 0)
+                ? [parsedData.assets]
+                : [],
           }
         };
         setCharacterData(v3Data);
@@ -595,8 +642,20 @@ const Index = () => {
                       />
 
                       <AlternateGreetings
-                        greetings={Array.isArray(characterData.data.alternate_greetings) ? characterData.data.alternate_greetings : []}
-                        group_only_greetings={characterData.data.group_only_greetings}
+                        greetings={
+                          Array.isArray(characterData.data.alternate_greetings)
+                            ? characterData.data.alternate_greetings as string[]
+                            : typeof characterData.data.alternate_greetings === "string"
+                              ? [characterData.data.alternate_greetings]
+                              : []
+                        }
+                        group_only_greetings={
+                          Array.isArray(characterData.data.group_only_greetings)
+                            ? characterData.data.group_only_greetings as string[]
+                            : typeof characterData.data.group_only_greetings === "string"
+                              ? [characterData.data.group_only_greetings]
+                              : []
+                        }
                         updateField={updateField}
                         aiSettings={aiSettings}
                         characterData={characterData.data}

@@ -9,6 +9,9 @@ interface MetadataSectionProps {
   updateField: (field: string, value: any) => void;
 }
 
+/**
+ * Renders a metadata section for creative information input.
+ */
 const MetadataSection = ({ data, updateField }: MetadataSectionProps) => {
   return (
     <div className="space-y-6">

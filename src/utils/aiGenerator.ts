@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AISettings } from "@/components/AISettings";
+import { buildApiUrl } from "./buildApiUrl";
 
 export interface CharacterData {
   name: string;
+  nickname?: string;
   description: string;
   personality?: string;
   scenario?: string;
@@ -11,6 +13,7 @@ export interface CharacterData {
   alternative_greetings?: string[];
   system_prompt?: string;
   post_history_instructions?: string;
+  character_book?: string[];
   tags?: string[];
 }
 
@@ -24,42 +27,16 @@ export const estimateTokens = (text: string): number => {
   return Math.ceil(chineseChars * 1.5 + englishWords + otherChars * 0.5);
 };
 
-// Intelligently build API URL - consistent with the AISettings component
-const buildApiUrl = (baseUrl: string, provider: string): string => {
-  if (!baseUrl) { return ''; }
-
-  // Remove the end slash
-  const cleanUrl = baseUrl.replace(/\/+$/, '');
-
-  // Ollama special treatment
-  if (provider === 'ollama') {
-    if (baseUrl.includes('/v1/chat/completions')) {
-      return cleanUrl;
-    }
-    return `${cleanUrl}/v1/chat/completions`;
-  }
-
-  // Special processing of Zhipu GLM
-  if (provider === 'zhipu') {
-    if (baseUrl.includes('/chat/completions')) {
-      return cleanUrl;
-    }
-    return `${cleanUrl}/chat/completions`;
-  }
-
-  // Standard processing from other providers
-  if (baseUrl.includes('/chat/completions')) {
-    return cleanUrl;
-  }
-
-  // Smartly add endpoints
-  if (cleanUrl.includes('/v1')) {
-    return `${cleanUrl}/chat/completions`;
-  } else {
-    return `${cleanUrl}/v1/chat/completions`;
-  }
-};
-
+/**
+ * Generate a response from an AI service based on the provided settings and prompt.
+ *
+ * This function checks if the AI service requires an API key and validates the settings. It constructs the API URL, prepares the request body, and handles the response, including error management for various scenarios. The function ensures that the response content is properly extracted and formatted before returning it, while also managing specific error cases for local services and network issues.
+ *
+ * @param settings - The configuration settings for the AI service, including provider, model, API key, and API URL.
+ * @param prompt - The input prompt to be sent to the AI service for generating a response.
+ * @returns A promise that resolves to the generated response content from the AI service.
+ * @throws Error If the API key is missing for a non-local service, if the API URL is not configured, if the API request fails, or if the response is empty.
+ */
 export const generateWithAI = async (
   settings: AISettings,
   prompt: string
@@ -87,11 +64,11 @@ export const generateWithAI = async (
     console.log('Requires API key:', requiresKey);
 
     // Use a unified Open AI-compatible format
-    let headers: any = {
+    let headers: Record<string, string> = {
       'Content-Type': 'application/json',
     };
 
-    // Only services that require a key will add Authorization header
+    // Only services that require a key will add an Authorization header
     if (requiresKey && settings.apiKey) {
       headers['Authorization'] = `Bearer ${settings.apiKey}`;
     }
@@ -109,7 +86,7 @@ export const generateWithAI = async (
       method: 'POST',
       headers,
       body: JSON.stringify(requestBody),
-      signal: AbortSignal.timeout(60000) // 60 seconds timeout
+      signal: AbortSignal.timeout(120000) // 120 seconds timeout
     });
 
     console.log('Response status:', response.status);
@@ -202,11 +179,14 @@ export const generateWithAI = async (
   }
 };
 
+/**
+ * Generates a character description based on provided data.
+ */
 export const generateDescription = (data: CharacterData): string => {
   const existingDescription = data.description.trim();
 
   if (existingDescription) {
-    return `Based on the following role information, enchance the descriptions, while remaining succinct:
+    return `Based on the following role information, enhance the descriptions, while remaining succinct:
 
 Card name:${data.name}
 Existing description:${existingDescription}
@@ -221,15 +201,21 @@ Please generate a detailed character appearance description, including the chara
   }
 };
 
+/**
+ * Generates a personality description based on character data.
+ */
 export const generatePersonality = (data: CharacterData): string => {
-  return `Based on the following role information, enchance the character's persona, while remaining succinct.
+  return `Based on the following role information, enhance the character's persona, while remaining succinct.
 
 Card name: ${data.name}
 Physical Description: ${data.description}
 
-A non-prosaic list, describing the character's traits, behavior, idiosyncracies, likes/dislikes, strengths/weaknesses, backstory.`;
+A non-prosaic list, describing the character's traits, behavior, idiosyncrasies, likes/dislikes, strengths/weaknesses, backstory.`;
 };
 
+/**
+ * Generates a meta-scenario based on character data.
+ */
 export const generateScenario = (data: CharacterData): string => {
   return `Generate an appropriate meta-scenario based on the following information:
 
@@ -251,6 +237,9 @@ Scene settings: ${data.scenario}
 This will be the first outward facing text, the first thing the player/user encounters when playing with the character.Somehow the character must meet the player/user. The writing should be a perfect combination of Douglas Adams, Ursula K. Le Guin, James Joyce, Anais Nin, and Philip K. Dick.`;
 };
 
+/**
+ * Generates a conversational example based on character data.
+ */
 export const generateMesExample = (data: CharacterData): string => {
   return `Generate a conversational example to help establish the character:
 
@@ -269,9 +258,12 @@ ${data.name}: *The character's actions.*
 <START>
 ${data.name}: The character talks to themself and acts on their own.
 
-Make sure each conversation example starts with a <START> macro. Do not include it if it doesn't help to develop the character's actions and speaking behavior. . `;
+Make sure each conversation example starts with a <START> macro. Do not include it if it doesn't help to develop the character's actions and speaking behavior.`;
 };
 
+/**
+ * Generates a system prompt based on character data.
+ */
 export const generateSystemPrompt = (data: CharacterData): string => {
   return `Generate System Prompt based on the following information:
 
@@ -285,6 +277,9 @@ Story introduction: ${data.first_mes}
 Write the System Prompt to instruct the AI how to accurately play the character. Be concise and clear.`;
 };
 
+/**
+ * Generates brief instructions for the AI based on character data.
+ */
 export const generatePostHistoryInstructions = (data: CharacterData): string => {
   return `Generate the most important instructions for the AI based on the following information:
   Card name: ${data.name}
@@ -293,6 +288,7 @@ export const generatePostHistoryInstructions = (data: CharacterData): string => 
   Scene settings: ${data.scenario}
   Example Character Actions: ${data.mes_example}
   Story introduction: ${data.first_mes}
+  SYSTEM PROMPT: ${data.system_prompt}
 
   THIS MUST BE EXTREMELY BRIEF!.`;
 };
@@ -308,37 +304,56 @@ Scene setting: ${data.scenario}
 Please generate 5-10 related keywords or single-word tags, separated by commas. Tags should include character type, personality traits, scene type, etc.`;
 };
 
+/**
+ * Generates an alternate greeting based on character data.
+ *
+ * This function constructs a detailed greeting string using various attributes from the provided
+ * CharacterData object. It includes the character's name, physical description, personality traits,
+ * scene settings, and examples of dialogue. The output is designed to facilitate the writing of
+ * a new chapter that incorporates the character and their interactions with the player/user.
+ *
+ * @param {CharacterData} data - The character data used to generate the greeting.
+ */
+/**
+ * Generates an alternate greeting based on character data.
+ */
 export const generateAlternateGreeting = (data: CharacterData): string => {
-  return `Generate an alternate greeting based on the following information:
+  return `Generate the start of the next chapter of the story based on the following information:
 
 Card name: ${data.name}
 Physical Description: ${data.description}
 Character Personality: ${data.personality}
 Scene settings: ${data.scenario}
-First message: ${data.first_mes}
 Dialogue example: ${data.mes_example}
-Other alternate greetings: ${data.alternative_greetings}
 
-Please generate another completely unique Generate an additional prompt that helps break down Alexa's rapist exterior to get at the root of her present actions -- her own childhood abuse.`;
+The chapters that have already been written: 
+
+First Chapter Beginning: ${data.first_mes}
+Subsequent chapters(if any): ${data.alternative_greetings}
+
+Write the beginning of a new chapter. It must include the character and some encounter with the player / user and must be at least one day after any prior chapters. Merge the writing styles of James Joyce, Philip K. Dick, Francois Rabelais, and Anais Nin as appropriate to the context.`;
 };
 
-export const generateCharacterBookEntry = (data: CharacterData, context?: string): string => {
-  return `Generate a role book entry based on the following information:
+/**
+ * Generates a character book entry based on character data and optional context.
+ */
+export const generateCharacterBookEntry = (data: CharacterData): string => {
+  return `Generate specific important character information entries based on the following information:
 
 Card name: ${data.name}
 Physical Description: ${data.description}
 Character Personality: ${data.personality}
 Scene settings: ${data.scenario}
-${context ? `Supplementary information: ${context}` : ''}
 
-Please generate a character book entry to supplement the character's background settings or special case descriptions.
+You are constructing what is referred to as a lorebook. When certain keywords are mentioned in the chat, it triggers a longer definition to be sent to the AI and considered in it's response. It can work like an important memory of the character's or an important fact about the character. It should be something quite unique and important to be worth including. 
 
-Keyword requirements: Use 2-3 related core keywords, separated by commas
+The parameters are:
+Keyword requirements: Use at least 2 - 3 related core keywords/synonyms, separated by commas.
 Content requirements: Generate specific setting content, such as the character's special skills, important experiences, interpersonal relationships or items, and other background information.
 
 The format is as follows:
-Keywords: core keyword 1, core keyword 2
-Content: Detailed settings description
+  Keywords: keyword1, keyword2, keyword3, keyword4, ...
+  Content: The detailed description.
 
 The content should be rich and helpful for role-playing.`;
 };
