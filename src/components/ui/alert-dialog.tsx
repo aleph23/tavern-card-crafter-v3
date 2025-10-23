@@ -57,6 +57,9 @@ const AlertDialogHeader = ({
 )
 AlertDialogHeader.displayName = "AlertDialogHeader"
 
+/**
+ * Renders a footer for an alert dialog with customizable class names.
+ */
 const AlertDialogFooter = ({
   className,
   ...props

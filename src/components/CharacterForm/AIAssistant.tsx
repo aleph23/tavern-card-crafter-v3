@@ -16,12 +16,16 @@ interface ParsedCharacterData {
   personality?: string;
   scenario?: string;
   first_mes?: string;
+  alternate_greetings?: string[];
   mes_example?: string;
   system_prompt?: string;
   post_history_instructions?: string;
+  group_only_greetings?: string[];
   tags?: string[];
   creator?: string;
   creator_notes?: string;
+  character_book?: any
+  assets?: any;
 }
 
 interface AIAssistantProps {
@@ -64,8 +68,10 @@ const CHARACTER_TYPES = [
  *
  * This component manages the state for input text, character type, and parsed data. It provides functionality to generate character data using AI, handle user interactions for inserting fields, and manage the cancellation of ongoing generation processes. The component also formats prompts based on the selected character type and ensures robust JSON parsing of the AI's response.
  *
- * @param aiSettings - The settings configuration for the AI generation process.
- * @param onInsertField - A callback function to handle the insertion of generated fields into the form.
+ * @param {AIAssistantProps} props - The properties for the AIAssistant component.
+ * @param {Object} props.aiSettings - The settings for the AI generation.
+ * @param {Function} props.onInsertField - Callback function to insert generated fields into a form.
+ * @returns {JSX.Element} The rendered AIAssistant component.
  */
 const AIAssistant = ({ aiSettings, onInsertField }: AIAssistantProps) => {
   const { toast } = useToast();
@@ -113,7 +119,7 @@ Intelligent analysis and extract role information based on the content.${jsonFor
 
 This is an anime character, please generate:
 - description: List the appearance, clothing, and body characteristics in a detailed, non-prosaic list. Body, clothing, general appearance.
-- personality: Detailed personality traits, idiosyncracies and mannerisms in a non-prosaic list.
+- personality: Detailed personality traits, idiosyncrasies and mannerisms in a non-prosaic list.
 - scenario: The back story.
 - first_mes: How character and player/user meet. This is a public part of the card and should read like a superb piece of professional fiction.
 - mes_example: A dialogue example that reflects the character's speaking style and personality ${jsonFormat}`,
@@ -134,16 +140,16 @@ This character stepped right out of a timeless classic, maybe Rabelais, maybe Jo
 - personality: Deep psychological characteristics and personality complexity
 - scenario: The background and environment setting of novel era
 - first mes: This is the first outward facing component and should be written in the style of a great literary master. It is a long paragraph portraying how this character first meets the user/player in this game.
-- mes example: Monologue or dialogue that captures the character's quintessance. ${jsonFormat}`,
+- mes example: Monologue or dialogue that captures the character's quintessence. ${jsonFormat}`,
 
       historical: `${baseInstructions}
 
 This is a historic character (real or fictional), please generate: 
 - description: List the appearance, clothing, and body characteristics in a detailed, non-prosaic list. Body, clothing, general appearance.
-- personality: Detailed personality traits, idiosyncracies and back story in a non-prosaic list.
+- personality: Detailed personality traits, idiosyncrasies and back story in a non-prosaic list.
 - scenario: The back story.
 - first_mes: How character and player/user meet. This is a public part of the card and should read like a superb piece of professional fiction.
-- mes example: Monologue or dialogue that captures the character's quintessance. ${jsonFormat}`,
+- mes example: Monologue or dialogue that captures the character's quintessence. ${jsonFormat}`,
     };
 
     return typeSpecificPrompts[type as keyof typeof typeSpecificPrompts] || typeSpecificPrompts.general;
@@ -244,6 +250,9 @@ This is a historic character (real or fictional), please generate:
     }
   };
 
+  /**
+   * Cancels the ongoing AI generation process.
+   */
   const cancelGeneration = () => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -256,6 +265,15 @@ This is a historic character (real or fictional), please generate:
     }
   };
 
+  /**
+   * Inserts all fields from parsedData into the role card form.
+   *
+   * The function checks if parsedData is available and iterates over its entries.
+   * For each entry, it verifies if the value is valid (non-empty or non-whitespace)
+   * before calling onInsertField to insert the field. It tracks the number of
+   * successfully inserted fields and displays a toast notification indicating
+   * the result of the operation.
+   */
   const insertAllFields = () => {
     if (!parsedData) {
       return;
@@ -285,13 +303,17 @@ This is a historic character (real or fictional), please generate:
     }
   };
 
+
+  // * Retrieves the label for a given field.
   const getFieldLabel = (field: string): string => {
     const labels: Record<string, string> = {
       name: "card name",
+      nickname: "nickname",
       description: "Role description",
       personality: "character traits",
       scenario: "Scene Setting",
       first_mes: "First message",
+      alternate_greetings: "Alternate greetings",
       mes_example: "Conversation Example",
       system_prompt: "system prompt word",
       post_history_instructions: "Post history instructions",
@@ -302,6 +324,7 @@ This is a historic character (real or fictional), please generate:
     return labels[field] || field;
   };
 
+  // * Returns a preview text from the given value, truncating if necessary.
   const getPreviewText = (value: any) => {
     if (Array.isArray(value)) {
       return value.join(", ");

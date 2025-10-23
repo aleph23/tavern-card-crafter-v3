@@ -32,6 +32,9 @@ const TagsSection = ({ tags, updateField, aiSettings, characterData }: TagsSecti
     }
   };
 
+  /**
+   * Removes a specified tag from the tags list.
+   */
   const removeTag = (tagToRemove: string) => {
     updateField("tags", tags.filter(tag => tag !== tagToRemove));
   };
@@ -43,6 +46,15 @@ const TagsSection = ({ tags, updateField, aiSettings, characterData }: TagsSecti
     }
   };
 
+  /**
+   * Handles the generation of tags using AI based on character data.
+   *
+   * The function first checks for the presence of an API key and required character information. If any checks fail, it displays an error message.
+   * It then initiates an AI request to generate tags, processes the response to ensure uniqueness, and updates the tags field accordingly.
+   * Error handling is implemented to manage both cancellation and other potential errors during the AI generation process.
+   *
+   * @returns {Promise<void>} A promise that resolves when the tag generation process is complete.
+   */
   const handleAIGenerateTags = async () => {
     if (!aiSettings?.apiKey && !['ollama', 'lmstudio'].includes(aiSettings?.provider?.toLowerCase() || '')) {
       toast({
@@ -97,6 +109,9 @@ const TagsSection = ({ tags, updateField, aiSettings, characterData }: TagsSecti
     }
   };
 
+  /**
+   * Cancels the AI generation process if it is currently active.
+   */
   const cancelGeneration = () => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -109,6 +124,9 @@ const TagsSection = ({ tags, updateField, aiSettings, characterData }: TagsSecti
     }
   };
 
+  /**
+   * Clears all tags and displays a notification.
+   */
   const handleClearAll = () => {
     updateField("tags", []);
     toast({

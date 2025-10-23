@@ -10,6 +10,15 @@ import { Download, Terminal, Play, FolderOpen, Code, Server } from "lucide-react
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 
+/**
+ * Component for managing the local deployment panel of the application.
+ *
+ * This component handles the display of deployment steps, system requirements, command line instructions,
+ * and provides functionality to download necessary files such as a batch script and package.json.
+ * It also allows users to copy commands to the clipboard and displays toast notifications based on user actions.
+ *
+ * @returns A JSX element representing the local deployment panel.
+ */
 const LocalDeploymentPanel = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { toast } = useToast();
@@ -143,6 +152,9 @@ pause`;
   }
 }`;
 
+  /**
+   * Initiates the download of a .bat file and displays a toast notification.
+   */
   const downloadBatFile = () => {
     const blob = new Blob([batFileContent], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
@@ -160,6 +172,9 @@ pause`;
     });
   };
 
+  /**
+   * Downloads the package.json file and shows a toast notification upon completion.
+   */
   const downloadPackageJson = () => {
     const blob = new Blob([packageJsonContent], { type: 'application/json' });
     const url = URL.createObjectURL(blob);

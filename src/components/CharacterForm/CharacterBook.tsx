@@ -31,6 +31,9 @@ const CharacterBook = ({ entries, updateField, aiSettings, characterData }: Char
   const abortControllerRef = useRef<AbortController | null>(null);
   const { toast } = useToast();
 
+  /**
+   * Adds a new book entry if both keys and content are provided.
+   */
   const addBookEntry = () => {
     if (newEntryKeys.trim() && newEntryContent.trim()) {
       const keys = newEntryKeys.split(',').map(k => k.trim()).filter(k => k);
@@ -50,6 +53,9 @@ const CharacterBook = ({ entries, updateField, aiSettings, characterData }: Char
     }
   };
 
+  /**
+   * Removes a book entry at the specified index.
+   */
   const removeBookEntry = (index: number) => {
     updateField("character_book", {
       entries: entries.filter((_, i) => i !== index)
@@ -60,7 +66,7 @@ const CharacterBook = ({ entries, updateField, aiSettings, characterData }: Char
     if (!aiSettings?.apiKey && !['ollama', 'lmstudio'].includes(aiSettings?.provider?.toLowerCase() || '')) {
       toast({
         title: "Configuration error",
-        description: "Please configure the API key in the AI ​​settings first",
+        description: "Please configure the API key in the AI settings first",
         variant: "destructive"
       });
       return;
@@ -142,6 +148,9 @@ const CharacterBook = ({ entries, updateField, aiSettings, characterData }: Char
     }
   };
 
+  /**
+   * Cancels the ongoing AI generation process.
+   */
   const cancelGeneration = () => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
