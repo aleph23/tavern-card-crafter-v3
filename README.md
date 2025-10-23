@@ -191,7 +191,7 @@ Welcome to submit Issue and Pull Request to help improve your project!
 
 ### License
 
-This project adopts a MIT license. For details, please see the LICENSE file.
+This project adopts an MIT license. For details, please see the LICENSE file.
 
 ---
 
