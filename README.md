@@ -1,37 +1,44 @@
 # Tavern Card Crafter - AI character card maker
 
-## Project Introduction
+## Changelog
+
+- Translated to English from original repo.
+- **Got saving to a PNG file actually working!**
+- Only tested with local and openrouter. If you have trouble with another provider, please open an issue.
+
+---
+
+### Project Introduction
 
 Tavern Card Crafter is a professional AI character card maker that helps users easily create and edit character cards for chatbots and roleplay. The tool offers an intuitive interface and powerful features that make character creation easy and efficient.
 
-## Key features:
+### Key features:
 
-### 🤖 AI intelligent assistant
+#### 🤖 AI intelligent assistant
 
 - **Intelligent Character Creation**: Quickly generate basic character information through AI assistants
 - **Multi-genre support**: Supports different types of characters such as anime, games, novels, and historical figures
 - **Intelligent Content Extraction**: Paste any text, and AI automatically extracts and generates structured character information
 
-### ✏️ Full character editing
+#### ✏️ Full character editing
 
 - **Basic information**: Name, description, first-person perspective, etc
 - **Personality Traits**: Detailed personality traits and behavior patterns
-- **Setting Setting**: Backstory and environment description
+- **Scenario Settings**: Backstory and environment description
 - **Dialogue System**: Sample dialogues, greetings, alternative greetings
-- **Character Book**: Worldview setting and memory entries
-- **Tag Classification**: Role labeling and metadata management
+- **Character/Lore Book**: Worldview setting and memory entries
+- **Keyword/Tag Classification**: Role labeling and metadata management
 
-## ![image](image/image01.png)
+![What the UI looks like in Dark mode.](img\2025-10-23_113717.png "Program appearance")
+![or in light mode](img\2025-10-23_113814.png "preview ui")
 
-![image](image/image02.png)
-
-### \uD83D\uDCF1 Multi-platform support
+####  📟 Multi-platform support
 
 - **Web version**: Browser direct access and use
 - **Desktop App**: A cross-platform Electron desktop app
 - **Sidebar Layout**: AI assistant, character editing, JSON preview split tab interface
 
-### \uD83D\uDD27 Practical features
+#### 🛠 Practical features
 
 - **Real-time preview**: Real-time preview in JSON format, syntax highlighting
 - **Multi-format export**: Supports JSON and PNG format export
@@ -40,9 +47,9 @@ Tavern Card Crafter is a professional AI character card maker that helps users e
 
 ---
 
-![image](image/image03.png)
+![Sampling of returned results](img\2025-10-23_113929.png "AI results")
 
-## Technology Stack
+### Technology Stack
 
 This project is built on modern web technology:
 
@@ -53,16 +60,16 @@ This project is built on modern web technology:
 - **Tailwind CSS** - Practical and priority CSS framework
 - **shadcn/ui** - High-quality React component library
 
-## Get started quickly
+### Get started quickly
 
-### Environmental Requirements
+#### Environmental Requirements
 
 Make sure your system is installed:
 
 - Node js (recommended to use [nvm](https://github.com/nvm-sh/nvm#installing-and-updating) Installation)
 - npm package manager
 
-### Install and run
+#### Install and run
 
 ```bash
 # 1. Clone project
@@ -84,9 +91,9 @@ npm run electron-dev
 - **Web version**: Access in the browser `http://localhost:8080`
 - **Desktop Version**: Automatically open the Electron desktop application window
 
-### Build and run
+#### Build and run
 
-#### Web Version
+##### Web Version
 
 ```bash
 # Build a web version
@@ -96,7 +103,7 @@ npm run build
 npm run preview
 ```
 
-#### Desktop application version
+##### Desktop application version
 
 ```bash
 # Quickly run desktop applications (production mode)
@@ -109,23 +116,23 @@ npm run electron-pack
 npm run electron-build
 ```
 
-## User Guide
+### User Guide
 
-### 🚀 Start quickly
+#### 🚀 Start quickly
 
 1. **Start the application**: use `npm run electron-dev`(Development) or `npm run electron`(Production)
 2. **Select working mode**: Use the left tab to switch between the three functions
 
-### 📋 Detailed explanation of functions
+#### 📋 Detailed explanation of functions
 
-#### 🤖 AI character card assistant
+##### 🤖 AI character card assistant
 
 1. **Paste content**: Paste any character-related text into the input box
 2. **Select type**: Select character type (animation, games, novels, historical characters, etc.)
 3. **AI Generation**: Click "AI Analysis Generation", and AI will intelligently extract and generate structured information
 4. **Fill in**: with one click: Select the generated field and fill in the role editor with one click
 
-#### ✏️ Character information editing
+##### ✏️ Character information editing
 
 1. **Basic Information**: Fill in the basic information such as character name, description, avatar, etc.
 2. **Personality Setting**: Describe the character characteristics and behavior patterns of the character in detail
@@ -133,8 +140,8 @@ npm run electron-build
 4. **Worldview Settings**: Add character book entries to enrich background settings
 5. **Tag management**: Adding relevant tags to roles is easy to classify
 
-#### 📄 JSON Preview
-
+##### 📄 JSON Preview
+![preview the generated JSON before saving](img\2025-10-23_114417.png "JSON view")
 1. **Real-time preview**: View the generated JSON format role card
 2. **Syntax Highlight**: Color displays JSON structure for easy reading
 3. **Statistics**: Display the total number of characters and tokens
@@ -144,13 +151,13 @@ npm run electron-build
 - **PNG Export**: Embed the character card into the picture (need to upload the avatar)
 - **Copy to clipboard**: Quickly copy JSON content
 
-### 💡 Usage Tips
+#### 💡 Usage Tips
 
 - **AI Assistant**: You can paste any related text such as character introduction, novel clips, game information, etc.
 - **Step editing**: Use tabs to focus on AI generation, manual editing, and preview export respectively
 - **Real-time synchronization**: The data of three tabs is synchronized in real time, and the effect can be switched to view at any time.
 
-## Project structure
+### Project structure
 
 ```
 src/
@@ -182,9 +189,9 @@ src/
 
 Welcome to submit Issue and Pull Request to help improve your project!
 
-## License
+### License
 
-This project adopts a MIT license. For details, please see the LICENSE file.
+This project adopts an MIT license. For details, please see the LICENSE file.
 
 ---
 
