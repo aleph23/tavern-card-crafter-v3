@@ -24,3 +24,5 @@ appmap.yml
 .continue/
 portable-build/**/*
 tmp/
+/pnpm-lock.yaml
+/pnpm-workspace.yaml

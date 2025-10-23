@@ -49,17 +49,17 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
   };
 
   /**
-   * Downloads a PNG image with embedded character data.
-   *
-   * The function checks if a character image is provided; if not, it displays a toast notification prompting the user to upload an avatar.
-   * It fetches the image as a blob, embeds JSON character data into the PNG, creates a download link, and triggers the download.
-   * In case of an error during the process, it logs the error and displays a failure notification.
-   *
-   * @param characterImage - The URL of the character image to be downloaded.
-   * @param characterData - The data associated with the character to be embedded in the PNG.
-   * @returns void
-   * @throws Error If an error occurs during the image fetching or embedding process.
-   */
+  * Downloads a PNG image with embedded character data.
+  *
+  * The function checks if a character image is provided; if not, it displays a toast notification prompting the user to upload an avatar.
+  * It fetches the image, embeds JSON character data into the PNG using the tEXt chunk format, creates a download link, and triggers the download.
+  * In case of an error during the process, it logs the error and displays a failure notification.
+  *
+  * @param characterImage - The URL of the character image to be downloaded.
+  * @param characterData - The data associated with the character to be embedded in the PNG.
+  * @returns void
+  * @throws Error If an error occurs during the image fetching or embedding process.
+  */
   const downloadWithImage = async () => {
     if (!characterImage) {
       toast({
@@ -80,45 +80,93 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
         canvas.width = img.width;
         canvas.height = img.height;
 
-        // Draw pictures
+        // Draw the image
         ctx?.drawImage(img, 0, 0);
 
-        // Embed role card data into PNG
-        const jsonData = JSON.stringify(characterData);
-        const canvas2 = document.createElement('canvas');
-        const ctx2 = canvas2.getContext('2d');
-
-        canvas2.width = canvas.width;
-        canvas2.height = canvas.height;
-
-        // Copy the original image
-        ctx2?.drawImage(canvas, 0, 0);
-
-        // Get image data
-        const imageData = ctx2?.getImageData(0, 0, canvas2.width, canvas2.height);
-        if (imageData) {
-          // Encode JSON data into the last few pixels of the image (this is a simplified implementation)
-          const jsonBytes = new TextEncoder().encode(jsonData);
-          const dataView = new DataView(imageData.data.buffer);
-
-          // Store JSON length and data at the end of the image data
-          let offset = imageData.data.length - 4;
-          dataView.setUint32(offset, jsonBytes.length, true);
-
-          // Storing JSON data (there is simplified here, there should be a more complex encoding scheme in fact)
-          for (let i = 0; i < Math.min(jsonBytes.length, 1000); i++) {
-            if (offset - i * 4 >= 0) {
-              imageData.data[offset - i * 4 - 4] = jsonBytes[i];
-            }
+        // Convert canvas to blob first
+        canvas.toBlob(async (blob) => {
+          if (!blob) {
+            toast({
+              title: "Export failed",
+              description: "Failed to create image blob",
+              variant: "destructive"
+            });
+            return;
           }
 
-          ctx2?.putImageData(imageData, 0, 0);
-        }
+          try {
+            // Read the PNG data
+            const arrayBuffer = await blob.arrayBuffer();
+            const uint8Array = new Uint8Array(arrayBuffer);
 
-        // Export PNG file
-        canvas2.toBlob((blob) => {
-          if (blob) {
-            const url = URL.createObjectURL(blob);
+            // Prepare the character data as base64
+            const jsonData = JSON.stringify(characterData);
+            const base64Data = btoa(unescape(encodeURIComponent(jsonData)));
+
+            // Create tEXt chunk
+            const keyword = 'chara';
+            const keywordBytes = new TextEncoder().encode(keyword);
+            const textBytes = new TextEncoder().encode(base64Data);
+
+            // Calculate chunk length (keyword + null terminator + text)
+            const chunkLength = keywordBytes.length + 1 + textBytes.length;
+
+            // Create the chunk data
+            const chunkData = new Uint8Array(chunkLength + 12); // +12 for length(4) + type(4) + CRC(4)
+
+            // Write length (big-endian)
+            const dataView = new DataView(chunkData.buffer);
+            dataView.setUint32(0, chunkLength, false);
+
+            // Write chunk type "tEXt"
+            chunkData[4] = 0x74; // 't'
+            chunkData[5] = 0x45; // 'E'
+            chunkData[6] = 0x58; // 'X'
+            chunkData[7] = 0x74; // 't'
+
+            // Write keyword
+            chunkData.set(keywordBytes, 8);
+
+            // Write null separator
+            chunkData[8 + keywordBytes.length] = 0;
+
+            // Write text data
+            chunkData.set(textBytes, 8 + keywordBytes.length + 1);
+
+            // Calculate CRC for type + data
+            const crcData = chunkData.slice(4, 8 + chunkLength);
+            const crc = calculateCRC32(crcData);
+            dataView.setUint32(8 + chunkLength, crc, false);
+
+            // Find IEND chunk position (last 12 bytes of PNG)
+            let iendPosition = uint8Array.length - 12;
+
+            // Verify it's actually IEND
+            if (uint8Array[iendPosition + 4] !== 0x49 || // 'I'
+              uint8Array[iendPosition + 5] !== 0x45 || // 'E'
+              uint8Array[iendPosition + 6] !== 0x4E || // 'N'
+              uint8Array[iendPosition + 7] !== 0x44) { // 'D'
+              // Search for IEND if not at expected position
+              for (let i = uint8Array.length - 12; i >= 0; i--) {
+                if (uint8Array[i + 4] === 0x49 &&
+                  uint8Array[i + 5] === 0x45 &&
+                  uint8Array[i + 6] === 0x4E &&
+                  uint8Array[i + 7] === 0x44) {
+                  iendPosition = i;
+                  break;
+                }
+              }
+            }
+
+            // Create new PNG with injected tEXt chunk
+            const newPNG = new Uint8Array(uint8Array.length + chunkData.length);
+            newPNG.set(uint8Array.slice(0, iendPosition), 0);
+            newPNG.set(chunkData, iendPosition);
+            newPNG.set(uint8Array.slice(iendPosition), iendPosition + chunkData.length);
+
+            // Create blob and download
+            const newBlob = new Blob([newPNG], { type: 'image/png' });
+            const url = URL.createObjectURL(newBlob);
             const link = document.createElement('a');
             link.href = url;
             link.download = `${characterData.data.name || 'character'}_card.png`;
@@ -127,7 +175,14 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
 
             toast({
               title: "Export successfully",
-              description: "PNG format role card has been exported"
+              description: "PNG format character card has been exported with embedded data"
+            });
+          } catch (error) {
+            console.error('Error injecting PNG chunk:', error);
+            toast({
+              title: "Export failed",
+              description: "Failed to embed character data in PNG",
+              variant: "destructive"
             });
           }
         }, 'image/png');
@@ -150,6 +205,30 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
       });
     }
   };
+
+  /**
+   * Calculate CRC32 checksum for PNG chunks
+   */
+  const calculateCRC32 = (data: Uint8Array): number => {
+    let crc = 0xFFFFFFFF;
+
+    // CRC table (standard PNG CRC table)
+    const crcTable = new Uint32Array(256);
+    for (let n = 0; n < 256; n++) {
+      let c = n;
+      for (let k = 0; k < 8; k++) {
+        c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+      }
+      crcTable[n] = c;
+    }
+
+    for (let i = 0; i < data.length; i++) {
+      crc = crcTable[(crc ^ data[i]) & 0xFF] ^ (crc >>> 8);
+    }
+
+    return (crc ^ 0xFFFFFFFF) >>> 0;
+  };
+
 
   // Calculate the total number of characters and tokens
   /**

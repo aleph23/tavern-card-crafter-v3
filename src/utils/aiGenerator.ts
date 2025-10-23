@@ -10,7 +10,7 @@ export interface CharacterData {
   scenario?: string;
   first_mes?: string;
   mes_example?: string;
-  alternative_greetings?: string[];
+  alternate_greetings?: string[];
   system_prompt?: string;
   post_history_instructions?: string;
   character_book?: string[];
@@ -329,7 +329,7 @@ Dialogue example: ${data.mes_example}
 The chapters that have already been written: 
 
 First Chapter Beginning: ${data.first_mes}
-Subsequent chapters(if any): ${data.alternative_greetings}
+Subsequent chapters(if any): ${data.alternate_greetings}
 
 Write the beginning of a new chapter. It must include the character and some encounter with the player / user and must be at least one day after any prior chapters. Merge the writing styles of James Joyce, Philip K. Dick, Francois Rabelais, and Anais Nin as appropriate to the context.`;
 };
