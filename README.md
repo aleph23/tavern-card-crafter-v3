@@ -30,9 +30,6 @@ Tavern Card Crafter is a professional AI character card maker that helps users e
 - **Character/Lore Book**: Worldview setting and memory entries
 - **Keyword/Tag Classification**: Role labeling and metadata management
 
-<img alt="2025-10-23_113717" src="https://github.com/aleph23/tavern-card-creator-v3/img/2025-10-23_113717.png>
-<img alt="2025-10-23_113717" src="https://github.com/aleph23/tavern-card-creator-v3/img/2025-10-23_113814.png>
-
 ####  📟 Multi-platform support
 
 - **Web version**: Browser direct access and use
