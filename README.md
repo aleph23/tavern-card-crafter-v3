@@ -13,6 +13,9 @@
 
 Tavern Card Crafter is a professional AI character card maker that helps users easily create and edit character cards for chatbots and roleplay. The tool offers an intuitive interface and powerful features that make character creation easy and efficient.
 
+![](img/2025-10-23-113717.png)
+![](img/2025-10-23-113814.png)
+
 ### Key features:
 
 #### 🤖 AI intelligent assistant
@@ -45,7 +48,7 @@ Tavern Card Crafter is a professional AI character card maker that helps users e
 
 ---
 
-![](img\2025-10-23_113929.png "AI results")
+![](img/2025-10-23_113929.png "AI results")
 
 ### Technology Stack
 
@@ -139,7 +142,7 @@ npm run electron-build
 5. **Tag management**: Adding relevant tags to roles is easy to classify
 
 ##### 📄 JSON Preview
-![preview the generated JSON before saving](img\2025-10-23_114417.png "JSON view")
+![preview the generated JSON before saving](img/2025-10-23_114417.png "JSON view")
 1. **Real-time preview**: View the generated JSON format role card
 2. **Syntax Highlight**: Color displays JSON structure for easy reading
 3. **Statistics**: Display the total number of characters and tokens
