@@ -24,6 +24,8 @@ Tavern Card Crafter is a professional AI character card maker that helps users e
 - **Multi-genre support**: Supports different types of characters such as anime, games, novels, and historical figures
 - **Intelligent Content Extraction**: Paste any text, and AI automatically extracts and generates structured character information
 
+![](img/2025-10-23_113929.png "AI results")
+
 #### ✏️ Full character editing
 
 - **Basic information**: Name, description, first-person perspective, etc
@@ -46,9 +48,9 @@ Tavern Card Crafter is a professional AI character card maker that helps users e
 - **Localized Interface**: Completely Chinese interface, easy and intuitive to operate
 - **Responsive Design**: Supports a wide range of devices and screen sizes
 
----
+![](img/2025-10-23_114242.png)
 
-![](img/2025-10-23_113929.png "AI results")
+---
 
 ### Technology Stack
 
