@@ -29,3 +29,5 @@ tmp/
 .github/copilot-instructions.md
 refactorgentohook.txt
 yarn.lock
+build-electron/**/*
+dist-electron/**/*
