@@ -26,3 +26,6 @@ portable-build/**/*
 tmp/
 /pnpm-lock.yaml
 /pnpm-workspace.yaml
+.github/copilot-instructions.md
+refactorgentohook.txt
+yarn.lock
