@@ -64,7 +64,7 @@ export const generateWithAI = async (
     console.log('Requires API key:', requiresKey);
 
     // Use a unified Open AI-compatible format
-    let headers: Record<string, string> = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
     };
 
