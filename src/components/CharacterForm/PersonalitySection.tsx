@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { useState, useRef } from "react";
+import { useState, useRef, memo } from "react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -232,4 +232,15 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
   );
 };
 
-export default PersonalitySection;
+export default memo(PersonalitySection, (prevProps, nextProps) => {
+  return (
+    prevProps.data.name === nextProps.data.name &&
+    prevProps.data.description === nextProps.data.description &&
+    prevProps.data.personality === nextProps.data.personality &&
+    prevProps.data.scenario === nextProps.data.scenario &&
+    prevProps.data.first_mes === nextProps.data.first_mes &&
+    prevProps.data.mes_example === nextProps.data.mes_example &&
+    prevProps.aiSettings === nextProps.aiSettings &&
+    prevProps.updateField === nextProps.updateField
+  );
+});

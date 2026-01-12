@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Upload, Bot, User, FileText } from "lucide-react";
@@ -140,7 +140,7 @@ const Index = () => {
   /**
    * Updates a specified field in the character data with a new value and sets the modification date.
    */
-  const updateField = (field: string, value: any) => {
+  const updateField = useCallback((field: string, value: any) => {
     setCharacterData(prev => ({
       ...prev,
       data: {
@@ -149,7 +149,7 @@ const Index = () => {
         modification_date: new Date().toISOString().split('T')[0]
       }
     }));
-  };
+  }, []);
 
   const handleInsertField = (field: string, value: string | string[]) => {
     if (field === 'tags' && Array.isArray(value)) {
