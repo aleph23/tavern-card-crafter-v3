@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from 'react';
-import { PromptCollection, promptManager } from '@/utils/promptManager';
+import { promptManager } from '@/utils/promptManager';
+import { PromptCollection } from '@/types/prompts';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';

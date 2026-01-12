@@ -1,13 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import defaultPrompts from '../config/defaultPrompts.json';
-
-export interface PromptTemplate {
-  name: string;
-  description: string;
-  template: string;
-}
-
-export type PromptCollection = Record<string, PromptTemplate>;
+import { PromptCollection, PromptTemplate } from '@/types/prompts';
 
 // Extend Window interface for Electron API
 declare global {
