@@ -2,7 +2,10 @@
 # Tavern Card Crafter - AI character card maker
 
 ## Changelog
+1/12/26
+- Configurable tempurate and max token response accessible via 'AI Settings'
 
+10/25
 - Translated to English from original repo.
 - **Got saving to a PNG file actually working!**
 - Only tested with local and openrouter. If you have trouble with another provider, please open an issue.
