@@ -13,5 +13,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Remove the listener
     removeAllListeners: (channel) => {
     ipcRenderer.removeAllListeners(channel);
-  }
+  },
+
+  // Prompt management
+  loadPrompts: () => ipcRenderer.invoke('load-prompts'),
+  savePrompts: (prompts) => ipcRenderer.invoke('save-prompts', prompts),
+  resetPrompts: () => ipcRenderer.invoke('reset-prompts'),
 });

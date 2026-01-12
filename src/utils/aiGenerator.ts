@@ -1,6 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AISettings } from "@/components/AISettings";
 import { buildApiUrl } from "./buildApiUrl";
+import { promptManager } from "./promptManager";
+
+// Initialize prompts
+promptManager.loadPrompts();
 
 export interface CharacterData {
   name: string;
@@ -64,7 +68,7 @@ export const generateWithAI = async (
     console.log('Requires API key:', requiresKey);
 
     // Use a unified Open AI-compatible format
-    let headers: Record<string, string> = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
     };
 
@@ -186,18 +190,11 @@ export const generateDescription = (data: CharacterData): string => {
   const existingDescription = data.description.trim();
 
   if (existingDescription) {
-    return `Based on the following role information, enhance the descriptions, while remaining succinct:
-
-Card name:${data.name}
-Existing description:${existingDescription}
-
-Embellish, making sure to describe all physical qualities of the character -- body, attire and how they compose themself. This should be in non-prosaic list format.`;
+    const template = promptManager.getPrompt('description_enhance');
+    return promptManager.interpolatePrompt(template, { ...data, description: existingDescription });
   } else {
-    return `Generate a list of all the physical qualities of the character -- body, attire and how they compose themself. This should be in non-prosaic CSV format riffing off of the character name:
-
-Card name:${data.name}
-
-Please generate a detailed character appearance description, including the character's physical characteristics, facial features, clothing style, temperament, etc. Only output character description content, do not include character name, background story or other information. Please output the description directly, and do not add summary or additional instructions.`;
+    const template = promptManager.getPrompt('description_create');
+    return promptManager.interpolatePrompt(template, data);
   }
 };
 
@@ -205,155 +202,67 @@ Please generate a detailed character appearance description, including the chara
  * Generates a personality description based on character data.
  */
 export const generatePersonality = (data: CharacterData): string => {
-  return `Based on the following role information, enhance the character's persona, while remaining succinct.
-
-Card name: ${data.name}
-Physical Description: ${data.description}
-
-A non-prosaic list, describing the character's traits, behavior, idiosyncrasies, likes/dislikes, strengths/weaknesses, backstory.`;
+  const template = promptManager.getPrompt('personality');
+  return promptManager.interpolatePrompt(template, data);
 };
 
 /**
  * Generates a meta-scenario based on character data.
  */
 export const generateScenario = (data: CharacterData): string => {
-  return `Generate an appropriate meta-scenario based on the following information:
-
-Card name: ${data.name}
-Physical Description: ${data.description}
-Character Personality: ${data.personality}
-
-Generate the backstory and meta-environment in acclaimed historian's prose.`;
+  const template = promptManager.getPrompt('scenario');
+  return promptManager.interpolatePrompt(template, data);
 };
 
 export const generateFirstMes = (data: CharacterData): string => {
-  return `Generate the first message of the game, introducing the character to the player/user:
-
-Card name: ${data.name}
-Physical Description: ${data.description}
-Character Personality: ${data.personality}
-Scene settings: ${data.scenario}
-
-This will be the first outward facing text, the first thing the player/user encounters when playing with the character.Somehow the character must meet the player/user. The writing should be a perfect combination of Douglas Adams, Ursula K. Le Guin, James Joyce, Anais Nin, and Philip K. Dick.`;
+  const template = promptManager.getPrompt('firstMessage');
+  return promptManager.interpolatePrompt(template, data);
 };
 
 /**
  * Generates a conversational example based on character data.
  */
 export const generateMesExample = (data: CharacterData): string => {
-  return `Generate a conversational example to help establish the character:
-
-Card name: ${data.name}
-Physical Description: ${data.description}
-Character Personality: ${data.personality}
-Scene setting: ${data.scenario}
-
-Please generate 2 to 3 dialogues or monologues that truly capture the spirit of the character. The format is as follows:
-
-<START>
-{{user}}: User's words
-${data.name}: The character's answer
-${data.name}: *The character's actions.*
-
-<START>
-${data.name}: The character talks to themself and acts on their own.
-
-Make sure each conversation example starts with a <START> macro. Do not include it if it doesn't help to develop the character's actions and speaking behavior.`;
+  const template = promptManager.getPrompt('messageExample');
+  // Pass {{user}} as user_placeholder if needed, but since we rely on unknown keys staying as placeholders,
+  // and {{user}} is in the template as {{user}}, and data probably doesn't have "user" key, it should be fine.
+  // We can pass user_placeholder if we want to be explicit, but the template has {{user}}.
+  return promptManager.interpolatePrompt(template, data);
 };
 
 /**
  * Generates a system prompt based on character data.
  */
 export const generateSystemPrompt = (data: CharacterData): string => {
-  return `Generate System Prompt based on the following information:
-
-Card name: ${data.name}
-Physical Description: ${data.description}
-Character Personality: ${data.personality}
-Scene settings: ${data.scenario}
-Example Character Actions: ${data.mes_example}
-Story introduction: ${data.first_mes}
-
-Write the System Prompt to instruct the AI how to accurately play the character. Be concise and clear.`;
+  const template = promptManager.getPrompt('systemPrompt');
+  return promptManager.interpolatePrompt(template, data);
 };
 
 /**
  * Generates brief instructions for the AI based on character data.
  */
 export const generatePostHistoryInstructions = (data: CharacterData): string => {
-  return `Generate the most important instructions for the AI based on the following information:
-  Card name: ${data.name}
-  Physical Description: ${data.description}
-  Character Personality: ${data.personality}
-  Scene settings: ${data.scenario}
-  Example Character Actions: ${data.mes_example}
-  Story introduction: ${data.first_mes}
-  SYSTEM PROMPT: ${data.system_prompt}
-
-  THIS MUST BE EXTREMELY BRIEF!.`;
+  const template = promptManager.getPrompt('postHistoryInstructions');
+  return promptManager.interpolatePrompt(template, data);
 };
 
 export const generateTags = (data: CharacterData): string => {
-  return `Generate appropriate keywords based on the following information:
-
-Card name: ${data.name}
-Physical Description: ${data.description}
-Character Personality: ${data.personality}
-Scene setting: ${data.scenario}
-
-Please generate 5-10 related keywords or single-word tags, separated by commas. Tags should include character type, personality traits, scene type, etc.`;
+  const template = promptManager.getPrompt('tags');
+  return promptManager.interpolatePrompt(template, data);
 };
 
-/**
- * Generates an alternate greeting based on character data.
- *
- * This function constructs a detailed greeting string using various attributes from the provided
- * CharacterData object. It includes the character's name, physical description, personality traits,
- * scene settings, and examples of dialogue. The output is designed to facilitate the writing of
- * a new chapter that incorporates the character and their interactions with the player/user.
- *
- * @param {CharacterData} data - The character data used to generate the greeting.
- */
 /**
  * Generates an alternate greeting based on character data.
  */
 export const generateAlternateGreeting = (data: CharacterData): string => {
-  return `Generate the start of the next chapter of the story based on the following information:
-
-Card name: ${data.name}
-Physical Description: ${data.description}
-Character Personality: ${data.personality}
-Scene settings: ${data.scenario}
-Dialogue example: ${data.mes_example}
-
-The chapters that have already been written: 
-
-First Chapter Beginning: ${data.first_mes}
-Subsequent chapters(if any): ${data.alternate_greetings}
-
-Write the beginning of a new chapter. It must include the character and some encounter with the player / user and must be at least one day after any prior chapters. Merge the writing styles of James Joyce, Philip K. Dick, Francois Rabelais, and Anais Nin as appropriate to the context.`;
+  const template = promptManager.getPrompt('alternateGreeting');
+  return promptManager.interpolatePrompt(template, data);
 };
 
 /**
  * Generates a character book entry based on character data and optional context.
  */
 export const generateCharacterBookEntry = (data: CharacterData): string => {
-  return `Generate specific important character information entries based on the following information:
-
-Card name: ${data.name}
-Physical Description: ${data.description}
-Character Personality: ${data.personality}
-Scene settings: ${data.scenario}
-
-You are constructing what is referred to as a lorebook. When certain keywords are mentioned in the chat, it triggers a longer definition to be sent to the AI and considered in it's response. It can work like an important memory of the character's or an important fact about the character. It should be something quite unique and important to be worth including. 
-
-The parameters are:
-Keyword requirements: Use at least 2 - 3 related core keywords/synonyms, separated by commas.
-Content requirements: Generate specific setting content, such as the character's special skills, important experiences, interpersonal relationships or items, and other background information.
-
-The format is as follows:
-  Keywords: keyword1, keyword2, keyword3, keyword4, ...
-  Content: The detailed description.
-
-The content should be rich and helpful for role-playing.`;
+  const template = promptManager.getPrompt('characterBookEntry');
+  return promptManager.interpolatePrompt(template, data);
 };

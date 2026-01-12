@@ -1,9 +1,48 @@
 
-const { app, BrowserWindow, Menu } = require('electron');
+const { app, BrowserWindow, Menu, ipcMain } = require('electron');
 const path = require('path');
+const fs = require('fs');
 const isDev = process.env.NODE_ENV === 'development';
 
 let mainWindow;
+const userDataPath = app.getPath('userData');
+const promptsPath = path.join(userDataPath, 'prompts.json');
+
+// IPC Handlers for prompts
+ipcMain.handle('load-prompts', async () => {
+  try {
+    if (fs.existsSync(promptsPath)) {
+      const data = fs.readFileSync(promptsPath, 'utf-8');
+      return JSON.parse(data);
+    }
+    return null; // Return null to indicate use defaults
+  } catch (error) {
+    console.error('Failed to load prompts:', error);
+    throw error;
+  }
+});
+
+ipcMain.handle('save-prompts', async (event, prompts) => {
+  try {
+    fs.writeFileSync(promptsPath, JSON.stringify(prompts, null, 2), 'utf-8');
+    return true;
+  } catch (error) {
+    console.error('Failed to save prompts:', error);
+    throw error;
+  }
+});
+
+ipcMain.handle('reset-prompts', async () => {
+  try {
+    if (fs.existsSync(promptsPath)) {
+      fs.unlinkSync(promptsPath);
+    }
+    return true;
+  } catch (error) {
+    console.error('Failed to reset prompts:', error);
+    throw error;
+  }
+});
 
 function createWindow() {
   // Create a browser window
