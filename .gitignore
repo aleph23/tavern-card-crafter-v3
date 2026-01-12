@@ -1,33 +1,56 @@
+# ─────────────────────────────────────────────
 # Logs
-logs
-*.log
+# ─────────────────────────────────────────────
+logs/
 *.log*
 
-node_modules
-dist
-dist-ssr
-*.local
-
-# Editor directories and files
-.vscode/*
-.vscode/**/*
-.idea
+# ─────────────────────────────────────────────
+# OS / Editor / Tooling
+# ─────────────────────────────────────────────
 .DS_Store
+.vscode/
+.idea/
+.vs/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
-.vs/*
-.vs/**/*
+
+# JetBrains / VSCode AI tooling
 appmap.yml
 .continue/
-portable-build/**/*
-tmp/
-/pnpm-lock.yaml
-/pnpm-workspace.yaml
-.github/copilot-instructions.md
-refactorgentohook.txt
+
+# ─────────────────────────────────────────────
+# Package managers
+# ─────────────────────────────────────────────
+node_modules/
 yarn.lock
-build-electron/**/*
-dist-electron/**/*
+pnpm-lock.yaml
+pnpm-workspace.yaml
+
+# ─────────────────────────────────────────────
+# Build output (Electron + Vite)
+# ─────────────────────────────────────────────
+build-electron/
+dist-electron/
+portable-build/
+dist/
+dist-ssr/
+
+# Electron artifacts that sometimes escape
+*.asar
+*.pak
+*.bin
+
+# ─────────────────────────────────────────────
+# Temporary / local environment
+# ─────────────────────────────────────────────
+tmp/
+*.local
+*.txt
+
+# ─────────────────────────────────────────────
+# GitHub-specific
+# ─────────────────────────────────────────────
+.github/copilot-instructions.md
