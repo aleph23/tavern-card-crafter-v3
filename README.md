@@ -3,7 +3,7 @@
 
 ## Changelog
 1/12/26
-- Configurable tempurate and max token response accessible via 'AI Settings'
+- Configurable temperature and max token response accessible via 'AI Settings'
 
 10/25
 - Translated to English from original repo.
