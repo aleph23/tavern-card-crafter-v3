@@ -77,7 +77,7 @@ export const generateWithAI = async (
       model: settings.model,
       messages: [{ role: 'user', content: prompt }],
       max_tokens: settings.maxTokens || 1200,
-      temperature: settings.infTemp || 0.7,
+      temperature: settings.infTemp ?? settings.temperature ?? 0.7,
     };
 
     console.log('Request body:', requestBody);
