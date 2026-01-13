@@ -20,6 +20,8 @@ export interface AISettings {
   apiUrl: string;
   model: string;
   provider: string;
+  maxTokens?: number;  // Optional, defaults to 1200
+  infTemp?: number;  // Optional, defaults to 0.7
 }
 
 /**
@@ -133,7 +135,9 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
       apiKey: "",
       apiUrl: "https://api.openai.com/v1/chat/completions",
       model: "gpt-3.5-turbo",
-      provider: "openai"
+      provider: "openai",
+      maxTokens: 1200,
+      infTemp: 1.0,
     }
   );
   const [isTestingConnection, setIsTestingConnection] = useState(false);
@@ -730,6 +734,37 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="space-y-4 border-t pt-4">
+            <h4 className="font-medium">Generation Parameters</h4>
+            <div className="space-y-2">
+              <Label htmlFor="maxTokens">Max Tokens ({settings.maxTokens ? settings.maxTokens : 1200})</Label>
+              <Input
+                id="maxTokens"
+                type="number"
+                min="1"
+                max="5000"  // Adjust as needed for your API limits
+                value={settings.maxTokens || 1200}
+                onChange={(e) => setSettings(prev => ({ ...prev, maxTokens: parseInt(e.target.value) || 1200 }))}
+                placeholder="e.g., 1200"
+              />
+              <p className="text-xs text-muted-foreground">Controls the maximum number of tokens in the AI response.</p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="infTemp">Temperature ({((settings.temperature || 1.0) * 50).toFixed(0)}%)</Label>
+              <Input
+                id="infTemp"
+                type="number"
+                min="0.1"
+                max="2"
+                step="0.1"
+                value={settings.temperature || 1.0}
+                onChange={(e) => setSettings(prev => ({ ...prev, temperature: parseFloat(e.target.value) || 1.0 }))}
+                placeholder="e.g., 1.0"
+              />
+              <p className="text-xs text-muted-foreground">Controls response creativity (0 = deterministic, 2 = highly creative).</p>
+            </div>
           </div>
 
           <Button onClick={handleSave} className="w-full">

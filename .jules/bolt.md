@@ -1,0 +1,3 @@
+## 2024-05-23 - React State Optimization
+**Learning:** This codebase uses a pattern where a large central state object (`characterData`) is managed in the parent component and passed down to multiple child sections. The updater function (`updateField`) recreates the state object and is itself recreated on every render. This causes every child section to re-render on every keystroke, even if they don't depend on the changed field.
+**Action:** Use `React.memo` with custom comparison functions for child components and `useCallback` for the updater function. Instead of refactoring to pass granular props (which would be a large change), memoizing components to check only relevant parts of the `data` object is a valid strategy for "small" performance improvements.

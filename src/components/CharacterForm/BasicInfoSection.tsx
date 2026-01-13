@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Upload, X, Sparkles, Loader2, RefreshCcw, Trash2 } from "lucide-react";
-import { useRef, useState } from "react";
+import { useRef, useState, memo } from "react";
 import { generateWithAI, generateDescription } from "@/utils/aiGenerator";
 import { AISettings } from "@/components/AISettings";
 import { useToast } from "@/hooks/use-toast";
@@ -277,4 +277,14 @@ const BasicInfoSection = ({ data, updateField, characterImage, setCharacterImage
   );
 };
 
-export default BasicInfoSection;
+export default memo(BasicInfoSection, (prevProps, nextProps) => {
+  return (
+    prevProps.data.name === nextProps.data.name &&
+    prevProps.data.nickname === nextProps.data.nickname &&
+    prevProps.data.description === nextProps.data.description &&
+    prevProps.characterImage === nextProps.characterImage &&
+    prevProps.aiSettings === nextProps.aiSettings &&
+    prevProps.updateField === nextProps.updateField &&
+    prevProps.setCharacterImage === nextProps.setCharacterImage
+  );
+});

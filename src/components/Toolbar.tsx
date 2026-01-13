@@ -10,7 +10,7 @@ const Toolbar = () => {
   const { theme, toggleTheme } = useTheme();
 
   const toggleLanguage = () => {
-    setLanguage(language === 'en' ? 'en' : 'zh');
+    setLanguage(language === 'en' ? 'zh' : 'en');
   };
 
   return (
@@ -24,7 +24,7 @@ const Toolbar = () => {
         className="gap-2"
       >
         <Globe className="h-4 w-4" />
-        {language === 'en' ? 'EN' : '中文'}
+        {language === 'en' ? '中文' : 'EN'}
       </Button>
 
       <Button

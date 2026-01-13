@@ -1,6 +1,7 @@
 {
   "appId": "com.taverncard.crafter",
   "productName": "Tavern Card Crafter",
+  "buildVersion": "0.2.1",
   "directories": {
     "output": "build-electron"
   },
@@ -16,17 +17,16 @@
     }
   ],
   "mac": {
-    "category": "public.app-category.productivity",
+    "category": "public.app-category.games",
     "target": "dmg"
   },
   "win": {
     "target": "portable",
     "forceCodeSigning": false,
-    "sign": null
   },
   "linux": {
     "target": "AppImage",
-    "category": "Office"
+    "category": "Entertainment;Game;"
   },
   "nsis": {
     "oneClick": false,
