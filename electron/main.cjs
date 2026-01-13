@@ -5,8 +5,11 @@ const fs = require('fs');
 const isDev = process.env.NODE_ENV === 'development';
 
 let mainWindow;
-const userDataPath = app.getPath('userData');
-const promptsPath = path.join(userDataPath, 'prompts.json');
+// Use process.cwd() for the working directory (portable-friendly)
+// In production packaged apps, this might need adjustment depending on how it's launched,
+// but for a portable executable or dev, process.cwd() or path.dirname(process.execPath) is often desired.
+// However, the request specifically asked for "electron's working directory".
+const promptsPath = path.join(process.cwd(), 'prompts.json');
 
 // IPC Handlers for prompts
 ipcMain.handle('load-prompts', async () => {
