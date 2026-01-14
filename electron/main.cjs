@@ -45,7 +45,22 @@ ipcMain.handle('reset-prompts', async () => {
 });
 
 function createWindow() {
-  // Create a browser window
+/**
+ * Creates and configures the main application browser window.
+ * Sets up window display behavior, loading of the app content, and key window event handlers.
+ *
+ * This function initializes the main BrowserWindow instance with predefined dimensions,
+ * security options, and UI settings, then loads either the development server or the
+ * production build depending on the environment.
+ * It also manages when the window is shown, handles cleanup on close, and prevents
+ * new in-app windows from opening by redirecting external links to the default browser.
+ *
+ * Args:
+ *   None
+ *
+ * Returns:
+ *   void
+ */
   mainWindow = new BrowserWindow({
     width: 1400,
     height: 900,
