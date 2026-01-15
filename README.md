@@ -243,27 +243,32 @@ This project is licensed under the MIT license. See the LICENSE file for details
 
 ## Changelog
 
-### 2026-01-15
+### 1/15/26
 
-#### New Features
-- Added a prompt management system with editable templates, a PromptEditor UI, default prompt configuration, and prompt interpolation utilities used across AI generation flows.
-- Persisted user-defined prompts via Electron IPC (desktop packaged releases) and browser localStorage (web), with support for loading, saving, and resetting prompts.
-- Extended the AI Settings dialog with tabbed navigation separating connection parameters from prompt template management.
+#### New Features:
 
-#### Bug Fixes
-- Escaped JSON content before syntax highlighting in the character preview to reduce XSS risk.
-- Corrected AI temperature handling by introducing a dedicated `infTemp` setting for inference behavior instead of overloading the generic temperature field.
+- Add a prompt management system with editable templates, including a PromptEditor UI, default prompt configuration, and prompt interpolation utilities used across AI generation flows.
+- Persist user-defined prompts via Electron IPC and local storage, with support for loading, saving, and resetting prompts in both desktop and web environments.
+- Extend the AI settings dialog with tabbed navigation separating connection parameters from prompt template management.
 
-#### Enhancements
-- Refined AI settings layout with a clearer separation of concerns and a wider dialog for easier editing.
-- Centralized AI generation prompt text into reusable templates rather than hardcoded strings.
-- Improved error messaging for missing local models and prompt save failures, including clearer permission-denied guidance.
-- Documented and cleaned up Electron window-creation logic and character preview comments for maintainability.
+#### Bug Fixes:
 
-### 2026-01-12
-- Configurable temperature and max token options accessible via 'AI Settings'.
+- Escape JSON content before syntax highlighting in the character preview to prevent XSS vulnerabilities.
+- Correct AI temperature handling by using a dedicated infTemp setting instead of overloading the generic temperature field.
 
-### 2025-10-25
-- Translated documentation to English from the original repo.
-- PNG export to image now working in production (avatar upload required).
-- Tested with local model and OpenRouter backends. If you have trouble with other providers, please open an issue.
+#### Enhancements:
+
+- Refine AI settings layout with a wider dialog and clearer organization of connection and generation parameters.
+- Centralize AI generation prompt text into reusable templates rather than hardcoded strings, simplifying future changes and localization.
+- Add clearer error messaging for missing local models and for prompt save failures, including friendlier permission-denied guidance.
+- Document and slightly clean up Electron window-creation logic and character preview documentation comments for better maintainability.
+
+### 1/12/26
+
+- Configurable temperature and max token response accessible via 'AI Settings'
+
+### 10/25
+
+- Translated to English from original repo.
+- **Got saving to a PNG file actually working!**
+- Only tested with local and openrouter. If you have trouble with another provider, please open an issue.
