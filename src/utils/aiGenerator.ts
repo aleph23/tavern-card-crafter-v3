@@ -116,7 +116,7 @@ export const generateWithAI = async (
 
       // Special error prompts for local services
       if (localServices.includes(settings.provider.toLowerCase()) && (response.status === 400 || errorText.includes('model'))) {
-            errorMessage = `Model"${settings.model}"Not present or not loaded. Please get a list of available models in the AI settings or make sure it has been downloaded/Load the model.`;
+        errorMessage = `Model "${settings.model}" not present or not loaded. Please fetch the list of available models in AI settings or make sure it has been downloaded/loaded.`;
       }
 
       throw new Error(errorMessage);
