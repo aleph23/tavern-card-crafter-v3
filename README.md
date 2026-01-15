@@ -1,15 +1,6 @@
 
 # Tavern Card Crafter - AI character card maker
 
-## Changelog
-1/12/26
-- Configurable temperature and max token response accessible via 'AI Settings'
-
-10/25
-- Translated to English from original repo.
-- **Got saving to a PNG file actually working!**
-- Only tested with local and openrouter. If you have trouble with another provider, please open an issue.
-
 ---
 
 ### Project Introduction
@@ -201,4 +192,34 @@ This project adopts an MIT license. For details, please see the LICENSE file.
 
 ---
 
-_Make AI character creation simpler and more efficient! _
+## Changelog
+
+### 1/15/26
+
+#### New Features:
+
+- Add a prompt management system with editable templates, including a PromptEditor UI, default prompt configuration, and prompt interpolation utilities used across AI generation flows.
+- Persist user-defined prompts via Electron IPC and local storage, with support for loading, saving, and resetting prompts in both desktop and web environments.
+- Extend the AI settings dialog with tabbed navigation separating connection parameters from prompt template management.
+
+#### Bug Fixes:
+
+- Escape JSON content before syntax highlighting in the character preview to prevent XSS vulnerabilities.
+- Correct AI temperature handling by using a dedicated infTemp setting instead of overloading the generic temperature field.
+
+#### Enhancements:
+
+- Refine AI settings layout with a wider dialog and clearer organization of connection and generation parameters.
+- Centralize AI generation prompt text into reusable templates rather than hardcoded strings, simplifying future changes and localization.
+- Add clearer error messaging for missing local models and for prompt save failures, including friendlier permission-denied guidance.
+- Document and slightly clean up Electron window-creation logic and character preview documentation comments for better maintainability.
+
+### 1/12/26
+
+- Configurable temperature and max token response accessible via 'AI Settings'
+
+### 10/25
+
+- Translated to English from original repo.
+- **Got saving to a PNG file actually working!**
+- Only tested with local and openrouter. If you have trouble with another provider, please open an issue.
