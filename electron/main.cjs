@@ -1,5 +1,5 @@
 
-const { app, BrowserWindow, Menu, ipcMain, safeStorage } = require('electron'); // Added safeStorage
+const { app, BrowserWindow, Menu, ipcMain } = require('electron'); // Added ipcMain
 const path = require('path');
 const fs = require('fs');
 const isDev = process.env.NODE_ENV === 'development';
