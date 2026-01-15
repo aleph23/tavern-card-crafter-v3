@@ -1,12 +1,76 @@
 
-const { app, BrowserWindow, Menu } = require('electron');
+const { app, BrowserWindow, Menu, ipcMain } = require('electron'); // Added ipcMain
 const path = require('path');
+const fs = require('fs');
 const isDev = process.env.NODE_ENV === 'development';
 
 let mainWindow;
 
+const promptsPath = path.join(process.cwd(), 'prompts.json');
+
+// IPC Handlers for prompts
+ipcMain.handle('load-prompts', async () => {
+  try {
+    if (fs.existsSync(promptsPath)) {
+      const data = fs.readFileSync(promptsPath, 'utf-8');
+      return JSON.parse(data);
+    }
+    return null; // Return null to indicate use defaults
+  } catch (error) {
+    console.error('Failed to load prompts:', error);
+    throw error;
+  }
+});
+// Save prompts with enhanced error handling for permission issues
+ipcMain.handle('save-prompts', async (event, prompts) => {
+  try {
+    fs.writeFileSync(promptsPath, JSON.stringify(prompts, null, 2), 'utf-8');
+    return true;
+  } catch (error) {
+    console.error('Failed to save prompts:', error);
+
+    // Check for specific permission errors
+    if (error.code === 'EACCES' || error.code === 'EPERM' || error.code === 'EROFS') {
+      // Throw a friendly error string that the frontend can display directly
+      throw new Error(
+        'PERMISSION DENIED: The application is in a read-only folder. Please move the app to a writable location (like your Desktop) to save changes.'
+      );
+    }
+
+    // Re-throw generic errors for other issues (disk full, etc.)
+    throw error;
+  }
+});
+
+ipcMain.handle('reset-prompts', async () => {
+  try {
+    if (fs.existsSync(promptsPath)) {
+      fs.unlinkSync(promptsPath);
+    }
+    return true;
+  } catch (error) {
+    console.error('Failed to reset prompts:', error);
+    throw error;
+  }
+});
+
 function createWindow() {
-  // Create a browser window
+/**
+ * Creates and configures the main application browser window.
+ * Sets up window display behavior, loading of the app content, and key window event handlers.
+ *
+ * This function initializes the main BrowserWindow instance with predefined dimensions,
+ * security options, and UI settings, then loads either the development server or the
+ * production build depending on the environment.
+ * It also manages when the window is shown, handles cleanup on close, and prevents
+ * new in-app windows from opening by redirecting external links to the default browser.
+ *
+ * Args:
+ *   None
+ *
+ * Returns:
+ *   void
+ */
   mainWindow = new BrowserWindow({
     width: 1400,
     height: 900,
