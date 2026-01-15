@@ -38,7 +38,7 @@ export const PromptEditor: React.FC = () => {
     }));
     setHasChanges(true);
   };
-
+  // Save handler with improved error message handling
   const handleSave = async () => {
     try {
       await promptManager.savePrompts(prompts);
@@ -47,10 +47,18 @@ export const PromptEditor: React.FC = () => {
         title: "Success",
         description: "Prompts saved successfully",
       });
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Save error:", error);
+      
+      // Clean up the error message from Electron's IPC wrapper
+      // This removes the "Error invoking remote method..." prefix so the user sees just your message
+      const cleanMessage = error.message 
+        ? error.message.replace(/Error invoking remote method '[^']+': /, '')
+        : "Failed to save prompts";
+
       toast({
-        title: "Error",
-        description: "Failed to save prompts",
+        title: "Save Failed",
+        description: cleanMessage,
         variant: "destructive"
       });
     }
@@ -81,11 +89,11 @@ export const PromptEditor: React.FC = () => {
   // Preview state
   const [previewData, setPreviewData] = useState<any>({
     name: "Alice",
-    description: "A young adventurer with blonde hair and blue eyes, wearing leather armor.",
-    personality: "Brave, curious, sometimes reckless.",
-    scenario: "A dark dungeon filled with monsters.",
-    first_mes: "Hello traveler! What brings you to this dangerous place?",
-    mes_example: "<START>\nAlice: Hi there!\nAlice: *waves hand*",
+    description: "A young woman with blonde hair and blue eyes, wearing a frilly blue and white dress.",
+    personality: "Innocent, curious, sometimes reckless.",
+    scenario: "Alice follows a bunny into its hole. Surrealist adventure ensues.",
+    first_mes: "The fall seems endless. Alice passes by shelves of books, floating teacups, and curious creatures. When she finally lands, she finds herself in a strange hallway with many doors.",
+    mes_example: "<START>\nWhite Rabbit: Mary Ann! Mary Ann! Fetch me a pair of gloves and a fan! Quick, now!\nAlice: Oh dear, I seem to have fallen down a rabbit hole. Where am I?\nWhite Rabbit: No time to explain! Hurry!\",",
     system_prompt: "You are Alice.",
   });
   const [showPreview, setShowPreview] = useState(false);

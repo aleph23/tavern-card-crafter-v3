@@ -1,5 +1,5 @@
 
-const { app, BrowserWindow, Menu, ipcMain } = require('electron');
+const { app, BrowserWindow, Menu, ipcMain, safeStorage } = require('electron'); // Added safeStorage
 const path = require('path');
 const fs = require('fs');
 const isDev = process.env.NODE_ENV === 'development';
@@ -21,13 +21,23 @@ ipcMain.handle('load-prompts', async () => {
     throw error;
   }
 });
-
+// Save prompts with enhanced error handling for permission issues
 ipcMain.handle('save-prompts', async (event, prompts) => {
   try {
     fs.writeFileSync(promptsPath, JSON.stringify(prompts, null, 2), 'utf-8');
     return true;
   } catch (error) {
     console.error('Failed to save prompts:', error);
+
+    // Check for specific permission errors
+    if (error.code === 'EACCES' || error.code === 'EPERM' || error.code === 'EROFS') {
+      // Throw a friendly error string that the frontend can display directly
+      throw new Error(
+        'PERMISSION DENIED: The application is in a read-only folder. Please move the app to a writable location (like your Desktop) to save changes.'
+      );
+    }
+
+    // Re-throw generic errors for other issues (disk full, etc.)
     throw error;
   }
 });
