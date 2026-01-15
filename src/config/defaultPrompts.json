@@ -22,7 +22,7 @@
   "firstMessage": {
     "name": "First Message",
     "description": "Generates the first message.",
-    "template": "Generate the first message of the game, introducing the character to the player/user:\n\nCard name: {{name}}\nPhysical Description: {{description}}\nCharacter Personality: {{personality}}\nScene settings: {{scenario}}\n\nThis will be the first outward facing text, the first thing the player/user encounters when playing with the character.Somehow the character must meet the player/user. The writing should be a perfect combination of Douglas Adams, Ursula K. Le Guin, James Joyce, Anais Nin, and Philip K. Dick."
+    "template": "Generate the first message of the game, introducing the character to the player/user:\n\nCard name: {{name}}\nPhysical Description: {{description}}\nCharacter Personality: {{personality}}\nScene settings: {{scenario}}\n\nThis will be the first outward facing text, the first thing the player/user encounters when playing with the character.Somehow the character must meet the player/user. The writing should be a melding of Jane Austin, Ursula Le Guin, James Joyce, Anais Nin, or Philip K. Dick, as appropriate to the context."
   },
   "messageExample": {
     "name": "Message Example",
@@ -47,7 +47,7 @@
   "alternateGreeting": {
     "name": "Alternate Greeting",
     "description": "Generates an alternate greeting (chapter start).",
-    "template": "Generate the start of the next chapter of the story based on the following information:\n\nCard name: {{name}}\nPhysical Description: {{description}}\nCharacter Personality: {{personality}}\nScene settings: {{scenario}}\nDialogue example: {{mes_example}}\n\nThe chapters that have already been written: \n\nFirst Chapter Beginning: {{first_mes}}\nSubsequent chapters(if any): {{alternate_greetings}}\n\nWrite the beginning of a new chapter. It must include the character and some encounter with the player / user and must be at least one day after any prior chapters. Merge the writing styles of James Joyce, Philip K. Dick, Francois Rabelais, and Anais Nin as appropriate to the context."
+    "template": "Generate the start of the next chapter of the story based on the following information:\n\nCard name: {{name}}\nPhysical Description: {{description}}\nCharacter Personality: {{personality}}\nScene settings: {{scenario}}\nDialogue example: {{mes_example}}\n\nThe chapters that have already been written: \n\nFirst Chapter Beginning: {{first_mes}}\nSubsequent chapters(if any): {{alternate_greetings}}\n\nWrite the beginning of a new chapter. It must include the character and some encounter with the player / user and must be at least one day after any prior chapters. Merge the writing styles of James Joyce, Jane Austin, Philip K. Dick, Francois Rabelais, or Anais Nin as appropriate to the context."
   },
   "characterBookEntry": {
     "name": "Character Book Entry",
