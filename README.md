@@ -175,13 +175,6 @@ npm run build
 npm run preview
 ```
 
-##### Desktop application version
-
-```cmd
-# Build the electron portable app
-build-portable.bat
-```
-
 ---
 
 ### Project structure
