@@ -1,55 +1,67 @@
-
 # Tavern Card Crafter - AI character card maker
-
-## Changelog
-1/12/26
-- Configurable temperature and max token response accessible via 'AI Settings'
-
-10/25
-- Translated to English from original repo.
-- **Got saving to a PNG file actually working!**
-- Only tested with local and openrouter. If you have trouble with another provider, please open an issue.
 
 ---
 
 ### Project Introduction
 
-Tavern Card Crafter is a professional AI character card maker that helps users easily create and edit character cards for chatbots and roleplay. The tool offers an intuitive interface and powerful features that make character creation easy and efficient.
+Tavern Card Crafter is a professional AI character card maker that helps users easily create and edit character cards for chatbots and roleplay. The tool offers an intuitive interface and powerful features for generating, editing, previewing, and exporting character role cards suitable for chatbot or roleplaying use.
 
 ![](img/2025-10-23_113717.png "Dark")
 ![](img/2025-10-23_113814.png "Light")
 
-### Key features:
+### Key features
 
 #### 🤖 AI intelligent assistant
 
-- **Intelligent Character Creation**: Quickly generate basic character information through AI assistants
-- **Multi-genre support**: Supports different types of characters such as anime, games, novels, and historical figures
-- **Intelligent Content Extraction**: Paste any text, and AI automatically extracts and generates structured character information
+- **Intelligent Character Creation**: Quickly generate structured character information from free text using AI.
+- **Multi-genre support**: Supports character types such as anime, games, novels, historical figures, and more.
+- **Intelligent Content Extraction**: Paste any text (novel excerpt, script, notes), and AI will extract and convert it into structured character fields.
 
 ![](img/2025-10-23_113929.png "AI results")
 
 #### ✏️ Full character editing
 
-- **Basic information**: Name, description, first-person perspective, etc
-- **Personality Traits**: Detailed personality traits and behavior patterns
-- **Scenario Settings**: Backstory and environment description
-- **Dialogue System**: Sample dialogues, greetings, alternative greetings
-- **Character/Lore Book**: Worldview setting and memory entries
-- **Keyword/Tag Classification**: Role labeling and metadata management
+- **Basic information**: Name, description, avatar, first-person perspective, and more.
+- **Personality Traits**: Detailed personality traits and behavior patterns for robust role simulation.
+- **Scenario Settings**: Backstory, environment, and other scenario-specific settings.
+- **Dialogue System**: Compose sample dialogues, greetings, and alternative greetings.
+- **Character/Lore Book**: Add and manage worldbuilding or memory entries.
+- **Keyword/Tag Classification**: Role labeling and metadata management for easy categorization.
 
-####  📟 Multi-platform support
+#### 🧩 Prompt Management (new)
 
-- **Web version**: Browser direct access and use
-- **Desktop App**: A cross-platform Electron desktop app
-- **Sidebar Layout**: AI assistant, character editing, JSON preview split tab interface
+- **Editable prompt templates**: Manage and edit prompt templates used across AI generation flows.
+- **Prompt interpolation utilities**: Reusable utilities for prompt variable interpolation and templating.
+- **PromptEditor UI**: A small UI to create, edit, preview, and select prompt templates while generating.
+- **Default and user prompts**: Comes with default templates and lets users create custom templates.
+
+#### 💾 Persisted prompts and cross-environment support
+
+- **Prompt persistence**: User-created or edited prompts are persisted across sessions.
+  - On Desktop (packaged Electron releases) prompts are saved/persisted via Electron IPC to local files for full functionality and stable permission handling.
+  - On Web, prompts are saved to browser localStorage (useful for quick testing and web-hosted usage).
+- **Load / Save / Reset**: Prompts can be loaded, saved, or reset to defaults from the AI Settings dialog.
+
+Note: To get the full functionality and most reliable prompt-saving behavior (especially filesystem persistence and permission handling), the preferred usage method is to download and install the packaged desktop release from this repository's Releases page. Running from source in development mode works, but packaged releases provide the complete persistent storage integration.
+
+#### ⚙️ AI Settings improvements
+
+- **Tabbed AI Settings dialog**: Connection parameters (keys, endpoints) are separated from prompt template management in a tabbed layout for clarity.
+- **Connection & generation controls**: Configure model/host settings, temperature, tokens and a dedicated `infTemp` for inference sampling behavior.
+- **Clearer error messaging**: Better messages for missing local models and prompt save failures, including permission guidance.
+
+#### 📟 Multi-platform support
+
+- **Web version**: Browser direct access and use (Vite-based).
+- **Desktop App**: Cross-platform Electron desktop app with filesystem access.
+- **Sidebar Layout**: AI assistant, character editing, and JSON preview split tab interface.
 
 #### 🛠 Practical features
 
-- **Real-time preview**: Real-time preview in JSON format, syntax highlighting
-- **Multi-format export**: Supports JSON and PNG format export
-- **Localized Interface**: Completely Chinese interface, easy and intuitive to operate
-- **Responsive Design**: Supports a wide range of devices and screen sizes
+- **Real-time preview**: JSON preview updates in real time with syntax highlighting.
+- **Multi-format export**: Export cards as JSON and PNG formats (PNG export embeds the character card into an image; avatar upload required).
+- **Language & localization**: The UI is now primarily English by default; Chinese (简体中文) remains available as a togglable option at the top of the page.
+- **Responsive Design**: Layout works across a range of screen sizes and platforms.
 
 ![](img/2025-10-23_114242.png)
 
@@ -57,23 +69,76 @@ Tavern Card Crafter is a professional AI character card maker that helps users e
 
 ### Technology Stack
 
-This project is built on modern web technology:
+This project uses modern web and desktop technologies:
 
-- **React** - User Interface Framework
-- **Type Script** - Type-safe Java Script
-- **Vite** - Quick build tool
-- **Electron** - Cross-platform desktop application framework
-- **Tailwind CSS** - Practical and priority CSS framework
-- **shadcn/ui** - High-quality React component library
+- React - User Interface Framework
+- TypeScript - Type-safe JavaScript
+- Vite - Fast build/development tooling
+- Electron - Cross-platform desktop application wrapper
+- Tailwind CSS - Utility-first CSS framework
+- shadcn/ui - Component primitives and patterns
+ 
+---
 
-### Get started quickly
+### User Guide
+
+#### 🚀 Start quickly
+
+1. Start the application via `npm run electron-dev` (development) or download the portable executable from Releases (production).
+2. Use the left sidebar to switch between three main modes: AI Assistant, Editor, and JSON/Export Preview.
+
+#### 📋 Detailed explanation of functions
+
+##### 🤖 AI character card assistant
+
+1. Paste a character-related text into the input box (novel snippets, game description, notes).
+2. Select the character type (anime, games, novels, historical figures, etc.).
+3. Click "AI Analysis / Generation" — AI will extract structured character fields.
+4. Click generated fields to fill them into the Role Editor with one click.
+
+##### 🧾 Prompt templates and AI Settings
+
+1. Open AI Settings and switch to the "Prompts" tab.
+2. Create or edit prompt templates in the PromptEditor UI.
+3. Save templates — saved prompts persist across sessions (Electron packaged releases: filesystem via IPC; Web: localStorage).
+4. Use the "Connection" tab in AI Settings to configure model endpoint, credentials, temperature, max tokens, and `infTemp`.
+
+##### ✏️ Character information editing
+
+1. Edit basic fields (name, description, avatar).
+2. Fill in personality, behavior patterns, and special scenario notes.
+3. Configure dialogue — first message, examples, and alternative greetings.
+4. Add worldview/memory book entries and use tags to classify characters.
+
+##### 📄 JSON Preview
+![preview the generated JSON before saving](img/2025-10-23_114417.png "JSON view")
+1. Real-time JSON preview of the generated character card.
+2. Syntax highlighting and escaped JSON content to prevent XSS vectors.
+3. Statistics: shows total characters and token estimation for the current card.
+4. Export options:
+   - JSON Export: download a standard JSON file.
+   - PNG Export: export an image of the character card (requires avatar upload).
+   - Copy to clipboard: quickly copy JSON content.
+
+#### 💡 Usage Tips
+
+- Use the AI Assistant to quickly bootstrap a card, then refine in the editor.
+- Create reusable prompts for specific genres/tones in the PromptEditor to get consistent results.
+- The UI synchronizes data across the AI assistant, editor, and preview tabs in real time.
+- For the most reliable prompt persistence and fewer permission issues, download and install the packaged desktop release from Releases.
+
+---
+
+### For Development: Get started quickly
 
 #### Environmental Requirements
 
-Make sure your system is installed:
+Make sure your system has:
 
-- Node js (recommended to use [nvm](https://github.com/nvm-sh/nvm#installing-and-updating) Installation)
-- npm package manager
+- Node.js (use nvm if you want to manage Node versions)
+- npm (or a compatible package manager)
+
+(If you have strict constraints, use the versions preferred in your development environment; Electron and dependencies generally work with Node LTS releases.)
 
 #### Install and run
 
@@ -84,7 +149,7 @@ git clone <YOUR_GIT_URL>
 # 2. Enter the project directory
 cd tavern-card-crafter-v3
 
-# 3. Installation dependencies
+# 3. Install dependencies
 npm install
 
 # 4. Start the development server (Web version)
@@ -94,8 +159,9 @@ npm run dev
 npm run electron-dev
 ```
 
-- **Web version**: Access in the browser `http://localhost:8080`
-- **Desktop Version**: Automatically open the Electron desktop application window
+- Web version: open `http://localhost:8080` (or the port Vite reports) in your browser
+- Desktop (dev): running `npm run electron-dev` will open an Electron development window
+- Desktop (full prompt persistence): for the most complete prompt-saving experience use the latest packaged desktop release from Releases
 
 #### Build and run
 
@@ -111,94 +177,93 @@ npm run preview
 
 ##### Desktop application version
 
-```bash
-# Quickly run desktop applications (production mode)
-npm run electron
-
-# Build and run desktop applications
-npm run electron-pack
-
-# Build a desktop application installation package
-npm run electron-build
+```cmd
+# Build the electron portable app
+build-portable.bat
 ```
 
-### User Guide
-
-#### 🚀 Start quickly
-
-1. **Start the application**: use `npm run electron-dev`(Development) or `npm run electron`(Production)
-2. **Select working mode**: Use the left tab to switch between the three functions
-
-#### 📋 Detailed explanation of functions
-
-##### 🤖 AI character card assistant
-
-1. **Paste content**: Paste any character-related text into the input box
-2. **Select type**: Select character type (animation, games, novels, historical characters, etc.)
-3. **AI Generation**: Click "AI Analysis Generation", and AI will intelligently extract and generate structured information
-4. **Fill in**: with one click: Select the generated field and fill in the role editor with one click
-
-##### ✏️ Character information editing
-
-1. **Basic Information**: Fill in the basic information such as character name, description, avatar, etc.
-2. **Personality Setting**: Describe the character characteristics and behavior patterns of the character in detail
-3. **Dialogue System**: Write first message, conversation examples and alternative greetings
-4. **Worldview Settings**: Add character book entries to enrich background settings
-5. **Tag management**: Adding relevant tags to roles is easy to classify
-
-##### 📄 JSON Preview
-![preview the generated JSON before saving](img/2025-10-23_114417.png "JSON view")
-1. **Real-time preview**: View the generated JSON format role card
-2. **Syntax Highlight**: Color displays JSON structure for easy reading
-3. **Statistics**: Display the total number of characters and tokens
-4. **Export function**:
-
-- **JSON Export**: Standard JSON format file
-- **PNG Export**: Embed the character card into the picture (need to upload the avatar)
-- **Copy to clipboard**: Quickly copy JSON content
-
-#### 💡 Usage Tips
-
-- **AI Assistant**: You can paste any related text such as character introduction, novel clips, game information, etc.
-- **Step editing**: Use tabs to focus on AI generation, manual editing, and preview export respectively
-- **Real-time synchronization**: The data of three tabs is synchronized in real time, and the effect can be switched to view at any time.
+---
 
 ### Project structure
 
+Note: The project file structure has undergone significant changes to support prompt management, prompt persistence, localized UI, and modular AI integration. The tree below is a representative layout; consult the repository for the canonical structure.
+
 ```
 src/
-├── components/          # React Components
-│   ├── CharacterForm/   # Role Edit Form Component
-│   │   ├── AIAssistant.tsx      # AI character card assistant
-│   │   ├── BasicInfoSection.tsx # Basic information edit
-│   │   ├── PersonalitySection.tsx # Personality traits Edit
-│   │   └── ...
-│   ├── CharacterPreview.tsx     # JSON preview component
-│   ├── AISettings.tsx           # AI Setup Components
-│   ├── ui/             # Basic UI components (shadcn/ui）
-│   └── ...
-├── pages/              # Page Components
-│   └── Index.tsx       # Main page (sidebar tab layout)
-├── contexts/           # React context
-│   ├── LanguageContext.tsx     # Multilingual support
-│   └── ThemeContext.tsx        # Topic Switch
-├── hooks/              # Custom Hook
-├── utils/              # Tool functions
-│   └── aiGenerator.ts  # AI generation related tools
-├── lib/                # Library files
-└── electron/           # Electron main process file
-    ├── main.cjs        # Main process entry
-    └── preload.js      # Preload scripts
+├── components/
+│   ├── CharacterForm/
+│   │   ├── AIAssistant.tsx
+│   │   ├── AlternateGreetings.tsx
+│   │   ├── BasicInfoSection.tsx
+│   │   ├── CharacterBook.tsx
+│   │   ├── MetadataSection.tsx
+│   │   ├── PersonalitySection.tsx
+│   │   ├── PromptsSection.tsx
+│   │   └── TagsSection.tsx
+│   ├── AISettings.tsx
+│   ├── CharacterPreview.tsx
+│   ├── PromptEditor.tsx
+│   ├── Toolbar.tsx
+│   └── ui/
+├── config/          
+│   ├──  defaultPrompts.json
+│   └── ui/
+├── contents/
+│   ├── LanguageContent.tsx
+│   └── ThemeContent.tsx
+├── hooks/
+│   ├── generatorHook.ts
+│   ├── use-toast.ts
+│   └── use-mobile.tsx
+├── lib/
+│   └── utils.ts
+├── pages/
+│   └── Index.tsx
+├── utils/
+│   ├── aiGenerator.ts
+│   ├── buildApiUrl.ts
+│   ├── promptManager.ts
+│   ├── promptMigration.ts
+├── types/
+│   └── prompts.ts
+└── electron/
+    ├── main.cjs
+    ├── preload.js
 ```
 
 ## Contribution Guide
 
-Welcome to submit Issue and Pull Request to help improve your project!
+Welcome — issues and pull requests are appreciated! If you add providers or functionality, please include tests or a short migration note. Sharing of prompts is also welcome.
 
 ### License
 
-This project adopts an MIT license. For details, please see the LICENSE file.
+This project is licensed under the MIT license. See the LICENSE file for details.
 
 ---
 
-_Make AI character creation simpler and more efficient! _
+## Changelog
+
+### 2026-01-15
+
+#### New Features
+- Added a prompt management system with editable templates, a PromptEditor UI, default prompt configuration, and prompt interpolation utilities used across AI generation flows.
+- Persisted user-defined prompts via Electron IPC (desktop packaged releases) and browser localStorage (web), with support for loading, saving, and resetting prompts.
+- Extended the AI Settings dialog with tabbed navigation separating connection parameters from prompt template management.
+
+#### Bug Fixes
+- Escaped JSON content before syntax highlighting in the character preview to reduce XSS risk.
+- Corrected AI temperature handling by introducing a dedicated `infTemp` setting for inference behavior instead of overloading the generic temperature field.
+
+#### Enhancements
+- Refined AI settings layout with a clearer separation of concerns and a wider dialog for easier editing.
+- Centralized AI generation prompt text into reusable templates rather than hardcoded strings.
+- Improved error messaging for missing local models and prompt save failures, including clearer permission-denied guidance.
+- Documented and cleaned up Electron window-creation logic and character preview comments for maintainability.
+
+### 2026-01-12
+- Configurable temperature and max token options accessible via 'AI Settings'.
+
+### 2025-10-25
+- Translated documentation to English from the original repo.
+- PNG export to image now working in production (avatar upload required).
+- Tested with local model and OpenRouter backends. If you have trouble with other providers, please open an issue.
