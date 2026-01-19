@@ -7,7 +7,7 @@ declare global {
   interface Window {
     electronAPI?: {
       loadPrompts: () => Promise<PromptCollection | null>;
-      savePrompts: (prompts: PromptCollection) => Promise<boolean>;
+      savePrompts: (prompts: PromptCollection) => Promise<{ success: boolean; path: string }>;
       resetPrompts: () => Promise<boolean>;
     };
   }
@@ -53,15 +53,16 @@ class PromptManager {
   async savePrompts(prompts: PromptCollection): Promise<void> {
     this.prompts = prompts;
 
-    console.log('[RENDERER] savePrompts called');
-    console.log('[RENDERER] window.electronAPI:', window.electronAPI);
+    // Debug logging (uncomment for troubleshooting)
+    // console.log('[RENDERER] savePrompts called');
+    // console.log('[RENDERER] window.electronAPI:', window.electronAPI);
 
     try {
       if (window.electronAPI) {
-        console.log('[RENDERER] Using electronAPI.savePrompts');
+        // console.log('[RENDERER] Using electronAPI.savePrompts');
         await window.electronAPI.savePrompts(prompts);
       } else {
-        console.log('[RENDERER] Falling back to localStorage');
+        // console.log('[RENDERER] Falling back to localStorage');
         localStorage.setItem('user_prompts', JSON.stringify(prompts));
       }
     } catch (error) {

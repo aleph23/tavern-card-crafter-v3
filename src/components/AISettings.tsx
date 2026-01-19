@@ -22,7 +22,7 @@ export interface AISettings {
   apiUrl: string;
   model: string;
   provider: string;
-  maxTokens?: number;  // Optional, defaults to 1200
+  maxTokens?: number;  // Optional, defaults to 800
   infTemp?: number;  // Optional, defaults to 0.7
 }
 
@@ -138,7 +138,7 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
       apiUrl: "https://api.openai.com/v1/chat/completions",
       model: "gpt-3.5-turbo",
       provider: "openai",
-      maxTokens: 1200,
+      maxTokens: 800,
       infTemp: 1.0,
     }
   );
@@ -358,7 +358,7 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
       console.log('Model:', settings.model);
 
       // Use a unified Open AI-compatible format
-      let headers: Record<string, string> = {'Content-Type': 'application/json', };
+      let headers: Record<string, string> = { 'Content-Type': 'application/json', };
       // Only providers that require a key will add an Authorization header
       if (currentProvider?.requiresKey && settings.apiKey) {
         headers['Authorization'] = `Bearer ${settings.apiKey}`;
@@ -490,7 +490,7 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
       console.log('Fetching models from:', modelsUrl);
       console.log('Provider:', settings.provider);
 
-      let headers: Record<string, string> = {'Content-Type': 'application/json', };
+      let headers: Record<string, string> = { 'Content-Type': 'application/json', };
       // Only providers that require a key will add an Authorization header
       if (currentProvider?.requiresKey && settings.apiKey) {
         headers['Authorization'] = `Bearer ${settings.apiKey}`;
@@ -748,15 +748,15 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
             <div className="space-y-4 border-t pt-4">
               <h4 className="font-medium">Generation Parameters</h4>
               <div className="space-y-2">
-                <Label htmlFor="maxTokens">Max Tokens ({settings.maxTokens ? settings.maxTokens : 1200})</Label>
+                <Label htmlFor="maxTokens">Max Tokens ({settings.maxTokens ? settings.maxTokens : 800})</Label>
                 <Input
                   id="maxTokens"
                   type="number"
                   min="1"
                   max="5000"  // Adjust as needed for your API limits
-                  value={settings.maxTokens || 1200}
-                  onChange={(e) => setSettings(prev => ({ ...prev, maxTokens: parseInt(e.target.value) || 1200 }))}
-                  placeholder="e.g., 1200"
+                  value={settings.maxTokens || 800}
+                  onChange={(e) => setSettings(prev => ({ ...prev, maxTokens: parseInt(e.target.value) || 800 }))}
+                  placeholder="e.g., 800"
                 />
                 <p className="text-xs text-muted-foreground">Controls the maximum number of tokens in the AI response.</p>
               </div>

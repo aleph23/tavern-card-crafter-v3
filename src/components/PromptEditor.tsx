@@ -5,12 +5,12 @@ import { PromptCollection } from '@/types/prompts';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from '@/components/ui/label';
+import { FileText } from 'lucide-react';
 
 export const PromptEditor: React.FC = () => {
   const [prompts, setPrompts] = useState<PromptCollection>({});
@@ -49,10 +49,10 @@ export const PromptEditor: React.FC = () => {
       });
     } catch (error: any) {
       console.error("Save error:", error);
-      
+
       // Clean up the error message from Electron's IPC wrapper
       // This removes the "Error invoking remote method..." prefix so the user sees just your message
-      const cleanMessage = error.message 
+      const cleanMessage = error.message
         ? error.message.replace(/Error invoking remote method '[^']+': /, '')
         : "Failed to save prompts";
 
@@ -111,7 +111,7 @@ export const PromptEditor: React.FC = () => {
           <p className="text-sm text-muted-foreground">Customize the prompts used for AI generation.</p>
         </div>
         <div className="space-x-2">
-           <Dialog open={showPreview} onOpenChange={setShowPreview}>
+          <Dialog open={showPreview} onOpenChange={setShowPreview}>
             <DialogTrigger asChild>
               <Button variant="outline" size="sm">Preview Interpolation</Button>
             </DialogTrigger>
@@ -124,18 +124,18 @@ export const PromptEditor: React.FC = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label>Sample Name</Label>
-                    <Input value={previewData.name} onChange={e => setPreviewData({...previewData, name: e.target.value})} />
+                    <Input value={previewData.name} onChange={e => setPreviewData({ ...previewData, name: e.target.value })} />
                   </div>
                   <div>
                     <Label>Sample Description</Label>
-                    <Input value={previewData.description} onChange={e => setPreviewData({...previewData, description: e.target.value})} />
+                    <Input value={previewData.description} onChange={e => setPreviewData({ ...previewData, description: e.target.value })} />
                   </div>
                 </div>
                 <div>
-                   <Label className="font-bold">Result:</Label>
-                   <div className="bg-muted p-4 rounded-md whitespace-pre-wrap text-sm mt-2">
-                     {getInterpolatedPreview(activeTab)}
-                   </div>
+                  <Label className="font-bold">Result:</Label>
+                  <div className="bg-muted p-4 rounded-md whitespace-pre-wrap text-sm mt-2">
+                    {getInterpolatedPreview(activeTab)}
+                  </div>
                 </div>
               </div>
             </DialogContent>
@@ -151,20 +151,31 @@ export const PromptEditor: React.FC = () => {
       </div>
 
       <div className="flex flex-col md:flex-row gap-4 h-[600px]">
-        <ScrollArea className="w-full md:w-1/4 h-full border rounded-md">
-           <div className="flex flex-col p-2 gap-1">
-             {Object.entries(prompts).map(([key, prompt]) => (
-               <Button
-                 key={key}
-                 variant={activeTab === key ? "default" : "ghost"}
-                 className="justify-start text-left"
-                 onClick={() => setActiveTab(key)}
-               >
-                 {prompt.name}
-               </Button>
-             ))}
-           </div>
-        </ScrollArea>
+        {/* Left sidebar - styled like Index.tsx */}
+        <div className="w-full md:w-1/4 h-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border rounded-lg overflow-hidden">
+          <div className="p-3 border-b border-gray-200 dark:border-gray-700">
+            <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200">Prompt Templates</h3>
+          </div>
+          <ScrollArea className="h-[calc(100%-48px)]">
+            <nav className="p-2">
+              <div className="space-y-1">
+                {Object.entries(prompts).map(([key, prompt]) => (
+                  <button
+                    key={key}
+                    onClick={() => setActiveTab(key)}
+                    className={`w-full flex items-center gap-2 px-3 py-2 text-left text-sm rounded-lg transition-all duration-200 ${activeTab === key
+                      ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-md"
+                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                      }`}
+                  >
+                    <FileText className="w-4 h-4 flex-shrink-0" />
+                    <span className="font-medium truncate">{prompt.name}</span>
+                  </button>
+                ))}
+              </div>
+            </nav>
+          </ScrollArea>
+        </div>
 
         <Card className="flex-1 flex flex-col">
           <CardHeader className="py-4">
@@ -172,14 +183,14 @@ export const PromptEditor: React.FC = () => {
             <CardDescription>{prompts[activeTab]?.description}</CardDescription>
           </CardHeader>
           <CardContent className="flex-1 p-4 pt-0">
-             <Textarea
-               className="h-full min-h-[400px] font-mono text-sm resize-none"
-               value={prompts[activeTab]?.template || ''}
-               onChange={(e) => handlePromptChange(activeTab, e.target.value)}
-             />
-             <div className="mt-2 text-xs text-muted-foreground text-right">
-               Length: {prompts[activeTab]?.template?.length || 0} chars
-             </div>
+            <Textarea
+              className="h-full min-h-[400px] font-mono text-sm resize-none"
+              value={prompts[activeTab]?.template || ''}
+              onChange={(e) => handlePromptChange(activeTab, e.target.value)}
+            />
+            <div className="mt-2 text-xs text-muted-foreground text-right">
+              Length: {prompts[activeTab]?.template?.length || 0} chars
+            </div>
           </CardContent>
         </Card>
       </div>
