@@ -53,10 +53,15 @@ class PromptManager {
   async savePrompts(prompts: PromptCollection): Promise<void> {
     this.prompts = prompts;
 
+    console.log('[RENDERER] savePrompts called');
+    console.log('[RENDERER] window.electronAPI:', window.electronAPI);
+
     try {
       if (window.electronAPI) {
+        console.log('[RENDERER] Using electronAPI.savePrompts');
         await window.electronAPI.savePrompts(prompts);
       } else {
+        console.log('[RENDERER] Falling back to localStorage');
         localStorage.setItem('user_prompts', JSON.stringify(prompts));
       }
     } catch (error) {
@@ -94,12 +99,12 @@ class PromptManager {
     return template.replace(/\{\{(\w+)\}\}/g, (match, key) => {
       // Check if data has the key
       if (Object.prototype.hasOwnProperty.call(data, key)) {
-          const value = data[key];
-          // Handle array joining if necessary, or just stringify
-          if (Array.isArray(value)) {
-              return value.join(', ');
-          }
-          return value !== undefined && value !== null ? String(value) : '';
+        const value = data[key];
+        // Handle array joining if necessary, or just stringify
+        if (Array.isArray(value)) {
+          return value.join(', ');
+        }
+        return value !== undefined && value !== null ? String(value) : '';
       }
       // If key not found, return the match (placeholder) as is
       return match;

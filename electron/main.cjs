@@ -1,18 +1,79 @@
-
-const { app, BrowserWindow, Menu, ipcMain } = require('electron'); // Added ipcMain
+const { app, BrowserWindow, Menu, ipcMain, dialog } = require('electron'); // Added dialog
 const path = require('path');
 const fs = require('fs');
 const isDev = process.env.NODE_ENV === 'development';
 
 let mainWindow;
 
-const promptsPath = path.join(process.cwd(), 'prompts.json');
+// For portable app: determine the correct directory for storing prompts.json
+// This is computed lazily because app.getPath('exe') requires app to be initialized
+let promptsPath = null;
+let userSelectedDir = null; // Cached user selection
+
+const getPromptsPath = () => {
+  if (promptsPath) return promptsPath;
+
+  // Check if we're in a packaged app
+  const isPackaged = app.isPackaged;
+
+  console.log('[MAIN] app.isPackaged:', isPackaged);
+  console.log('[MAIN] __dirname:', __dirname);
+  console.log('[MAIN] process.execPath:', process.execPath);
+  console.log('[MAIN] PORTABLE_EXECUTABLE_DIR:', process.env.PORTABLE_EXECUTABLE_DIR);
+  console.log('[MAIN] PORTABLE_EXECUTABLE_FILE:', process.env.PORTABLE_EXECUTABLE_FILE);
+
+  let appDir;
+  if (!isPackaged) {
+    // In dev mode, go up from /electron to project root
+    appDir = path.join(__dirname, '..');
+    console.log('[MAIN] Using dev path:', appDir);
+  } else if (process.env.PORTABLE_EXECUTABLE_DIR) {
+    // Portable app: electron-builder sets this to the directory containing the original .exe
+    appDir = process.env.PORTABLE_EXECUTABLE_DIR;
+    console.log('[MAIN] Using PORTABLE_EXECUTABLE_DIR:', appDir);
+  } else if (userSelectedDir) {
+    // Use previously selected directory
+    appDir = userSelectedDir;
+    console.log('[MAIN] Using cached user selection:', appDir);
+  } else {
+    // Fallback: ask user to select a folder for saving prompts
+    console.log('[MAIN] PORTABLE_EXECUTABLE_DIR not set, prompting user...');
+
+    const result = dialog.showOpenDialogSync({
+      title: 'Select folder to save prompts.json',
+      message: 'Could not detect app location. Please select the folder where Tavern Card Crafter.exe is located to save your custom prompts.',
+      properties: ['openDirectory', 'createDirectory'],
+      buttonLabel: 'Use This Folder'
+    });
+
+    if (result && result.length > 0) {
+      appDir = result[0];
+      userSelectedDir = appDir; // Cache for this session
+      console.log('[MAIN] User selected directory:', appDir);
+    } else {
+      // User cancelled - fall back to temp (prompts won't persist)
+      appDir = path.dirname(process.execPath);
+      console.log('[MAIN] User cancelled, using temp path (prompts will not persist):', appDir);
+      dialog.showMessageBoxSync({
+        type: 'warning',
+        title: 'Prompts Will Not Persist',
+        message: 'No folder selected. Your custom prompts will be lost when the app closes.',
+        buttons: ['OK']
+      });
+    }
+  }
+
+  promptsPath = path.join(appDir, 'prompts.json');
+  console.log('[MAIN] Final prompts path:', promptsPath);
+  return promptsPath;
+};
 
 // IPC Handlers for prompts
 ipcMain.handle('load-prompts', async () => {
+  const filePath = getPromptsPath();
   try {
-    if (fs.existsSync(promptsPath)) {
-      const data = fs.readFileSync(promptsPath, 'utf-8');
+    if (fs.existsSync(filePath)) {
+      const data = fs.readFileSync(filePath, 'utf-8');
       return JSON.parse(data);
     }
     return null; // Return null to indicate use defaults
@@ -23,9 +84,14 @@ ipcMain.handle('load-prompts', async () => {
 });
 // Save prompts with enhanced error handling for permission issues
 ipcMain.handle('save-prompts', async (event, prompts) => {
+  const filePath = getPromptsPath();
+  console.log('[MAIN] save-prompts IPC called');
+  console.log('[MAIN] Writing to:', filePath);
   try {
-    fs.writeFileSync(promptsPath, JSON.stringify(prompts, null, 2), 'utf-8');
-    return true;
+    fs.writeFileSync(filePath, JSON.stringify(prompts, null, 2), 'utf-8');
+    console.log('[MAIN] Successfully wrote prompts.json');
+    // Return the path so renderer can see where it was written
+    return { success: true, path: filePath };
   } catch (error) {
     console.error('Failed to save prompts:', error);
 
@@ -43,9 +109,10 @@ ipcMain.handle('save-prompts', async (event, prompts) => {
 });
 
 ipcMain.handle('reset-prompts', async () => {
+  const filePath = getPromptsPath();
   try {
-    if (fs.existsSync(promptsPath)) {
-      fs.unlinkSync(promptsPath);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
     }
     return true;
   } catch (error) {
@@ -55,22 +122,22 @@ ipcMain.handle('reset-prompts', async () => {
 });
 
 function createWindow() {
-/**
- * Creates and configures the main application browser window.
- * Sets up window display behavior, loading of the app content, and key window event handlers.
- *
- * This function initializes the main BrowserWindow instance with predefined dimensions,
- * security options, and UI settings, then loads either the development server or the
- * production build depending on the environment.
- * It also manages when the window is shown, handles cleanup on close, and prevents
- * new in-app windows from opening by redirecting external links to the default browser.
- *
- * Args:
- *   None
- *
- * Returns:
- *   void
- */
+  /**
+   * Creates and configures the main application browser window.
+   * Sets up window display behavior, loading of the app content, and key window event handlers.
+   *
+   * This function initializes the main BrowserWindow instance with predefined dimensions,
+   * security options, and UI settings, then loads either the development server or the
+   * production build depending on the environment.
+   * It also manages when the window is shown, handles cleanup on close, and prevents
+   * new in-app windows from opening by redirecting external links to the default browser.
+   *
+   * Args:
+   *   None
+   *
+   * Returns:
+   *   void
+   */
   mainWindow = new BrowserWindow({
     width: 1400,
     height: 900,
@@ -80,7 +147,8 @@ function createWindow() {
       nodeIntegration: false,
       contextIsolation: true,
       enableRemoteModule: false,
-      webSecurity: true
+      webSecurity: true,
+      preload: path.join(__dirname, 'preload.js')
     },
     icon: path.join(__dirname, '../public/favicon.ico'),
     title: 'Tavern Card Crafter - AI character card creation tool',

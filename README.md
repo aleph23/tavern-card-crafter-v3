@@ -77,7 +77,7 @@ This project uses modern web and desktop technologies:
 - Electron - Cross-platform desktop application wrapper
 - Tailwind CSS - Utility-first CSS framework
 - shadcn/ui - Component primitives and patterns
- 
+
 ---
 
 ### User Guide
@@ -111,7 +111,9 @@ This project uses modern web and desktop technologies:
 4. Add worldview/memory book entries and use tags to classify characters.
 
 ##### 📄 JSON Preview
+
 ![preview the generated JSON before saving](img/2025-10-23_114417.png "JSON view")
+
 1. Real-time JSON preview of the generated character card.
 2. Syntax highlighting and escaped JSON content to prevent XSS vectors.
 3. Statistics: shows total characters and token estimation for the current card.
@@ -243,20 +245,20 @@ This project is licensed under the MIT license. See the LICENSE file for details
 
 ## Changelog
 
-### 1/15/26
+### v0.3.0 (1/19/26)
 
-#### New Features:
+#### New Features
 
 - Add a prompt management system with editable templates, including a PromptEditor UI, default prompt configuration, and prompt interpolation utilities used across AI generation flows.
 - Persist user-defined prompts via Electron IPC and local storage, with support for loading, saving, and resetting prompts in both desktop and web environments.
 - Extend the AI settings dialog with tabbed navigation separating connection parameters from prompt template management.
 
-#### Bug Fixes:
+#### Bug Fixes
 
 - Escape JSON content before syntax highlighting in the character preview to prevent XSS vulnerabilities.
 - Correct AI temperature handling by using a dedicated infTemp setting instead of overloading the generic temperature field.
 
-#### Enhancements:
+#### Enhancements
 
 - Refine AI settings layout with a wider dialog and clearer organization of connection and generation parameters.
 - Centralize AI generation prompt text into reusable templates rather than hardcoded strings, simplifying future changes and localization.

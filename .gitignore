@@ -54,3 +54,4 @@ tmp/
 # GitHub-specific
 # ─────────────────────────────────────────────
 .github/copilot-instructions.md
+prompts.json

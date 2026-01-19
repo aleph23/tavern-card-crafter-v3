@@ -2,17 +2,17 @@
   "description_enhance": {
     "name": "Enhance Description",
     "description": "Used when an existing description is provided to enhance it.",
-    "template": "Based on the following role information, enhance the descriptions, while remaining succinct:\n\nCard name:{{name}}\nExisting description:{{description}}\n\nEmbellish, making sure to describe all physical qualities of the character -- body, attire and how they compose themself. This should be in non-prosaic list format."
+    "template": "Based on the following role information, enhance the descriptions, while remaining succinct:\n\nCard name:{{name}}\nExisting description:{{description}}\n\nEmbellish, making sure to describe all physical qualities of the character -- body, attire and how they compose themself. Format in a non-prosaic, pseudocode list format."
   },
   "description_create": {
     "name": "Create Description",
     "description": "Used when no description is provided to generate one.",
-    "template": "Generate a list of all the physical qualities of the character -- body, attire and how they compose themself. This should be in non-prosaic CSV format riffing off of the character name:\n\nCard name:{{name}}\n\nPlease generate a detailed character appearance description, including the character's physical characteristics, facial features, clothing style, temperament, etc. Only output character description content, do not include character name, background story or other information. Please output the description directly, and do not add summary or additional instructions."
+    "template": "Generate a list of all the physical qualities of the character -- body, attire and how they compose themself. Format in a non-prosaic, pseudocode list format riffing off of the character name:\n\nCard name:{{name}}\n\nPlease generate a detailed character appearance description, including the character's physical characteristics, facial features, clothing style, temperament, etc. Only output character description content, do not include character name, background story or other information. Please output the description directly, and do not add summary or additional instructions."
   },
   "personality": {
     "name": "Personality",
     "description": "Generates personality description.",
-    "template": "Based on the following role information, enhance the character's persona, while remaining succinct.\n\nCard name: {{name}}\nPhysical Description: {{description}}\n\nA non-prosaic list, describing the character's traits, behavior, idiosyncrasies, likes/dislikes, strengths/weaknesses, backstory."
+    "template": "Based on the following role information, enhance the character's persona, while remaining succinct.\n\nCard name: {{name}}\nPhysical Description: {{description}}\n\nA non-prosaic, pseudocode list, describing the character's traits, behavior, idiosyncrasies, likes/dislikes, strengths/weaknesses, backstory."
   },
   "scenario": {
     "name": "Scenario",

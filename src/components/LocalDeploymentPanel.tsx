@@ -76,7 +76,7 @@ pause`;
   const packageJsonContent = `{
   "name": "character-card-creator",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.3.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
