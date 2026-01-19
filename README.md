@@ -60,7 +60,7 @@ Note: To get the full functionality and most reliable prompt-saving behavior (es
 
 - **Real-time preview**: JSON preview updates in real time with syntax highlighting.
 - **Multi-format export**: Export cards as JSON and PNG formats (PNG export embeds the character card into an image; avatar upload required).
-- **Language & localization**: The UI is now primarily English by default; Chinese (简体中文) remains available as a togglable option at the top of the page.
+- **Language & localization**: The UI is now primarily English by default; Chinese (简体中文) remains available as a toggleable option at the top of the page.
 - **Responsive Design**: Layout works across a range of screen sizes and platforms.
 
 ![](img/2025-10-23_114242.png)
@@ -175,13 +175,6 @@ npm run build
 
 # Preview build results
 npm run preview
-```
-
-##### Desktop application version
-
-```cmd
-# Build the electron portable app
-build-portable.bat
 ```
 
 ---
