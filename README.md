@@ -4,70 +4,70 @@
 
 ### Project Introduction
 
-Tavern Card Crafter is a professional AI character card maker that helps users easily create and edit character cards for chatbots and roleplay. The tool offers an intuitive interface and powerful features for generating, editing, previewing, and exporting character role cards suitable for chatbot or roleplaying use.
+This app began as an exclusively vibed character creator in Mandarin by user @Idun & Co.  I initially just wanted to fully translate it to EN, but the .PNG save function didn't work.  So I fixed that, then got to tinkering a little.  Like, for example, all of the elements of the version 3 card weren't captured. Not like we're ever going to use all of them, but just in case, they're there.  **But today, the most import change is finally fully working (fingers crossed).**  Arguably the most important part of this or any similar application is the prompt sent to the AI helper.  Previously, they were hardcoded.  Now they're fully exposed. in-app editable and they save to an external .JSON file along side the executable.  Plus, feel free to break things experimenting; the defaults are still hardcoded to come to the rescue of a misplaced comma or un-escaped double-quote control character or three.
+'That's cool,' you say, 'but you still didn't make it so that I could save my damned API key.'  And you'd be right.  But that's next.  I'd argue that editable prompts is much more important--and I'd be right.  Next week? External settings file.  And by March?  This thing will not only be creating your all of your characters AND personae, it'll be playing them through to your blueetooth snowboard helmet so that you can go get some fresh air--if that's still a thing.
 
 ![](img/2025-10-23_113717.png "Dark")
 ![](img/2025-10-23_113814.png "Light")
 
 ### Key features
 
-#### 🤖 AI intelligent assistant
+#### 🤖 Hey Bots! Get Bots to make your bots!
 
-- **Intelligent Character Creation**: Quickly generate structured character information from free text using AI.
-- **Multi-genre support**: Supports character types such as anime, games, novels, historical figures, and more.
-- **Intelligent Content Extraction**: Paste any text (novel excerpt, script, notes), and AI will extract and convert it into structured character fields.
+- **But Seriously** use the buggers for a little kick start. If you don't edit afterwards, we will ALL know.
+- **Intelligent Character Creation**: Quickly generate structured character information from free text using AI. 
+- **Multi-genre support**: Stock character types like anime, games, novels, historical figures, to compensate for full cranial constipation.
+- **Intelligent Content Extraction**: Paste any text (novel excerpt, Mom's recipe cards, apology emails you never sent), and AI will extract and convert it into structured character fields.
 
 ![](img/2025-10-23_113929.png "AI results")
 
-#### ✏️ Full character editing
+#### ✏️ Full character editing *(Skip if you know what a character card v3 is)*
 
-- **Basic information**: Name, description, avatar, first-person perspective, and more.
-- **Personality Traits**: Detailed personality traits and behavior patterns for robust role simulation.
-- **Scenario Settings**: Backstory, environment, and other scenario-specific settings.
-- **Dialogue System**: Compose sample dialogues, greetings, and alternative greetings.
+- **Basic information**: Name, description, avatar, POV, things.
+- **Personality Traits**: Detailed personality traits and behavior patterns. Or not. Your choice.
+- **Scenario Settings**: Backstory, environment, and other scenario-specific settings. You know, like in the damn chara-card-v3 spec, right?
+- **Dialogue System**: Compose sample dialogues, greetings, and alternative greetings.  Guess where we got that one from... yep, same spec.
 - **Character/Lore Book**: Add and manage worldbuilding or memory entries.
-- **Keyword/Tag Classification**: Role labeling and metadata management for easy categorization.
+- **Keyword/Tag Classification**: Role labeling and metadata management for easy categorization.  Probably best not to get AI to do this for you, but sometimes it's fun AND useless.
 
-#### 🧩 Prompt Management (new)
+#### 🧩 Prompt Management (FINALLY)
 
-- **Editable prompt templates**: Manage and edit prompt templates used across AI generation flows.
-- **Prompt interpolation utilities**: Reusable utilities for prompt variable interpolation and templating.
+- **Detestable Defaults** I spent a great deal of time coming up with terrible prompts for you to hate.  What better motivator to get you to hunt down that last thread of creativity.
+- **Editable prompt templates**: Manage and edit prompt templates used across AI generation flows. Like, huh?  Rename the prompts.json to prompts.YourMom and swap it in when you're making 'Your Mom' bots.
 - **PromptEditor UI**: A small UI to create, edit, preview, and select prompt templates while generating.
-- **Default and user prompts**: Comes with default templates and lets users create custom templates.
+- **Prompt interpolation utilities**: Reusable utilities for prompt variable interpolation and templating.  Not really, but Gemini thought it looked cool.
 
 #### 💾 Persisted prompts and cross-environment support
 
-- **Prompt persistence**: User-created or edited prompts are persisted across sessions.
-  - On Desktop (packaged Electron releases) prompts are saved/persisted via Electron IPC to local files for full functionality and stable permission handling.
-  - On Web, prompts are saved to browser localStorage (useful for quick testing and web-hosted usage).
+- **Prompt persistence**: User-created or edited prompts are persisted across sessions. Because they're in an external file.... Did I mention that already?  On Desktop (packaged Electron releases) prompts are saved/persisted via Electron IPC to local files for full functionality and stable permission handling.
 - **Load / Save / Reset**: Prompts can be loaded, saved, or reset to defaults from the AI Settings dialog.
 
-Note: To get the full functionality and most reliable prompt-saving behavior (especially filesystem persistence and permission handling), the preferred usage method is to download and install the packaged desktop release from this repository's Releases page. Running from source in development mode works, but packaged releases provide the complete persistent storage integration.
+NOTE: For best user experience, be lazy. Use the electron slop, err, app.  The electron app... in releases.  
 
 #### ⚙️ AI Settings improvements
 
-- **Tabbed AI Settings dialog**: Connection parameters (keys, endpoints) are separated from prompt template management in a tabbed layout for clarity.
-- **Connection & generation controls**: Configure model/host settings, temperature, tokens and a dedicated `infTemp` for inference sampling behavior.
-- **Clearer error messaging**: Better messages for missing local models and prompt save failures, including permission guidance.
+- **Tabbed AI Settings dialog**: Connection parameters (keys, endpoints) are separated from prompt template management, because, even AI aren't total heathens.
+- **Connection & generation controls**: Configure model/host settings, inference temperature, and max tokens. Who knows? Maybe your backend will even listen.
+- **Clearer error messaging**: Better messages for missing local models and prompt save failures, including permission guidance. Unless you speak Mandarin, in which case I suspect it is now much worse. Sorry!
 
 #### 📟 Multi-platform support
 
-- **Web version**: Browser direct access and use (Vite-based).
-- **Desktop App**: Cross-platform Electron desktop app with filesystem access.
-- **Sidebar Layout**: AI assistant, character editing, and JSON preview split tab interface.
+- **Dev/PITA version**: Browser direct access and use (Vite-based).
+- **Desktop App**: *(Theoritically Cross-platform)* Electron desktop app with filesystem access.
+- **Sidebar Layout**: Because clickable menues are still easier than psychic links.
 
 #### 🛠 Practical features
 
-- **Real-time preview**: JSON preview updates in real time with syntax highlighting.
-- **Multi-format export**: Export cards as JSON and PNG formats (PNG export embeds the character card into an image; avatar upload required).
-- **Language & localization**: The UI is now primarily English by default; Chinese (简体中文) remains available as a toggleable option at the top of the page.
-- **Responsive Design**: Layout works across a range of screen sizes and platforms.
+- **Real-time preview**: No longer do you have to send the proof off to the typesetter! Welcome to 1988!
+- **Multi-format export**: Export cards as JSON and PNG formats (PNG export embeds the character card into an image; avatar upload required). That's right. Two. That twice as many as one!
+- **Language & localization**: The UI is now primarily English.  If anyone wants to check and see if the Mandarin is still correct, cool, let me know. Wanna translate into your own native scrawl? PR me your language. 
+- **Responsive Design**: Because. Now you can drag that bottom right corner whereever the hell you feel like.  I mean... don't get too crazy.
 
 ![](img/2025-10-23_114242.png)
 
 ---
 
-### Technology Stack
+### Technology Stack (Pile? Mixed Salad?)
 
 This project uses modern web and desktop technologies:
 
@@ -82,17 +82,18 @@ This project uses modern web and desktop technologies:
 
 ### User Guide
 
-#### 🚀 Start quickly
+#### 🚀 Quick Start
 
-1. Start the application via `npm run electron-dev` (development) or download the portable executable from Releases (production).
-2. Use the left sidebar to switch between three main modes: AI Assistant, Editor, and JSON/Export Preview.
+1. Start the application from releases.
+2. Enter your API key and pick a model
+3. Type words and click buttons. Note, sometimes faster isn't better.
 
 #### 📋 Detailed explanation of functions
 
-##### 🤖 AI character card assistant
+##### 🤖 AI character card from thin air.
 
-1. Paste a character-related text into the input box (novel snippets, game description, notes).
-2. Select the character type (anime, games, novels, historical figures, etc.).
+1. So, you can cut and paste something from fandom, wikipedia, or your friend's facebook page.
+2. Then pick from a stock character type (anime, games, novels, historical figures, etc. *(there is not et cetera)*).
 3. Click "AI Analysis / Generation" — AI will extract structured character fields.
 4. Click generated fields to fill them into the Role Editor with one click.
 
@@ -101,83 +102,67 @@ This project uses modern web and desktop technologies:
 1. Open AI Settings and switch to the "Prompts" tab.
 2. Create or edit prompt templates in the PromptEditor UI.
 3. Save templates — saved prompts persist across sessions (Electron packaged releases: filesystem via IPC; Web: localStorage).
-4. Use the "Connection" tab in AI Settings to configure model endpoint, credentials, temperature, max tokens, and `infTemp`.
+4. As you add/fill in an element into the card, that new element will be sent to your AI assistant of choice, cluing them in on where you're going with this whole idea of yours.
 
 ##### ✏️ Character information editing
 
+Downloaded a card from Janny, Chub, or RisuAI, but it just isn't up to your standard?
 1. Edit basic fields (name, description, avatar).
-2. Fill in personality, behavior patterns, and special scenario notes.
-3. Configure dialogue — first message, examples, and alternative greetings.
-4. Add worldview/memory book entries and use tags to classify characters.
+2. Edit moderate fields personality, behavior patterns, and special scenario notes.
+4. Edit fields of three and four dimensional space (first message, examples, and alternative greetings).
+5. Teach your bot differential equations and then make it thinks it's Jim Simons.  You'll be broke or a billionaire in no time.
 
 ##### 📄 JSON Preview
 
 ![preview the generated JSON before saving](img/2025-10-23_114417.png "JSON view")
 
-1. Real-time JSON preview of the generated character card.
-2. Syntax highlighting and escaped JSON content to prevent XSS vectors.
-3. Statistics: shows total characters and token estimation for the current card.
-4. Export options:
+1. Real-time JSON preview of the generated character card. That's right folks. When I said no more waiting for the type setter, I meant it, dad blam-it!  No more slaves carving stones. Bend photons to your will.
+2. Syntax highlighting and escaped JSON content to prevent XSS vectors, vixens and CVEs.
+3. Statistics: shows total characters and token estimation for the current card and each field.
+4. FIVE Export options:
    - JSON Export: download a standard JSON file.
    - PNG Export: export an image of the character card (requires avatar upload).
    - Copy to clipboard: quickly copy JSON content.
+   - Read it from the screen and handwrite it on to a real piece of paper.
+   - TTS it and record it into that old Sony Walkman.
 
 #### 💡 Usage Tips
 
-- Use the AI Assistant to quickly bootstrap a card, then refine in the editor.
+- Use the AI Assistant to quickly bootstrap a card, then refine in the editor.  Or don't. Pride is just another obstacle to overcome.
 - Create reusable prompts for specific genres/tones in the PromptEditor to get consistent results.
-- The UI synchronizes data across the AI assistant, editor, and preview tabs in real time.
-- For the most reliable prompt persistence and fewer permission issues, download and install the packaged desktop release from Releases.
+- The UI synchronizes data across the AI assistant, editor, and preview tabs in real time, because copper-bound energy moves damn near as fast as light.
 
 ---
 
-### For Development: Get started quickly
+### For Development: Get started quickly (Probably don't read any of this, but AI likes to talk almost as much as I do, so it had to write another damned chapter.)
 
 #### Environmental Requirements
 
 Make sure your system has:
 
+- A minimally functional keyboard and mouse
 - Node.js (use nvm if you want to manage Node versions)
-- npm (or a compatible package manager)
+- npm (or pnpm or yarn or...)
 
 (If you have strict constraints, use the versions preferred in your development environment; Electron and dependencies generally work with Node LTS releases.)
 
 #### Install and run
 
 ```bash
-# 1. Clone project
-git clone <YOUR_GIT_URL>
-
-# 2. Enter the project directory
-cd tavern-card-crafter-v3
-
-# 3. Install dependencies
+git clone https://github.com/aleph23/tavern-card-crafter-v3 tcc
+cd tcc
+nvm use <yourfavenodeversion>
 npm install
-
-# 4. Start the development server (Web version)
 npm run dev
-
-# Or start desktop application development mode
+```
+Or for the bloat-lover in you
+```bash
 npm run electron-dev
 ```
 
 - Web version: open `http://localhost:8080` (or the port Vite reports) in your browser
 - Desktop (dev): running `npm run electron-dev` will open an Electron development window
-- Desktop (full prompt persistence): for the most complete prompt-saving experience use the latest packaged desktop release from Releases
-
-#### Build and run
-
-##### Web Version
-
-```bash
-# Build a web version
-npm run build
-
-# Preview build results
-npm run preview
-```
-
----
+- Desktop (full prompt persistence): Just be lazy and download the .exe.  Save your creative juices for your character development.
 
 ### Project structure
 
@@ -199,10 +184,9 @@ src/
 │   ├── CharacterPreview.tsx
 │   ├── PromptEditor.tsx
 │   ├── Toolbar.tsx
-│   └── ui/
+│   └── ui/                          ## Third-party stock UI elements
 ├── config/          
-│   ├──  defaultPrompts.json
-│   └── ui/
+│   └──  defaultPrompts.json
 ├── contents/
 │   ├── LanguageContent.tsx
 │   └── ThemeContent.tsx
@@ -228,15 +212,15 @@ src/
 
 ## Contribution Guide
 
-Welcome — issues and pull requests are appreciated! If you add providers or functionality, please include tests or a short migration note. Sharing of prompts is also welcome.
+Howdy — issues and pull requests are things you can do. If you add providers or functionality, include tests or don't. Sharing of prompts is always welcome. If it doesn't work, don't assume I already know.  Because I don't already know.  As best I can tell, it's perfect, so unless you say otherwise, I remain in another world.
 
 ### License
 
-This project is licensed under the MIT license. See the LICENSE file for details.
+This project was licensed under the MIT license and I am way too not giving a damn to change that. See the LICENSE file for details. Or consider getting a life. Your choice.
 
 ---
 
-## Changelog
+## Changelog 
 
 ### v0.3.0 (1/19/26)
 
