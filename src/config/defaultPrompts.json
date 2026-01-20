@@ -1,0 +1,57 @@
+{
+  "description_enhance": {
+    "name": "Enhance Description",
+    "description": "Used when an existing description is provided to enhance it.",
+    "template": "Based on the following role information, enhance the descriptions, while remaining succinct:\n\nCard name:{{name}}\nExisting description:{{description}}\n\nEmbellish, making sure to describe all physical qualities of the character -- body, attire and how they compose themself. Format in a non-prosaic, pseudocode list format."
+  },
+  "description_create": {
+    "name": "Create Description",
+    "description": "Used when no description is provided to generate one.",
+    "template": "Generate a list of all the physical qualities of the character -- body, attire and how they compose themself. Format in a non-prosaic, pseudocode list format riffing off of the character name:\n\nCard name:{{name}}\n\nPlease generate a detailed character appearance description, including the character's physical characteristics, facial features, clothing style, temperament, etc. Only output character description content, do not include character name, background story or other information. Please output the description directly, and do not add summary or additional instructions."
+  },
+  "personality": {
+    "name": "Personality",
+    "description": "Generates personality description.",
+    "template": "Based on the following role information, enhance the character's persona, while remaining succinct.\n\nCard name: {{name}}\nPhysical Description: {{description}}\n\nA non-prosaic, pseudocode list, describing the character's traits, behavior, idiosyncrasies, likes/dislikes, strengths/weaknesses, backstory."
+  },
+  "scenario": {
+    "name": "Scenario",
+    "description": "Generates a meta-scenario.",
+    "template": "Generate an appropriate meta-scenario based on the following information:\n\nCard name: {{name}}\nPhysical Description: {{description}}\nCharacter Personality: {{personality}}\n\nGenerate the backstory and meta-environment in acclaimed historian's prose."
+  },
+  "firstMessage": {
+    "name": "First Message",
+    "description": "Generates the first message.",
+    "template": "Generate the first message of the game, introducing the character to the player/user:\n\nCard name: {{name}}\nPhysical Description: {{description}}\nCharacter Personality: {{personality}}\nScene settings: {{scenario}}\n\nThis will be the first outward facing text, the first thing the player/user encounters when playing with the character.Somehow the character must meet the player/user. The writing should be a melding of Jane Austin, Ursula Le Guin, James Joyce, Anais Nin, or Philip K. Dick, as appropriate to the context."
+  },
+  "messageExample": {
+    "name": "Message Example",
+    "description": "Generates conversational examples. {{user}} is a placeholder literal that should remain in the output.",
+    "template": "Generate a conversational example to help establish the character:\n\nCard name: {{name}}\nPhysical Description: {{description}}\nCharacter Personality: {{personality}}\nScene setting: {{scenario}}\n\nPlease generate 2 to 3 dialogues or monologues that truly capture the spirit of the character. The format is as follows:\n\n<START>\n{{user}}: User's words\n{{name}}: The character's answer\n{{name}}: *The character's actions.*\n\n<START>\n{{name}}: The character talks to themself and acts on their own.\n\nMake sure each conversation example starts with a <START> macro. Do not include it if it doesn't help to develop the character's actions and speaking behavior."
+  },
+  "systemPrompt": {
+    "name": "System Prompt",
+    "description": "Generates the system prompt.",
+    "template": "Generate System Prompt based on the following information:\n\nCard name: {{name}}\nPhysical Description: {{description}}\nCharacter Personality: {{personality}}\nScene settings: {{scenario}}\nExample Character Actions: {{mes_example}}\nStory introduction: {{first_mes}}\n\nWrite the System Prompt to instruct the AI how to accurately play the character. Be concise and clear."
+  },
+  "postHistoryInstructions": {
+    "name": "Post History Instructions",
+    "description": "Generates brief instructions for the AI.",
+    "template": "Generate the most important instructions for the AI based on the following information:\n  Card name: {{name}}\n  Physical Description: {{description}}\n  Character Personality: {{personality}}\n  Scene settings: {{scenario}}\n  Example Character Actions: {{mes_example}}\n  Story introduction: {{first_mes}}\n  SYSTEM PROMPT: {{system_prompt}}\n\n  THIS MUST BE EXTREMELY BRIEF!."
+  },
+  "tags": {
+    "name": "Tags",
+    "description": "Generates keywords/tags.",
+    "template": "Generate appropriate keywords based on the following information:\n\nCard name: {{name}}\nPhysical Description: {{description}}\nCharacter Personality: {{personality}}\nScene setting: {{scenario}}\n\nPlease generate 5-10 related keywords or single-word tags, separated by commas. Tags should include character type, personality traits, scene type, etc."
+  },
+  "alternateGreeting": {
+    "name": "Alternate Greeting",
+    "description": "Generates an alternate greeting (chapter start).",
+    "template": "Generate the start of the next chapter of the story based on the following information:\n\nCard name: {{name}}\nPhysical Description: {{description}}\nCharacter Personality: {{personality}}\nScene settings: {{scenario}}\nDialogue example: {{mes_example}}\n\nThe chapters that have already been written: \n\nFirst Chapter Beginning: {{first_mes}}\nSubsequent chapters(if any): {{alternate_greetings}}\n\nWrite the beginning of a new chapter. It must include the character and some encounter with the player / user and must be at least one day after any prior chapters. Merge the writing styles of James Joyce, Jane Austin, Philip K. Dick, Francois Rabelais, or Anais Nin as appropriate to the context."
+  },
+  "characterBookEntry": {
+    "name": "Character Book Entry",
+    "description": "Generates character book entry.",
+    "template": "Generate specific important character information entries based on the following information:\n\nCard name: {{name}}\nPhysical Description: {{description}}\nCharacter Personality: {{personality}}\nScene settings: {{scenario}}\n\nYou are constructing what is referred to as a lorebook. When certain keywords are mentioned in the chat, it triggers a longer definition to be sent to the AI and considered in it's response. It can work like an important memory of the character's or an important fact about the character. It should be something quite unique and important to be worth including. \n\nThe parameters are:\nKeyword requirements: Use at least 2 - 3 related core keywords/synonyms, separated by commas.\nContent requirements: Generate specific setting content, such as the character's special skills, important experiences, interpersonal relationships or items, and other background information.\n\nThe format is as follows:\n  Keywords: keyword1, keyword2, keyword3, keyword4, ...\n  Content: The detailed description.\n\nThe content should be rich and helpful for role-playing."
+  }
+}

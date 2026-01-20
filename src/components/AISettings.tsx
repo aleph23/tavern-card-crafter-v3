@@ -9,6 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { buildApiUrl } from "@/utils/buildApiUrl";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PromptEditor } from "./PromptEditor";
 
 interface AISettingsProps {
   onSettingsChange: (settings: AISettings) => void;
@@ -20,7 +22,7 @@ export interface AISettings {
   apiUrl: string;
   model: string;
   provider: string;
-  maxTokens?: number;  // Optional, defaults to 1200
+  maxTokens?: number;  // Optional, defaults to 800
   infTemp?: number;  // Optional, defaults to 0.7
 }
 
@@ -136,7 +138,7 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
       apiUrl: "https://api.openai.com/v1/chat/completions",
       model: "gpt-3.5-turbo",
       provider: "openai",
-      maxTokens: 1200,
+      maxTokens: 800,
       infTemp: 1.0,
     }
   );
@@ -356,7 +358,7 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
       console.log('Model:', settings.model);
 
       // Use a unified Open AI-compatible format
-      let headers: Record<string, string> = {'Content-Type': 'application/json', };
+      let headers: Record<string, string> = { 'Content-Type': 'application/json', };
       // Only providers that require a key will add an Authorization header
       if (currentProvider?.requiresKey && settings.apiKey) {
         headers['Authorization'] = `Bearer ${settings.apiKey}`;
@@ -488,7 +490,7 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
       console.log('Fetching models from:', modelsUrl);
       console.log('Provider:', settings.provider);
 
-      let headers: Record<string, string> = {'Content-Type': 'application/json', };
+      let headers: Record<string, string> = { 'Content-Type': 'application/json', };
       // Only providers that require a key will add an Authorization header
       if (currentProvider?.requiresKey && settings.apiKey) {
         headers['Authorization'] = `Bearer ${settings.apiKey}`;
@@ -629,148 +631,160 @@ const AISettings = ({ onSettingsChange, currentSettings }: AISettingsProps) => {
           AI Settings
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] max-h-[85vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[800px] max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>AI Settings</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4 py-4">
-          <div className="space-y-2">
-            <Label htmlFor="provider">API provider</Label>
-            <Select value={settings.provider} onValueChange={handleProviderChange}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select an API provider" />
-              </SelectTrigger>
-              <SelectContent>
-                {apiProviders.map((provider) => (
-                  <SelectItem key={provider.value} value={provider.value}>
-                    {provider.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {currentProvider?.tips && (
-              <Alert>
-                <Info className="h-4 w-4" />
+
+        <Tabs defaultValue="connection">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="connection">Connection & Parameters</TabsTrigger>
+            <TabsTrigger value="prompts">Prompt Templates</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="connection" className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="provider">API provider</Label>
+              <Select value={settings.provider} onValueChange={handleProviderChange}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select an API provider" />
+                </SelectTrigger>
+                <SelectContent>
+                  {apiProviders.map((provider) => (
+                    <SelectItem key={provider.value} value={provider.value}>
+                      {provider.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {currentProvider?.tips && (
+                <Alert>
+                  <Info className="h-4 w-4" />
+                  <AlertDescription className="text-sm">
+                    {currentProvider.tips}
+                  </AlertDescription>
+                </Alert>
+              )}
+            </div>
+
+            {currentProvider?.requiresKey && (
+              <div className="space-y-2">
+                <Label htmlFor="apiKey">API Key</Label>
+                <Input
+                  id="apiKey"
+                  type="password"
+                  value={settings.apiKey}
+                  onChange={(e) => setSettings(prev => ({ ...prev, apiKey: e.target.value }))}
+                  placeholder="Enter your API key..."
+                />
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <Label htmlFor="apiUrl">API Address</Label>
+              <Input
+                id="apiUrl"
+                value={settings.apiUrl}
+                onChange={(e) => setSettings(prev => ({ ...prev, apiUrl: e.target.value }))}
+                placeholder="Enter the API address and the system will automatically complete it/v1/chat/completions..."
+              />
+              <p className="text-xs text-muted-foreground">
+                Tip: Just enter the basic address and the system will automatically add it /v1/chat/completions suffix
+              </p>
+            </div>
+
+            <div className="flex gap-2">
+              <Button
+                onClick={testConnection}
+                disabled={isTestingConnection || !settings.apiUrl || (currentProvider?.requiresKey && !settings.apiKey)}
+                variant="outline"
+                size="sm"
+                className="flex-1"
+              >
+                {getConnectionIcon()}
+                <span className="ml-2">Test connection</span>
+              </Button>
+              <Button
+                onClick={fetchModels}
+                disabled={isLoadingModels || !settings.apiUrl || (currentProvider?.requiresKey && !settings.apiKey)}
+                variant="outline"
+                size="sm"
+                className="flex-1"
+              >
+                {isLoadingModels ? (
+                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                ) : (
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                )}
+                Get the model
+              </Button>
+            </div>
+
+            {lastError && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
                 <AlertDescription className="text-sm">
-                  {currentProvider.tips}
+                  <strong>Connection error:</strong> {lastError}
                 </AlertDescription>
               </Alert>
             )}
-          </div>
 
-          {currentProvider?.requiresKey && (
             <div className="space-y-2">
-              <Label htmlFor="apiKey">API Key</Label>
-              <Input
-                id="apiKey"
-                type="password"
-                value={settings.apiKey}
-                onChange={(e) => setSettings(prev => ({ ...prev, apiKey: e.target.value }))}
-                placeholder="Enter your API key..."
-              />
+              <Label htmlFor="model">Model selection</Label>
+              <Select value={settings.model} onValueChange={(value) => setSettings(prev => ({ ...prev, model: value }))}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a model" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableModels.filter(model => model && model.trim() !== '').map((model) => (
+                    <SelectItem key={model} value={model}>
+                      {model}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-          )}
 
-          <div className="space-y-2">
-            <Label htmlFor="apiUrl">API Address</Label>
-            <Input
-              id="apiUrl"
-              value={settings.apiUrl}
-              onChange={(e) => setSettings(prev => ({ ...prev, apiUrl: e.target.value }))}
-              placeholder="Enter the API address and the system will automatically complete it/v1/chat/completions..."
-            />
-            <p className="text-xs text-muted-foreground">
-              Tip: Just enter the basic address and the system will automatically add it /v1/chat/completions suffix
-            </p>
-          </div>
+            <div className="space-y-4 border-t pt-4">
+              <h4 className="font-medium">Generation Parameters</h4>
+              <div className="space-y-2">
+                <Label htmlFor="maxTokens">Max Tokens ({settings.maxTokens ? settings.maxTokens : 800})</Label>
+                <Input
+                  id="maxTokens"
+                  type="number"
+                  min="1"
+                  max="5000"  // Adjust as needed for your API limits
+                  value={settings.maxTokens || 800}
+                  onChange={(e) => setSettings(prev => ({ ...prev, maxTokens: parseInt(e.target.value) || 800 }))}
+                  placeholder="e.g., 800"
+                />
+                <p className="text-xs text-muted-foreground">Controls the maximum number of tokens in the AI response.</p>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="infTemp">Temperature ({((settings.infTemp || 1.0) * 50).toFixed(0)}%)</Label>
+                <Input
+                  id="infTemp"
+                  type="number"
+                  min="0.1"
+                  max="2"
+                  step="0.1"
+                  value={settings.infTemp || 1.0}
+                  onChange={(e) => setSettings(prev => ({ ...prev, infTemp: parseFloat(e.target.value) || 1.0 }))}
+                  placeholder="e.g., 1.0"
+                />
+                <p className="text-xs text-muted-foreground">Controls response creativity (0 = deterministic, 2 = highly creative).</p>
+              </div>
+            </div>
 
-          <div className="flex gap-2">
-            <Button
-              onClick={testConnection}
-              disabled={isTestingConnection || !settings.apiUrl || (currentProvider?.requiresKey && !settings.apiKey)}
-              variant="outline"
-              size="sm"
-              className="flex-1"
-            >
-              {getConnectionIcon()}
-              <span className="ml-2">Test connection</span>
+            <Button onClick={handleSave} className="w-full">
+              Save settings
             </Button>
-            <Button
-              onClick={fetchModels}
-              disabled={isLoadingModels || !settings.apiUrl || (currentProvider?.requiresKey && !settings.apiKey)}
-              variant="outline"
-              size="sm"
-              className="flex-1"
-            >
-              {isLoadingModels ? (
-                <Loader2 className="w-4 h-4 animate-spin mr-2" />
-              ) : (
-                <RefreshCw className="w-4 h-4 mr-2" />
-              )}
-              Get the model
-            </Button>
-          </div>
+          </TabsContent>
 
-          {lastError && (
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription className="text-sm">
-                <strong>Connection error:</strong> {lastError}
-              </AlertDescription>
-            </Alert>
-          )}
-
-          <div className="space-y-2">
-            <Label htmlFor="model">Model selection</Label>
-            <Select value={settings.model} onValueChange={(value) => setSettings(prev => ({ ...prev, model: value }))}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a model" />
-              </SelectTrigger>
-              <SelectContent>
-                {availableModels.filter(model => model && model.trim() !== '').map((model) => (
-                  <SelectItem key={model} value={model}>
-                    {model}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-4 border-t pt-4">
-            <h4 className="font-medium">Generation Parameters</h4>
-            <div className="space-y-2">
-              <Label htmlFor="maxTokens">Max Tokens ({settings.maxTokens ? settings.maxTokens : 1200})</Label>
-              <Input
-                id="maxTokens"
-                type="number"
-                min="1"
-                max="5000"  // Adjust as needed for your API limits
-                value={settings.maxTokens || 1200}
-                onChange={(e) => setSettings(prev => ({ ...prev, maxTokens: parseInt(e.target.value) || 1200 }))}
-                placeholder="e.g., 1200"
-              />
-              <p className="text-xs text-muted-foreground">Controls the maximum number of tokens in the AI response.</p>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="infTemp">Temperature ({((settings.temperature || 1.0) * 50).toFixed(0)}%)</Label>
-              <Input
-                id="infTemp"
-                type="number"
-                min="0.1"
-                max="2"
-                step="0.1"
-                value={settings.temperature || 1.0}
-                onChange={(e) => setSettings(prev => ({ ...prev, temperature: parseFloat(e.target.value) || 1.0 }))}
-                placeholder="e.g., 1.0"
-              />
-              <p className="text-xs text-muted-foreground">Controls response creativity (0 = deterministic, 2 = highly creative).</p>
-            </div>
-          </div>
-
-          <Button onClick={handleSave} className="w-full">
-            Save settings
-          </Button>
-        </div>
+          <TabsContent value="prompts">
+            <PromptEditor />
+          </TabsContent>
+        </Tabs>
       </DialogContent>
     </Dialog>
   );

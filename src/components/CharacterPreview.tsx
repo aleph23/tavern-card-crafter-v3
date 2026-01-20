@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable prefer-const */
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,14 +15,14 @@ interface CharacterPreviewProps {
 }
 
 /**
- * Renders a character preview component with options to copy, download JSON, or export as PNG.
- *
- * The component utilizes hooks for toast notifications and language translation. It provides functionality to copy character data to the clipboard, download the character data as a JSON file, and export the character data embedded in a PNG image. It also calculates total characters and tokens from various fields in the character data and highlights JSON syntax for better readability.
- *
- * @param characterData - The data of the character to be previewed, including various attributes.
- * @param characterImage - The URL of the character's image to be used for PNG export.
- * @returns A JSX element representing the character preview.
- */
+* Renders a character preview component with options to copy, download JSON, or export as PNG.
+*
+* The component utilizes hooks for toast notifications and language translation. It provides functionality to copy character data to the clipboard, download the character data as a JSON file, and export the character data embedded in a PNG image. It also calculates total characters and tokens from various fields in the character data and highlights JSON syntax for better readability.
+*
+* @param characterData - The data of the character to be previewed, including various attributes.
+* @param characterImage - The URL of the character's image to be used for PNG export.
+* @returns A JSX element representing the character preview.
+*/
 const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewProps) => {
   const { toast } = useToast();
   const { t } = useLanguage();
@@ -35,8 +36,8 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
   };
 
   /**
-   * Downloads character data as a JSON file.
-   */
+  * Downloads character data as a JSON file.
+  */
   const downloadJson = () => {
     const dataStr = JSON.stringify(characterData, null, 2);
     const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
@@ -207,8 +208,8 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
   };
 
   /**
-   * Calculate CRC32 checksum for PNG chunks
-   */
+  * Calculate CRC32 checksum for PNG chunks
+  */
   const calculateCRC32 = (data: Uint8Array): number => {
     let crc = 0xFFFFFFFF;
 
@@ -232,13 +233,13 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
 
   // Calculate the total number of characters and tokens
   /**
-   * Calculates the total character count and token estimate from character data fields.
-   *
-   * This function extracts various fields from the characterData object, including name, nickname,
-   * description, and others. It iterates through these fields, checking if they are non-empty strings,
-   * and accumulates their lengths for totalChars and estimates tokens using the estimateTokens function
-   * for totalTokens. The results are returned as an object containing both totals.
-   */
+  * Calculates the total character count and token estimate from character data fields.
+  *
+  * This function extracts various fields from the characterData object, including name, nickname,
+  * description, and others. It iterates through these fields, checking if they are non-empty strings,
+  * and accumulates their lengths for totalChars and estimates tokens using the estimateTokens function
+  * for totalTokens. The results are returned as an object containing both totals.
+  */
   const calculateTotalStats = () => {
     const {data} = characterData;
     let totalChars = 0;
@@ -264,30 +265,52 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
   };
 
   const { totalChars, totalTokens } = calculateTotalStats();
+  /**
+  * Escapes HTML special characters in a string to prevent XSS attacks.
+  *
+  * This function replaces characters like &, <, >, ", and ' with their corresponding HTML entities.
+  * This is crucial when inserting user-generated content into the DOM to avoid execution of malicious scripts.
+  *
+  * @param unsafe - The input string that may contain HTML special characters.
+  * @returns The escaped string safe for HTML insertion.
+  */
+  const escapeHtml = (unsafe: string) => {
+    return unsafe
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  };
 
   /**
-   * Highlights syntax in a JSON string by wrapping elements in HTML span tags with appropriate classes.
-   * The function uses a regular expression to identify JSON elements such as keys, string values, booleans,
-   * and null values, applying specific CSS classes for each type. The matched elements are then returned
-   * as a formatted string suitable for display with syntax highlighting.
-   *
-   * @param json - The JSON string to be highlighted.
-   */
+  * Highlights syntax in a JSON string by wrapping elements in HTML span tags with appropriate classes.
+  * The function uses a regular expression to identify JSON elements such as keys, string values, booleans,
+  * and null values, applying specific CSS classes for each type. The matched elements are then returned
+  * as a formatted string suitable for display with syntax highlighting. Also includes security measures to 
+  * escape HTML characters.
+  *
+  * @param json - The JSON string to be highlighted.
+  */
   const syntaxHighlight = (json: string) => {
     return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\\-]?\d+)?)/g, (match) => {
-      let cls = 'text-yellow-300'; // Default color - Numbers and others
+      let cls = 'text-yellow-300';
       if (/^"/.test(match)) {
         if (/:$/.test(match)) {
-          cls = 'text-blue-300 font-semibold'; // Key name - Blue thick
+          cls = 'text-blue-300 font-semibold'; // Key
         } else {
-          cls = 'text-green-300'; // String value - green
+          cls = 'text-green-300'; // String
         }
       } else if (/true|false/.test(match)) {
-        cls = 'text-purple-300'; // Boolean value - Purple
+        cls = 'text-purple-300'; // Boolean
       } else if (/null/.test(match)) {
-        cls = 'text-red-300'; // null value - red
+        cls = 'text-red-300'; // Null
       }
-      return `<span class="${cls}">${match}</span>`;
+        
+      // SECURITY FIX: Escape the content BEFORE wrapping it in HTML.
+      // This neutralizes <script> tags into harmless text, 
+      // preventing them from executing while still displaying them.
+      return `<span class="${cls}">${escapeHtml(match)}</span>`;
     });
   };
 
