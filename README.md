@@ -21,7 +21,7 @@ This app began as an exclusively vibed character creator in Mandarin by user @Id
 - **But Seriously** use the buggers for a little kick start. If you don't edit afterwards, we will ALL know.
 - **Intelligent Character Creation**: Quickly generate structured character information from free text using AI.
 - **Multi-genre support**: Stock character types like anime, games, novels, historical figures, to help compensate for full creative constipation.
-- **Intelligent Content Extraction**: Paste any text (novel excerpt, Mom's recipe cards, apology emails you never sent), and AI will extract and convert it into structured character fields.
+- **Intelligent Content Extraction**: Paste any text (novel excerpt, Mom's recipe cards, apology emails you never sent), and AI will extract and convert it into structured character fields and do what it does so well... Hallucinate details.
 
 ![For you light-loving masochists](img/2025-10-23_113929.png "AI results")
 
