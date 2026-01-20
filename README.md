@@ -1,16 +1,17 @@
-## Tavern Card Crafter - AI character card maker
+# Tavern Card Crafter - AI character card maker
 
 ---
 
-### Project Introduction
+## Project Introduction
 
 This app began as an exclusively vibed character creator in Mandarin by user @Idun & Co.  I initially just wanted to fully translate it to EN, but the .PNG save function didn't work.  So I fixed that, then got to tinkering a little.  Like, for example, all of the elements of the version 3 card weren't captured. Not like we're ever going to use all of them, but just in case, they're there.
 
 **However, today, the most import change is finally fully working (fingers crossed).**  Arguably the most important part of this or any similar application is the prompt sent to the AI helper.  Previously, they were hardcoded.  Now they're fully exposed. in-app editable and they save to an external .JSON file along side the executable.  Plus, feel free to break things experimenting; the defaults are still hardcoded to come to the rescue of a misplaced comma or un-escaped double-quote control character or three.
 
-'That's cool,' you say, 'but you still didn't make it so that I could save my damned API key.'  And you'd be right.  But that's next.  I'd argue that editable prompts is much more important--and I'd be right.  Next week? External settings file.  And by March?  This thing will not only be creating your all of your characters AND personae, it'll be playing them through to your bluetooth snowboard helmet so that you can go get some fresh air--if that's still a thing.
+'That's cool,' you say, 'but you still didn't make it so that I could save my damned API key.'  And you'd be right.  But that's next.  I'd argue that editable prompts is much more important--and I'd be right.  Next week? External settings file.  And by March?  This thing will not only be creating all of your characters AND personae, it'll be playing them through to your bluetooth snowboard helmet headphones so that you can go get some fresh air...if that's still a thing.
 
 ![UI dark view](img/2025-10-23_113717.png "Dark")
+
 ![UI light view](img/2025-10-23_113814.png "Light")
 
 ### Key features
@@ -19,10 +20,46 @@ This app began as an exclusively vibed character creator in Mandarin by user @Id
 
 - **But Seriously** use the buggers for a little kick start. If you don't edit afterwards, we will ALL know.
 - **Intelligent Character Creation**: Quickly generate structured character information from free text using AI.
-- **Multi-genre support**: Stock character types like anime, games, novels, historical figures, to compensate for full cranial constipation.
+- **Multi-genre support**: Stock character types like anime, games, novels, historical figures, to help compensate for full creative constipation.
 - **Intelligent Content Extraction**: Paste any text (novel excerpt, Mom's recipe cards, apology emails you never sent), and AI will extract and convert it into structured character fields.
 
 ![For you light-loving masochists](img/2025-10-23_113929.png "AI results")
+
+#### 🧩 Prompt Management (FINALLY)
+
+- **Detestable Defaults** I spent a great deal of time coming up with terrible prompts for you to hate. What better motivator to get you to hunt down that last thread of creativity.
+- **Editable prompt templates**: Manage and edit prompt templates used across AI generation flows. Like, huh? Rename the prompts.json to prompts.YourMom and swap it in when you're making 'YourMom' bots.
+- **PromptEditor UI**: A small UI to create, edit, preview, and select prompt templates while generating.
+- **Prompt interpolation utilities**: Reusable utilities for prompt variable interpolation and templating.  Not really, but Gemini thought it looked cool and then had the balls to use the name 'Alice' in it's demo without it being *that* Alice. Fixed that too.
+
+#### 💾 Persistent prompts and (you do the heavy lifting) cross-environment support
+
+- **Prompt persistence**: User-created or edited prompts are persisted across sessions. Because they're in an external file.... Did I mention that already?  On Desktop (packaged Electron releases) prompts are saved/persisted via Electron IPC to local files for full functionality and stable permission handling.
+- **Load / Save / Reset**: Prompts can be loaded, saved, or reset to defaults from the AI Settings dialog.
+
+NOTE: For best user experience, be lazy. Use the electron slop, err, app.  The electron app... in releases. To your right.
+
+#### ⚙️ AI Settings improvements
+
+- **Any OpenAI-compatible API**: Builtin; OpenRouter, OpenAI, DeepSeek, Moonshot, OneAPI, Zhipu, and, of course, Yi.
+- **Tabbed AI Settings dialog**: Connection parameters (keys, endpoints) are separated from prompt template management, because... even AI aren't total heathens.
+- **Connection & generation controls**: Configure model/host settings, inference temperature, and max tokens. Who knows? Maybe your backend will even listen and obey.
+- **Clearer error messaging**: Better messages for missing local models and prompt save failures, including permission guidance. Unless you speak Mandarin, in which case I suspect it is now much worse. Sorry!
+
+#### 📟 Multi-platform support (AI **really** wants me to lie to you about this. So I guess I will)
+
+- **Dev/PITA version**: Browser direct access and use (Vite-based).
+- **Desktop App**: *(Theoretically Cross-platform)* Electron desktop app with filesystem access.
+- **Sidebar Layout**: Because clickable menus are still easier than psychic links.
+
+#### 🛠 Practical features
+
+- **Real-time preview**: No longer do you have to send the proof off to the type-setter! Welcome to 1988!
+- **Multi-format export**: Export cards as JSON and PNG formats (PNG export embeds the character card into an image; avatar upload required). That's right. Two. *That twice as many as one!*
+- **Language & localization**: The UI is now primarily English. If anyone wants to check and see if the Mandarin is still correct, cool, let me know. Wanna translate into your own native scrawl? PR me your language under /src/contents/LanguageContext.tsx
+- **Responsive Design**: Because. Now you can drag that bottom right corner wherever the hell you feel like.  I mean... don't get too crazy. But *almost* wherever you want.
+
+![Pretty UI Picture](img/2025-10-23_114242.png)
 
 #### ✏️ Full character editing *(Skip if you know what a character card v3 is)*
 
@@ -33,44 +70,9 @@ This app began as an exclusively vibed character creator in Mandarin by user @Id
 - **Character/Lore Book**: Add and manage world-building or memory entries.
 - **Keyword/Tag Classification**: Role labeling and metadata management for easy categorization.  Probably best not to get AI to do this for you, but sometimes it's fun AND useless.
 
-#### 🧩 Prompt Management (FINALLY)
-
-- **Detestable Defaults** I spent a great deal of time coming up with terrible prompts for you to hate.  What better motivator to get you to hunt down that last thread of creativity.
-- **Editable prompt templates**: Manage and edit prompt templates used across AI generation flows. Like, huh?  Rename the prompts.json to prompts.YourMom and swap it in when you're making 'Your Mom' bots.
-- **PromptEditor UI**: A small UI to create, edit, preview, and select prompt templates while generating.
-- **Prompt interpolation utilities**: Reusable utilities for prompt variable interpolation and templating.  Not really, but Gemini thought it looked cool.
-
-#### 💾 Persisted prompts and cross-environment support
-
-- **Prompt persistence**: User-created or edited prompts are persisted across sessions. Because they're in an external file.... Did I mention that already?  On Desktop (packaged Electron releases) prompts are saved/persisted via Electron IPC to local files for full functionality and stable permission handling.
-- **Load / Save / Reset**: Prompts can be loaded, saved, or reset to defaults from the AI Settings dialog.
-
-NOTE: For best user experience, be lazy. Use the electron slop, err, app.  The electron app... in releases.
-
-#### ⚙️ AI Settings improvements
-
-- **Tabbed AI Settings dialog**: Connection parameters (keys, endpoints) are separated from prompt template management, because, even AI aren't total heathens.
-- **Connection & generation controls**: Configure model/host settings, inference temperature, and max tokens. Who knows? Maybe your backend will even listen.
-- **Clearer error messaging**: Better messages for missing local models and prompt save failures, including permission guidance. Unless you speak Mandarin, in which case I suspect it is now much worse. Sorry!
-
-#### 📟 Multi-platform support
-
-- **Dev/PITA version**: Browser direct access and use (Vite-based).
-- **Desktop App**: *(Theoretically Cross-platform)* Electron desktop app with filesystem access.
-- **Sidebar Layout**: Because clickable menus are still easier than psychic links.
-
-#### 🛠 Practical features
-
-- **Real-time preview**: No longer do you have to send the proof off to the typesetter! Welcome to 1988!
-- **Multi-format export**: Export cards as JSON and PNG formats (PNG export embeds the character card into an image; avatar upload required). That's right. Two. That twice as many as one!
-- **Language & localization**: The UI is now primarily English.  If anyone wants to check and see if the Mandarin is still correct, cool, let me know. Wanna translate into your own native scrawl? PR me your language.
-- **Responsive Design**: Because. Now you can drag that bottom right corner wherever the hell you feel like.  I mean... don't get too crazy.
-
-![Pretty UI Picture](img/2025-10-23_114242.png)
-
 ---
 
-### Technology Stack (Pile? Mixed Salad?)
+## Technology Stack (Pile? Mixed Salad?)
 
 This project uses modern web and desktop technologies:
 
@@ -83,31 +85,31 @@ This project uses modern web and desktop technologies:
 
 ---
 
-### User Guide
+# User Guide
 
-#### 🚀 Quick Start
+## 🚀 Quick Start
 
 1. Start the application from releases.
 2. Enter your API key and pick a model
 3. Type words and click buttons. Note, sometimes faster isn't better.
 
-#### 📋 Detailed explanation of functions
+## 📋 Detailed explanation of functions
 
-##### 🤖 AI character card from thin air
+### 🤖 AI character card from thin air
 
 1. So, you can cut and paste something from fandom, wikipedia, or your friend's facebook page.
 2. Then pick from a stock character type (anime, games, novels, historical figures, etc. *(there is not et cetera)*).
 3. Click "AI Analysis / Generation" — AI will extract structured character fields.
 4. Click generated fields to fill them into the Role Editor with one click.
 
-##### 🧾 Prompt templates and AI Settings
+### 🧾 Prompt templates and AI Settings
 
 1. Open AI Settings and switch to the "Prompts" tab.
 2. Create or edit prompt templates in the PromptEditor UI.
 3. Save templates — saved prompts persist across sessions (Electron packaged releases: filesystem via IPC; Web: localStorage).
 4. As you add/fill in an element into the card, that new element will be sent to your AI assistant of choice, cluing them in on where you're going with this whole idea of yours.
 
-##### ✏️ Character information editing
+### ✏️ Character information editing
 
 Downloaded a card from Janny, Chub, or RisuAI, but it just isn't up to your standard?
 
@@ -116,7 +118,7 @@ Downloaded a card from Janny, Chub, or RisuAI, but it just isn't up to your stan
 3. Edit fields of three and four dimensional space (first message, examples, and alternative greetings).
 4. Teach your bot differential equations and then make it thinks it's Jim Simons.  You'll be broke or a billionaire in no time.
 
-##### 📄 JSON Preview
+### 📄 JSON Preview
 
 ![preview the generated JSON before saving](img/2025-10-23_114417.png "JSON view")
 
@@ -130,7 +132,7 @@ Downloaded a card from Janny, Chub, or RisuAI, but it just isn't up to your stan
    - Read it from the screen and handwrite it on to a real piece of paper.
    - TTS it and record it into that old Sony Walkman.
 
-#### 💡 Usage Tips
+## 💡 Usage Tips
 
 - Use the AI Assistant to quickly bootstrap a card, then refine in the editor.  Or don't. Pride is just another obstacle to overcome.
 - Create reusable prompts for specific genres/tones in the PromptEditor to get consistent results.
@@ -138,9 +140,9 @@ Downloaded a card from Janny, Chub, or RisuAI, but it just isn't up to your stan
 
 ---
 
-### For Development: Get started quickly (Probably don't read any of this, but AI likes to talk almost as much as I do, so it had to write another damned chapter.)
+## For Development: Get started quickly (Probably don't read any of this, but AI likes to talk almost as much as I do, so it had to write another damned chapter.)
 
-#### Environmental Requirements
+### Environmental Requirements
 
 Make sure your system has:
 
@@ -150,7 +152,7 @@ Make sure your system has:
 
 (If you have strict constraints, use the versions preferred in your development environment; Electron and dependencies generally work with Node LTS releases.)
 
-#### Install and run
+### Install and run
 
 ```bash
 git clone https://github.com/aleph23/tavern-card-crafter-v3 tcc
@@ -172,7 +174,7 @@ npm run electron-dev
 
 ---
 
-### Project structure
+## Project structure
 
 Note: The project file structure has undergone significant changes to support prompt management, prompt persistence, localized UI, and modular AI integration. The tree below is a representative layout; consult the repository for the canonical structure.
 
@@ -222,7 +224,7 @@ src/
 
 Howdy — issues and pull requests are things you can do. If you add providers or functionality, include tests or don't. Sharing of prompts is always welcome. If it doesn't work, don't assume I already know.  Because I don't already know.  As best I can tell, it's perfect, so unless you say otherwise, I remain in another world.
 
-### License
+## License
 
 This project was licensed under the MIT license and I am way too not giving a damn to change that. See the LICENSE file for details. Or consider getting a life. Your choice.
 
