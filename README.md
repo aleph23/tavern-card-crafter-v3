@@ -1,25 +1,25 @@
-# Tavern Card Crafter - AI character card maker
+## Tavern Card Crafter - AI character card maker
 
 ---
 
 ### Project Introduction
 
 This app began as an exclusively vibed character creator in Mandarin by user @Idun & Co.  I initially just wanted to fully translate it to EN, but the .PNG save function didn't work.  So I fixed that, then got to tinkering a little.  Like, for example, all of the elements of the version 3 card weren't captured. Not like we're ever going to use all of them, but just in case, they're there.  **But today, the most import change is finally fully working (fingers crossed).**  Arguably the most important part of this or any similar application is the prompt sent to the AI helper.  Previously, they were hardcoded.  Now they're fully exposed. in-app editable and they save to an external .JSON file along side the executable.  Plus, feel free to break things experimenting; the defaults are still hardcoded to come to the rescue of a misplaced comma or un-escaped double-quote control character or three.
-'That's cool,' you say, 'but you still didn't make it so that I could save my damned API key.'  And you'd be right.  But that's next.  I'd argue that editable prompts is much more important--and I'd be right.  Next week? External settings file.  And by March?  This thing will not only be creating your all of your characters AND personae, it'll be playing them through to your blueetooth snowboard helmet so that you can go get some fresh air--if that's still a thing.
+'That's cool,' you say, 'but you still didn't make it so that I could save my damned API key.'  And you'd be right.  But that's next.  I'd argue that editable prompts is much more important--and I'd be right.  Next week? External settings file.  And by March?  This thing will not only be creating your all of your characters AND personae, it'll be playing them through to your bluetooth snowboard helmet so that you can go get some fresh air--if that's still a thing.
 
-![](img/2025-10-23_113717.png "Dark")
-![](img/2025-10-23_113814.png "Light")
+![UI dark view](img/2025-10-23_113717.png "Dark")
+![UI light view](img/2025-10-23_113814.png "Light")
 
 ### Key features
 
-#### 🤖 Hey Bots! Get Bots to make your bots!
+#### 🤖 Hey Bots! Get Bots to make your bots
 
 - **But Seriously** use the buggers for a little kick start. If you don't edit afterwards, we will ALL know.
-- **Intelligent Character Creation**: Quickly generate structured character information from free text using AI. 
+- **Intelligent Character Creation**: Quickly generate structured character information from free text using AI.
 - **Multi-genre support**: Stock character types like anime, games, novels, historical figures, to compensate for full cranial constipation.
 - **Intelligent Content Extraction**: Paste any text (novel excerpt, Mom's recipe cards, apology emails you never sent), and AI will extract and convert it into structured character fields.
 
-![](img/2025-10-23_113929.png "AI results")
+![For you light-loving masochists](img/2025-10-23_113929.png "AI results")
 
 #### ✏️ Full character editing *(Skip if you know what a character card v3 is)*
 
@@ -27,7 +27,7 @@ This app began as an exclusively vibed character creator in Mandarin by user @Id
 - **Personality Traits**: Detailed personality traits and behavior patterns. Or not. Your choice.
 - **Scenario Settings**: Backstory, environment, and other scenario-specific settings. You know, like in the damn chara-card-v3 spec, right?
 - **Dialogue System**: Compose sample dialogues, greetings, and alternative greetings.  Guess where we got that one from... yep, same spec.
-- **Character/Lore Book**: Add and manage worldbuilding or memory entries.
+- **Character/Lore Book**: Add and manage world-building or memory entries.
 - **Keyword/Tag Classification**: Role labeling and metadata management for easy categorization.  Probably best not to get AI to do this for you, but sometimes it's fun AND useless.
 
 #### 🧩 Prompt Management (FINALLY)
@@ -42,7 +42,7 @@ This app began as an exclusively vibed character creator in Mandarin by user @Id
 - **Prompt persistence**: User-created or edited prompts are persisted across sessions. Because they're in an external file.... Did I mention that already?  On Desktop (packaged Electron releases) prompts are saved/persisted via Electron IPC to local files for full functionality and stable permission handling.
 - **Load / Save / Reset**: Prompts can be loaded, saved, or reset to defaults from the AI Settings dialog.
 
-NOTE: For best user experience, be lazy. Use the electron slop, err, app.  The electron app... in releases.  
+NOTE: For best user experience, be lazy. Use the electron slop, err, app.  The electron app... in releases.
 
 #### ⚙️ AI Settings improvements
 
@@ -53,17 +53,17 @@ NOTE: For best user experience, be lazy. Use the electron slop, err, app.  The e
 #### 📟 Multi-platform support
 
 - **Dev/PITA version**: Browser direct access and use (Vite-based).
-- **Desktop App**: *(Theoritically Cross-platform)* Electron desktop app with filesystem access.
-- **Sidebar Layout**: Because clickable menues are still easier than psychic links.
+- **Desktop App**: *(Theoretically Cross-platform)* Electron desktop app with filesystem access.
+- **Sidebar Layout**: Because clickable menus are still easier than psychic links.
 
 #### 🛠 Practical features
 
 - **Real-time preview**: No longer do you have to send the proof off to the typesetter! Welcome to 1988!
 - **Multi-format export**: Export cards as JSON and PNG formats (PNG export embeds the character card into an image; avatar upload required). That's right. Two. That twice as many as one!
-- **Language & localization**: The UI is now primarily English.  If anyone wants to check and see if the Mandarin is still correct, cool, let me know. Wanna translate into your own native scrawl? PR me your language. 
-- **Responsive Design**: Because. Now you can drag that bottom right corner whereever the hell you feel like.  I mean... don't get too crazy.
+- **Language & localization**: The UI is now primarily English.  If anyone wants to check and see if the Mandarin is still correct, cool, let me know. Wanna translate into your own native scrawl? PR me your language.
+- **Responsive Design**: Because. Now you can drag that bottom right corner wherever the hell you feel like.  I mean... don't get too crazy.
 
-![](img/2025-10-23_114242.png)
+![Pretty UI Picture](img/2025-10-23_114242.png)
 
 ---
 
@@ -90,7 +90,7 @@ This project uses modern web and desktop technologies:
 
 #### 📋 Detailed explanation of functions
 
-##### 🤖 AI character card from thin air.
+##### 🤖 AI character card from thin air
 
 1. So, you can cut and paste something from fandom, wikipedia, or your friend's facebook page.
 2. Then pick from a stock character type (anime, games, novels, historical figures, etc. *(there is not et cetera)*).
@@ -107,10 +107,11 @@ This project uses modern web and desktop technologies:
 ##### ✏️ Character information editing
 
 Downloaded a card from Janny, Chub, or RisuAI, but it just isn't up to your standard?
+
 1. Edit basic fields (name, description, avatar).
 2. Edit moderate fields personality, behavior patterns, and special scenario notes.
-4. Edit fields of three and four dimensional space (first message, examples, and alternative greetings).
-5. Teach your bot differential equations and then make it thinks it's Jim Simons.  You'll be broke or a billionaire in no time.
+3. Edit fields of three and four dimensional space (first message, examples, and alternative greetings).
+4. Teach your bot differential equations and then make it thinks it's Jim Simons.  You'll be broke or a billionaire in no time.
 
 ##### 📄 JSON Preview
 
@@ -155,7 +156,9 @@ nvm use <yourfavenodeversion>
 npm install
 npm run dev
 ```
+
 Or for the bloat-lover in you
+
 ```bash
 npm run electron-dev
 ```
@@ -164,11 +167,13 @@ npm run electron-dev
 - Desktop (dev): running `npm run electron-dev` will open an Electron development window
 - Desktop (full prompt persistence): Just be lazy and download the .exe.  Save your creative juices for your character development.
 
+---
+
 ### Project structure
 
 Note: The project file structure has undergone significant changes to support prompt management, prompt persistence, localized UI, and modular AI integration. The tree below is a representative layout; consult the repository for the canonical structure.
 
-```
+```vtree
 src/
 ├── components/
 │   ├── CharacterForm/
@@ -185,7 +190,7 @@ src/
 │   ├── PromptEditor.tsx
 │   ├── Toolbar.tsx
 │   └── ui/                          ## Third-party stock UI elements
-├── config/          
+├── config/
 │   └──  defaultPrompts.json
 ├── contents/
 │   ├── LanguageContent.tsx
@@ -220,7 +225,7 @@ This project was licensed under the MIT license and I am way too not giving a da
 
 ---
 
-## Changelog 
+## Changelog
 
 ### v0.3.0 (1/19/26)
 
