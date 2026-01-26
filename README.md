@@ -14,6 +14,8 @@ This app began as an exclusively vibed character creator in Mandarin by user @Id
 
 ![UI light view](img/2025-10-23_113814.png "Light")
 
+**Download Portable Executable from [Releases](https://github.com/aleph23/tavern-card-crafter-v3/releases)**
+
 ### Key features
 
 #### 🧩 Prompt Management (FINALLY)
@@ -61,7 +63,7 @@ NOTE: For easy laziness, use the electron slop, err, app. The electron *app*... 
 
 ## 🚀 Quick Start
 
-1. Download and execute the application from Releases.
+1. Download and execute the application from [Releases](https://github.com/aleph23/tavern-card-crafter-v3/releases).
 2. Enter your API key and pick a model in the 'AI Settings'.
 3. Type words and click buttons.
 
@@ -215,7 +217,7 @@ This project was licensed under the MIT license and I am way too not giving a da
 
 ## Changelog
 
-### v0.3.0 (1/19/26)
+### [v0.3.0 (1/19/26)](https://github.com/aleph23/tavern-card-crafter-v3/releases)
 
 #### New Features
 
