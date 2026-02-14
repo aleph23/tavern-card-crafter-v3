@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable prefer-const */
 import { AISettings } from "@/components/AISettings";
 import { buildApiUrl } from "./buildApiUrl";
 import { promptManager } from "./promptManager";

@@ -55,3 +55,8 @@ tmp/
 # ─────────────────────────────────────────────
 .github/copilot-instructions.md
 prompts.json
+/.claude
+/docs
+prompts.json
+settings.json
+
