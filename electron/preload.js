@@ -34,4 +34,15 @@ contextBridge.exposeInMainWorld('electronAPI', {
     // console.log('[PRELOAD] resetPrompts called');
     return ipcRenderer.invoke('reset-prompts');
   },
+
+  // Config management
+  loadConfig: () => {
+    return ipcRenderer.invoke('load-config');
+  },
+  saveConfig: (config) => {
+    return ipcRenderer.invoke('save-config', config);
+  },
+  resetConfig: () => {
+    return ipcRenderer.invoke('reset-config');
+  },
 });
