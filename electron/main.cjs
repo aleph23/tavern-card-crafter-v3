@@ -14,7 +14,7 @@ const getPromptsPath = () => {
   if (promptsPath) return promptsPath;
 
   // Check if we're in a packaged app
-  const isPackaged = app.isPackaged;
+  const {isPackaged} = app;
 
   // Debug logging (uncomment for troubleshooting)
   // console.log('[MAIN] app.isPackaged:', isPackaged);
