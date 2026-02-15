@@ -267,7 +267,7 @@ export const AISettings = ({ onSettingsChange }: AISettingsProps) => {
 
     try {
       const apiUrl = buildApiUrl(endpoint.apiUrl, endpoint.provider);
-      let headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
       if (currentProvider?.requiresKey && endpoint.apiKey) {
         headers['Authorization'] = `Bearer ${endpoint.apiKey}`;
       }
@@ -324,7 +324,7 @@ export const AISettings = ({ onSettingsChange }: AISettingsProps) => {
 
     try {
       const modelsUrl = currentProvider?.modelsUrl || buildModelsUrl(endpoint.apiUrl, endpoint.provider);
-      let headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
       if (currentProvider?.requiresKey && endpoint.apiKey) {
         headers['Authorization'] = `Bearer ${endpoint.apiKey}`;
       }

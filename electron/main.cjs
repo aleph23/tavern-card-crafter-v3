@@ -78,7 +78,9 @@ const XOR_KEY = 'TAVERN_CARD_CRAFTER_SECRET';
 function obfuscate(text) {
   if (!text) return text;
   try {
-    const xor = text.split('').map((c, i) => c.charCodeAt(0) ^ XOR_KEY.charCodeAt(i % XOR_KEY.length));
+    // Prepend 'deenc' to verify successful decryption later
+    const payload = 'deenc' + text;
+    const xor = payload.split('').map((c, i) => c.charCodeAt(0) ^ XOR_KEY.charCodeAt(i % XOR_KEY.length));
     return Buffer.from(xor).toString('base64');
   } catch (e) {
     console.error('Obfuscation failed:', e);
@@ -89,14 +91,19 @@ function obfuscate(text) {
 function deobfuscate(encoded) {
   if (!encoded) return encoded;
   try {
-    // If it looks like a normal API key (starts with sk-), return it as is (migration/backward compatibility)
-    if (encoded.startsWith('sk-')) return encoded;
-
     // Check if it's valid base64
     if (!/^[A-Za-z0-9+/]*={0,2}$/.test(encoded)) return encoded;
 
     const xor = Buffer.from(encoded, 'base64');
-    return String.fromCharCode(...xor.map((b, i) => b ^ XOR_KEY.charCodeAt(i % XOR_KEY.length)));
+    const decoded = String.fromCharCode(...xor.map((b, i) => b ^ XOR_KEY.charCodeAt(i % XOR_KEY.length)));
+
+    // Check for the prefix to confirm successful decryption
+    if (decoded.startsWith('deenc')) {
+      return decoded.slice(5);
+    }
+
+    // If prefix not found, assume it's a plain text legacy key
+    return encoded;
   } catch (e) {
     // console.error('Deobfuscation failed:', e);
     return encoded;
