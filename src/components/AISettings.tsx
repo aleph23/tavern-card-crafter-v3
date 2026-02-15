@@ -29,6 +29,15 @@ interface AISettingsProps {
   currentSettings: AISettings | null; // Kept for interface compatibility but we'll use configManager mostly
 }
 
+/**
+ * AISettings component for managing AI provider settings.
+ *
+ * This component allows users to configure API provider settings, including selecting a provider, entering an API key, and testing the connection. It intelligently builds API URLs based on the selected provider and handles fetching available models. The component also manages state for connection status and error messages, providing user feedback through toasts.
+ *
+ * @param {function} onSettingsChange - Callback function to handle changes in settings.
+ * @param {AISettings} currentSettings - The current settings to initialize the component state.
+ * @returns {JSX.Element} representing the AISettings component.
+ */
 export const AISettings = ({ onSettingsChange }: AISettingsProps) => {
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
@@ -74,7 +83,7 @@ export const AISettings = ({ onSettingsChange }: AISettingsProps) => {
       modelsUrl: "https://open.z.ai/api/paas/v4/models",
       models: ["glm-5", "glm-4.6", "glm-4.7", "glm-4.5-air"],
       requiresKey: true,
-      tips: "Zhipu AI / GLM models (Z-ai)."
+      tips: "Zhipu AI / GLM models (Z-ai). Fairly creative."
     },
     {
       name: "01.AI (Yi)",
@@ -138,9 +147,26 @@ export const AISettings = ({ onSettingsChange }: AISettingsProps) => {
 
   const loadConfig = async () => {
     const loadedConfig = await configManager.loadConfig();
-    setConfig(loadedConfig);
+    setConfig(loadedConfig) || {
+      name: "OpenRouter",
+      value: "openrouter",
+      url: "https://openrouter.ai/api",
+      modelsUrl: "https://openrouter.ai/api/v1/models",
+      models: ["openrouter/free"],
+      requiresKey: true,
+      tips: "Open Router unified interface, supports multiple models from several providers"
+    },
   };
 
+  /**
+   * Handles changes to the selected API provider.
+   *
+   * This function updates the settings based on the selected provider's value. It searches for the provider in the apiProviders 
+   * array and, if found, updates the settings with the provider's URL, model, and API key. Additionally, it sets the available 
+   * models based on the selected provider or defaults to a predefined set of models if none are available.
+   *
+   * @param {string} providerValue - The value of the selected provider.
+   */
   const handleEndpointChange = <K extends keyof Endpoint>(index: number, field: K, value: Endpoint[K]) => {
     if (!config) return;
     const newEndpoints = [...config.endpoints];
@@ -176,9 +202,9 @@ export const AISettings = ({ onSettingsChange }: AISettingsProps) => {
       provider: 'openai',
       apiKey: '',
       apiUrl: 'https://api.openai.com/v1/chat/completions',
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-5.2',
       type: 'text',
-      availableModels: ["gpt-3.5-turbo", "gpt-4"]
+      availableModels: ["gpt-5.2", "gpt-4"]
     };
 
     setConfig({ ...config, endpoints: [...config.endpoints, newEndpoint] });
@@ -216,6 +242,18 @@ export const AISettings = ({ onSettingsChange }: AISettingsProps) => {
     setConfig({ ...config, activeChatEndpointId: id });
   };
 
+
+  /**
+   * Build a models URL based on the provided base URL and provider.
+   *
+   * The function first checks if the baseUrl is valid. It then cleans the URL by removing trailing slashes.
+   * Depending on the provider, it applies specific rules for constructing the final URL, particularly for 'ollama'
+   * and other providers, ensuring the correct endpoint structure is returned.
+   *
+   * @param baseUrl - The base URL to be processed.
+   * @param provider - The provider to determine specific URL formatting (defaults to settings.provider).
+   * @returns The constructed models URL based on the input parameters.
+   */      
   const buildModelsUrl = (baseUrl: string, provider: string): string => {
     if (!baseUrl) return '';
     const cleanUrl = baseUrl.replace(/\/+$/, '');
@@ -226,11 +264,37 @@ export const AISettings = ({ onSettingsChange }: AISettingsProps) => {
     return cleanUrl.includes('/v1') ? `${cleanUrl}/models` : `${cleanUrl}/v1/models`;
   };
 
+  /**
+   * Parse and return a user-friendly error message from an API error.
+   *
+   * The function checks the type of the error and matches it against known error patterns to provide specific messages.
+   * If the error is an object, it attempts to extract the message from the error's structure.
+   * In case of unexpected formats or exceptions, a generic error message is returned.
+   *
+   * @param error - The error object or message received from the API.
+   * @param response - An optional Response object that may provide additional context.
+   * @returns A user-friendly error message based on the provided error.
+   */  
   const parseApiError = (error: unknown): string => {
     try {
       if (typeof error === 'string') {
         if (error.includes('model')) return "The model does not exist or is invalid.";
         if (error.includes('Unauthorized') || error.includes('401')) return "Invalid API Key.";
+        if (error.includes('No channels available') || error.includes('no available channels')) {
+          return "There is no available channel for the current API grouping. Please check the API configuration or contact the service provider.";
+        }
+        if (error.includes('User location is not supported') || error.includes('location')) {
+          return "This API service is not supported in the current region, and it may be necessary to use a proxy or replace the API provider.";
+        }
+        if (error.includes('rate limit') || error.includes('429')) {
+          return "API call frequency exceeds the limit, please try again later";
+        }
+        if (error.includes('quota') || error.includes('insufficient')) {
+          return "The API limit is insufficient, please check the account balance";
+        }
+        if (error.includes('CORS')) {
+          return "Cross-domain requests are blocked, please check the CORS configuration of the API service";
+        }
         if (error.includes('Failed to fetch')) return "Network connection failed. Check URL and server status.";
         return error;
       }
@@ -240,6 +304,23 @@ export const AISettings = ({ onSettingsChange }: AISettingsProps) => {
     }
   };
 
+  /**
+   * Tests the connection to the specified API provider and model.
+   *
+   * The function first verifies the configuration settings, including the API key and URL.
+   * It then constructs the API request and handles the response, providing feedback through toast notifications
+   * based on the success or failure of the connection attempt. Error handling is implemented for various scenarios,
+   * including network issues and invalid configurations.
+   *
+   * @param {Object} endpoint - The configuration settings for the API connection.
+   * @param {string} endpoint.provider - The API provider to connect to.
+   * @param {string} endpoint.apiKey - The API key for authentication, if required.
+   * @param {string} endpoint.apiUrl - The URL of the API to connect to.
+   * @param {string} endpoint.model - The model to be used for the connection.
+   * @param {Array} availableModels - The list of models available for the selected provider.
+   * @returns {Promise<void>} A promise that resolves when the connection test is complete.
+   * @throws {Error} Throws an error if the connection test fails due to network issues or invalid configurations.
+   */
   const testConnection = async (endpoint: Endpoint) => {
     const currentProvider = apiProviders.find(p => p.value === endpoint.provider);
 
@@ -247,8 +328,9 @@ export const AISettings = ({ onSettingsChange }: AISettingsProps) => {
       toast({ title: "Missing API Key", description: "Please enter an API key.", variant: "destructive" });
       return;
     }
+    
     if (!endpoint.apiUrl) {
-      toast({ title: "Missing API URL", description: "Please enter an API URL.", variant: "destructive" });
+      toast({ title: "Configuration missing", description: "Please fill in the API address first", variant: "destructive" });
       return;
     }
 
@@ -258,15 +340,18 @@ export const AISettings = ({ onSettingsChange }: AISettingsProps) => {
 
     try {
       const apiUrl = buildApiUrl(endpoint.apiUrl, endpoint.provider);
+
+      console.log('Testing connection to:', apiUrl);
+      console.log('Provider:', settings.provider);
+      console.log('Model:', settings.model);
+
+      // Use a unified Open AI-compatible format
       const headers: Record<string, string> = { 'Content-Type': 'application/json' };
       if (endpoint.provider === 'openrouter') {
         headers['HTTP-Referer'] = 'https://github.com/aleph23/tavern-card-creator-v3';
         headers['X-Title'] = 'CardCreator';
       }
-      if (endpoint.apiKey) {
-        headers['Authorization'] = `Bearer ${endpoint.apiKey}`;
-      }
-
+      
       const requestBody = {
         model: endpoint.model,
         messages: [{ role: 'user', content: 'test' }],
@@ -301,6 +386,13 @@ export const AISettings = ({ onSettingsChange }: AISettingsProps) => {
     }
   };
 
+  /**
+   * Fetch models from the configured API provider.
+   *
+   * This function checks for the necessary API key and URL configuration before attempting to fetch model data from the specified provider. It handles both successful and error responses, updating the available models accordingly and providing user feedback through toast notifications. The function also manages loading states and handles potential errors during the fetch operation.
+   *
+   * @returns {Promise<void>} A promise that resolves when the fetch operation is complete.
+   */
   const fetchModels = async (index: number) => {
     if (!config) return;
     const endpoint = config.endpoints[index];
@@ -319,7 +411,12 @@ export const AISettings = ({ onSettingsChange }: AISettingsProps) => {
 
     try {
       const modelsUrl = currentProvider?.modelsUrl || buildModelsUrl(endpoint.apiUrl, endpoint.provider);
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+
+      console.log('Fetching models from:', modelsUrl);
+      console.log('Provider:', endpoint.provider);
+      
+      let headers: Record<string, string> = { 'Content-Type': 'application/json', };
+      
       if (endpoint.provider === 'openrouter') {
         headers['HTTP-Referer'] = 'https://github.com/aleph23/tavern-card-creator-v3';
         headers['X-Title'] = 'CardCreator';
@@ -521,7 +618,7 @@ export const AISettings = ({ onSettingsChange }: AISettingsProps) => {
                               size="icon"
                               onClick={() => fetchModels(index)}
                               disabled={loadingModelsEndpointId === endpoint.id}
-                              title="Fetch Models"
+                              title="Get Model List"
                             >
                               {loadingModelsEndpointId === endpoint.id ? (
                                 <Loader2 className="h-4 w-4 animate-spin" />
