@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from 'react';
 import { promptManager } from '@/utils/promptManager';
 import { PromptCollection } from '@/types/prompts';
@@ -18,15 +17,15 @@ export const PromptEditor: React.FC = () => {
   const [hasChanges, setHasChanges] = useState(false);
   const { toast } = useToast();
 
-  useEffect(() => {
-    loadPrompts();
-  }, []);
-
   const loadPrompts = async () => {
     await promptManager.loadPrompts();
     setPrompts(promptManager.getAllPrompts());
     setHasChanges(false);
   };
+
+  useEffect(() => {
+    loadPrompts();
+  }, []);
 
   const handlePromptChange = (key: string, newValue: string) => {
     setPrompts(prev => ({
@@ -47,12 +46,12 @@ export const PromptEditor: React.FC = () => {
         title: "Success",
         description: "Prompts saved successfully",
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Save error:", error);
 
       // Clean up the error message from Electron's IPC wrapper
       // This removes the "Error invoking remote method..." prefix so the user sees just your message
-      const cleanMessage = error.message
+      const cleanMessage = (error instanceof Error)
         ? error.message.replace(/Error invoking remote method '[^']+': /, '')
         : "Failed to save prompts";
 
@@ -87,13 +86,13 @@ export const PromptEditor: React.FC = () => {
   };
 
   // Preview state
-  const [previewData, setPreviewData] = useState<any>({
+  const [previewData, setPreviewData] = useState<Record<string, string>>({
     name: "Alice",
     description: "A young woman with blonde hair and blue eyes, wearing a frilly blue and white dress.",
     personality: "Innocent, curious, sometimes reckless.",
     scenario: "Alice follows a bunny into its hole. Surrealist adventure ensues.",
     first_mes: "The fall seems endless. Alice passes by shelves of books, floating teacups, and curious creatures. When she finally lands, she finds herself in a strange hallway with many doors.",
-    mes_example: "<START>\nWhite Rabbit: Mary Ann! Mary Ann! Fetch me a pair of gloves and a fan! Quick, now!\nAlice: Oh dear, I seem to have fallen down a rabbit hole. Where am I?\nWhite Rabbit: No time to explain! Hurry!\",",
+    mes_example: "<START>\nWhite Rabbit: \"Mary Ann! Mary Ann! Fetch me a pair of gloves and a fan! Quick, now!\"\nAlice: \"Oh dear, I seem to have fallen down a rabbit hole. Where am I?\"\nWhite Rabbit: \"No time to explain! Hurry!\"",
     system_prompt: "You are Alice.",
   });
   const [showPreview, setShowPreview] = useState(false);

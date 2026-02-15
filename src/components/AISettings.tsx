@@ -1,3 +1,4 @@
+/* eslint-disable prefer-const */
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PromptEditor } from "./PromptEditor";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, } from "@/components/ui/accordion";
 import { configManager } from "@/utils/configManager";
-import { AppConfig, Endpoint } from "@/types/config";
+import { AppConfig, Endpoint, InferenceSettings } from "@/types/config";
 
 // Re-export for compatibility with other components
 export interface AISettings {
@@ -24,10 +25,37 @@ export interface AISettings {
   infTemp?: number;
 }
 
+export const DEFAULT_AI_SETTINGS: AISettings = {
+  apiKey: "",
+  apiUrl: "https://openrouter.ai/api",
+  model: "openrouter/free",
+  provider: "openrouter",
+  maxTokens: 800,
+  infTemp: 0.7
+};
+
 interface AISettingsProps {
   onSettingsChange: (settings: AISettings) => void;
   currentSettings: AISettings | null; // Kept for interface compatibility but we'll use configManager mostly
 }
+
+const createDefaultConfig = (): AppConfig => {
+  const defaultId = crypto.randomUUID();
+  return {
+    endpoints: [{
+      id: defaultId,
+      name: "OpenRouter",
+      provider: "openrouter",
+      apiKey: "",
+      apiUrl: "https://openrouter.ai/api",
+      model: "openrouter/free",
+      type: "text",
+      availableModels: ["openrouter/free"]
+    }],
+    activeChatEndpointId: defaultId,
+    inferenceSettings: { maxTokens: 800, temp: 0.7 }
+  };
+};
 
 /**
  * AISettings component for managing AI provider settings.
@@ -101,7 +129,7 @@ export const AISettings = ({ onSettingsChange }: AISettingsProps) => {
       modelsUrl: "https://openrouter.ai/api/v1/models",
       models: ["openrouter/free"],
       requiresKey: true,
-      tips: "Open Router unified interface, supports multiple models"
+      tips: "OpenRouter unified interface. Free models available (no credit card required)."
     },
     {
       name: "Ollama (local)",
@@ -141,22 +169,18 @@ export const AISettings = ({ onSettingsChange }: AISettingsProps) => {
     }
   ];
 
+  const loadConfig = async () => {
+    const loadedConfig = await configManager.loadConfig();
+    if (loadedConfig) {
+      setConfig(loadedConfig);
+    } else {
+      setConfig(createDefaultConfig());
+    }
+  };
+
   useEffect(() => {
     loadConfig();
   }, [isOpen]); // Reload when opened, but also load initially
-
-  const loadConfig = async () => {
-    const loadedConfig = await configManager.loadConfig();
-    setConfig(loadedConfig) || {
-      name: "OpenRouter",
-      value: "openrouter",
-      url: "https://openrouter.ai/api",
-      modelsUrl: "https://openrouter.ai/api/v1/models",
-      models: ["openrouter/free"],
-      requiresKey: true,
-      tips: "Open Router unified interface, supports multiple models from several providers"
-    },
-  };
 
   /**
    * Handles changes to the selected API provider.
@@ -199,12 +223,12 @@ export const AISettings = ({ onSettingsChange }: AISettingsProps) => {
     const newEndpoint: Endpoint = {
       id: crypto.randomUUID(),
       name: `New Endpoint ${config.endpoints.length + 1}`,
-      provider: 'openai',
+      provider: 'openrouter',
       apiKey: '',
-      apiUrl: 'https://api.openai.com/v1/chat/completions',
-      model: 'gpt-5.2',
+      apiUrl: 'https://openrouter.ai/api',
+      model: 'openrouter/free',
       type: 'text',
-      availableModels: ["gpt-5.2", "gpt-4"]
+      availableModels: ["openrouter/free"]
     };
 
     setConfig({ ...config, endpoints: [...config.endpoints, newEndpoint] });
@@ -298,7 +322,10 @@ export const AISettings = ({ onSettingsChange }: AISettingsProps) => {
         if (error.includes('Failed to fetch')) return "Network connection failed. Check URL and server status.";
         return error;
       }
-      return (error as any)?.error?.message || "Unknown error";
+      // Cast to 'any' to safely probe for common API error structures
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const errObj = error as any;
+      return errObj?.error?.message || errObj?.message || JSON.stringify(error);
     } catch {
       return "Failed to parse error message";
     }
@@ -342,11 +369,11 @@ export const AISettings = ({ onSettingsChange }: AISettingsProps) => {
       const apiUrl = buildApiUrl(endpoint.apiUrl, endpoint.provider);
 
       console.log('Testing connection to:', apiUrl);
-      console.log('Provider:', settings.provider);
-      console.log('Model:', settings.model);
+      console.log('Provider:', endpoint.provider);
+      console.log('Model:', endpoint.model);
 
       // Use a unified Open AI-compatible format
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      let headers: Record<string, string> = { 'Content-Type': 'application/json' };
       if (endpoint.provider === 'openrouter') {
         headers['HTTP-Referer'] = 'https://github.com/aleph23/tavern-card-creator-v3';
         headers['X-Title'] = 'CardCreator';
@@ -376,8 +403,8 @@ export const AISettings = ({ onSettingsChange }: AISettingsProps) => {
         setLastError(prev => ({ ...prev, [endpoint.id]: errorMessage }));
         toast({ title: "Connection Failed", description: errorMessage, variant: "destructive" });
       }
-    } catch (error: any) {
-      const errorMessage = parseApiError(error.message || "Network error");
+    } catch (error: unknown) {
+      const errorMessage = parseApiError(error instanceof Error ? error.message : "Network error");
       setConnectionStatus(prev => ({ ...prev, [endpoint.id]: 'error' }));
       setLastError(prev => ({ ...prev, [endpoint.id]: errorMessage }));
       toast({ title: "Connection Failed", description: errorMessage, variant: "destructive" });
@@ -435,9 +462,9 @@ export const AISettings = ({ onSettingsChange }: AISettingsProps) => {
         let modelIds: string[] = [];
 
         if (endpoint.provider === 'ollama' && data.models) {
-          modelIds = data.models.map((model: any) => model.name).filter((name: string) => name && name.trim() !== '');
+          modelIds = data.models.map((model: { name: string }) => model.name).filter((name: string) => name && name.trim() !== '');
         } else if (data.data && Array.isArray(data.data)) {
-          modelIds = data.data.map((model: any) => model.id).filter((id: string) => id && id.trim() !== '');
+          modelIds = data.data.map((model: { id: string }) => model.id).filter((id: string) => id && id.trim() !== '');
         }
 
         if (modelIds.length > 0) {

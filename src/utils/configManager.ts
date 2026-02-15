@@ -1,23 +1,22 @@
-import { AppConfig, Endpoint, InferenceSettings } from '@/types/config';
-import { AISettings } from '@/components/AISettings';
+import { AppConfig, Endpoint, InferenceSettings, AISettings } from '@/types/config';
 
 const defaultConfig: AppConfig = {
-  activeChatEndpointId: 'default-openai',
+  activeChatEndpointId: 'default-openrouter',
   activeImageEndpointId: '',
   inferenceSettings: {
     maxTokens: 800,
-    temp: 1.0,
+    temp: 0.7,
   },
   endpoints: [
     {
-      id: 'default-openai',
-      name: 'OpenAI Official',
-      provider: 'openai',
+      id: 'default-openrouter',
+      name: 'OpenRouter',
+      provider: 'openrouter',
       apiKey: '',
-      apiUrl: 'https://api.openai.com/v1/chat/completions',
-      model: 'gpt-3.5-turbo',
+      apiUrl: 'https://openrouter.ai/api',
+      model: 'openrouter/free',
       type: 'text',
-      availableModels: ["gpt-4o", "gpt-4o-mini", "gpt-4-turbo", "gpt-4", "gpt-3.5-turbo"],
+      availableModels: ["openrouter/free"],
     }
   ]
 };
@@ -112,27 +111,30 @@ class ConfigManager {
   // Helper to convert internal config to the AISettings format expected by components
   getActiveAISettings(): AISettings {
     const activeEndpoint = this.getActiveChatEndpoint();
-    const inferenceSettings = this.config.inferenceSettings;
+    const { inferenceSettings } = this.config;
+    const { maxTokens, temp } = inferenceSettings;
 
     if (!activeEndpoint) {
       // Return default if no active endpoint found
       return {
         apiKey: '',
-        apiUrl: 'https://api.openai.com/v1/chat/completions',
-        model: 'gpt-3.5-turbo',
-        provider: 'openai',
-        maxTokens: inferenceSettings.maxTokens,
-        infTemp: inferenceSettings.temp,
+        apiUrl: 'https://openrouter.ai/api',
+        model: 'openrouter/free',
+        provider: 'openrouter',
+        maxTokens,
+        infTemp: temp,
       };
     }
 
+    const { apiKey, apiUrl, model, provider } = activeEndpoint;
+
     return {
-      apiKey: activeEndpoint.apiKey,
-      apiUrl: activeEndpoint.apiUrl,
-      model: activeEndpoint.model,
-      provider: activeEndpoint.provider,
-      maxTokens: inferenceSettings.maxTokens,
-      infTemp: inferenceSettings.temp,
+      apiKey,
+      apiUrl,
+      model,
+      provider,
+      maxTokens,
+      infTemp: temp,
     };
   }
 }

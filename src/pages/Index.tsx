@@ -6,7 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import AISettings, { AISettings as AISettingsType } from "@/components/AISettings";
+import AISettings, { AISettings as AISettingsType, DEFAULT_AI_SETTINGS } from "@/components/AISettings";
 import Toolbar from "@/components/Toolbar";
 import BasicInfoSection from "@/components/CharacterForm/BasicInfoSection";
 import PersonalitySection from "@/components/CharacterForm/PersonalitySection";
@@ -121,9 +121,12 @@ const Index = () => {
         const settings = configManager.getActiveAISettings();
         if (settings) {
           setAISettings(settings);
+        } else {
+          setAISettings(DEFAULT_AI_SETTINGS);
         }
       } catch (error) {
         console.error('Failed to load AI settings:', error);
+        setAISettings(DEFAULT_AI_SETTINGS);
       }
     };
     loadSettings();

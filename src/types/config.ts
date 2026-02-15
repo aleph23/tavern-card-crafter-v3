@@ -16,7 +16,7 @@ export interface Endpoint {
 
 export interface AppConfig {
   activeChatEndpointId: string;
-  activeImageEndpointId: string;
+  activeImageEndpointId?: string;  // Image endpoints are not yet supported
   inferenceSettings: InferenceSettings;
   endpoints: Endpoint[];
 }

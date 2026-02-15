@@ -67,7 +67,7 @@ export const generateWithAI = async (
     console.log('Model:', settings.model);
 
     // Use a unified Open AI-compatible format
-    const headers: Record<string, string> = {
+    let headers: Record<string, string> = {
       'Content-Type': 'application/json',
     };
 
