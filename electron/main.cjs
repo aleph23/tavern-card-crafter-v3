@@ -14,7 +14,7 @@ const getPromptsPath = () => {
   if (promptsPath) return promptsPath;
 
   // Check if we're in a packaged app
-  const isPackaged = app.isPackaged;
+  const {isPackaged} = app;
 
   // Debug logging (uncomment for troubleshooting)
   // console.log('[MAIN] app.isPackaged:', isPackaged);
@@ -67,6 +67,49 @@ const getPromptsPath = () => {
   return promptsPath;
 };
 
+const getConfigPath = () => {
+  const pPath = getPromptsPath();
+  return path.join(path.dirname(pPath), 'config.json');
+};
+
+// Simple obfuscation for API keys
+const XOR_KEY = 'TAVERN_CARD_CRAFTER_SECRET';
+
+function obfuscate(text) {
+  if (!text) return text;
+  try {
+    // Prepend 'deenc' to verify successful decryption later
+    const payload = 'deenc' + text;
+    const xor = payload.split('').map((c, i) => c.charCodeAt(0) ^ XOR_KEY.charCodeAt(i % XOR_KEY.length));
+    return Buffer.from(xor).toString('base64');
+  } catch (e) {
+    console.error('Obfuscation failed:', e);
+    return text;
+  }
+}
+
+function deobfuscate(encoded) {
+  if (!encoded) return encoded;
+  try {
+    // Check if it's valid base64
+    if (!/^[A-Za-z0-9+/]*={0,2}$/.test(encoded)) return encoded;
+
+    const xor = Buffer.from(encoded, 'base64');
+    const decoded = String.fromCharCode(...xor.map((b, i) => b ^ XOR_KEY.charCodeAt(i % XOR_KEY.length)));
+
+    // Check for the prefix to confirm successful decryption
+    if (decoded.startsWith('deenc')) {
+      return decoded.slice(5);
+    }
+
+    // If prefix not found, assume it's a plain text legacy key
+    return encoded;
+  } catch (e) {
+    console.error('Deobfuscation failed:', e);
+    return encoded;
+  }
+}
+
 // IPC Handlers for prompts
 ipcMain.handle('load-prompts', async () => {
   const filePath = getPromptsPath();
@@ -78,6 +121,71 @@ ipcMain.handle('load-prompts', async () => {
     return null; // Return null to indicate use defaults
   } catch (error) {
     console.error('Failed to load prompts:', error);
+    throw error;
+  }
+});
+
+// IPC Handlers for config
+ipcMain.handle('load-config', async () => {
+  const filePath = getConfigPath();
+  try {
+    if (fs.existsSync(filePath)) {
+      const data = fs.readFileSync(filePath, 'utf-8');
+      const config = JSON.parse(data);
+
+      // Deobfuscate API keys in endpoints
+      if (config.endpoints && Array.isArray(config.endpoints)) {
+        config.endpoints = config.endpoints.map(endpoint => ({
+          ...endpoint,
+          apiKey: deobfuscate(endpoint.apiKey)
+        }));
+      }
+
+      return config;
+    }
+    return null;
+  } catch (error) {
+    console.error('Failed to load config:', error);
+    return null;
+  }
+});
+
+ipcMain.handle('save-config', async (event, config) => {
+  const filePath = getConfigPath();
+  try {
+    // Deep copy to avoid mutating the original object if it's used elsewhere (though IPC passes by copy usually)
+    const configToSave = JSON.parse(JSON.stringify(config));
+
+    // Obfuscate API keys before saving
+    if (configToSave.endpoints && Array.isArray(configToSave.endpoints)) {
+      configToSave.endpoints = configToSave.endpoints.map(endpoint => ({
+        ...endpoint,
+        apiKey: obfuscate(endpoint.apiKey)
+      }));
+    }
+
+    fs.writeFileSync(filePath, JSON.stringify(configToSave, null, 2), 'utf-8');
+    return { success: true, path: filePath };
+  } catch (error) {
+    console.error('Failed to save config:', error);
+    if (error.code === 'EACCES' || error.code === 'EPERM' || error.code === 'EROFS') {
+      throw new Error(
+        'PERMISSION DENIED: The application is in a read-only folder. Please move the app to a writable location.'
+      );
+    }
+    throw error;
+  }
+});
+
+ipcMain.handle('reset-config', async () => {
+  const filePath = getConfigPath();
+  try {
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+    return true;
+  } catch (error) {
+    console.error('Failed to reset config:', error);
     throw error;
   }
 });

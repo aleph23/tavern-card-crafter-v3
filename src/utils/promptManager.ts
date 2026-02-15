@@ -2,17 +2,6 @@
 import defaultPrompts from '../config/defaultPrompts.json';
 import { PromptCollection, PromptTemplate } from '@/types/prompts';
 
-// Extend Window interface for Electron API
-declare global {
-  interface Window {
-    electronAPI?: {
-      loadPrompts: () => Promise<PromptCollection | null>;
-      savePrompts: (prompts: PromptCollection) => Promise<{ success: boolean; path: string }>;
-      resetPrompts: () => Promise<boolean>;
-    };
-  }
-}
-
 class PromptManager {
   private prompts: PromptCollection;
   private isLoaded: boolean = false;

@@ -55,3 +55,4 @@ tmp/
 # ─────────────────────────────────────────────
 .github/copilot-instructions.md
 prompts.json
+docs/

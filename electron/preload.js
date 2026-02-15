@@ -34,4 +34,21 @@ contextBridge.exposeInMainWorld('electronAPI', {
     // console.log('[PRELOAD] resetPrompts called');
     return ipcRenderer.invoke('reset-prompts');
   },
+
+  // Config management
+  loadConfig: () => {
+    console.log('[PRELOAD] loadConfig called');
+    return ipcRenderer.invoke('load-config');
+  },
+  saveConfig: (config) => {
+    console.log('[PRELOAD] saveConfig called, invoking IPC...');
+    console.log('[PRELOAD] Config data size:', JSON.stringify(config).length, 'chars');
+    return ipcRenderer.invoke('save-config', config);
+  //  .then((result) => { console.log('[PRELOAD] saveConfig IPC returned:', result); return result; })
+  //  .catch((err) => { console.error('[PRELOAD] saveConfig IPC error:', err); throw err; });
+  },
+  resetConfig: () => {
+    console.log('[PRELOAD] resetConfig called');
+    return ipcRenderer.invoke('reset-config');
+  },
 });

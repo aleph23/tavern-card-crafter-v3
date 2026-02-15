@@ -6,7 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import AISettings, { AISettings as AISettingsType } from "@/components/AISettings";
+import AISettings, { AISettings as AISettingsType, DEFAULT_AI_SETTINGS } from "@/components/AISettings";
 import Toolbar from "@/components/Toolbar";
 import BasicInfoSection from "@/components/CharacterForm/BasicInfoSection";
 import PersonalitySection from "@/components/CharacterForm/PersonalitySection";
@@ -18,6 +18,7 @@ import MetadataSection from "@/components/CharacterForm/MetadataSection";
 import CharacterPreview from "@/components/CharacterPreview";
 import AIAssistant from "@/components/CharacterForm/AIAssistant";
 import { CharacterData } from '../utils/aiGenerator';
+import { configManager } from '@/utils/configManager';
 
 interface CharacterBookEntry {
   keys: string[];
@@ -114,16 +115,21 @@ const Index = () => {
   const [characterImage, setCharacterImage] = useState<string | null>(null);
 
   useEffect(() => {
-    // Load saved AI settings
-    const savedSettings = localStorage.getItem('ai-settings');
-    if (savedSettings) {
+    const loadSettings = async () => {
       try {
-        const parsedSettings = JSON.parse(savedSettings);
-        setAISettings(parsedSettings);
+        await configManager.loadConfig();
+        const settings = configManager.getActiveAISettings();
+        if (settings) {
+          setAISettings(settings);
+        } else {
+          setAISettings(DEFAULT_AI_SETTINGS);
+        }
       } catch (error) {
         console.error('Failed to load AI settings:', error);
+        setAISettings(DEFAULT_AI_SETTINGS);
       }
-    }
+    };
+    loadSettings();
   }, []);
 
   /**
