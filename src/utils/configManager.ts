@@ -1,4 +1,4 @@
-import { AppConfig, Endpoint, InferenceSettings, AISettings } from '@/types/config';
+import { AppConfig, Endpoint, InferenceSettings } from '@/types/config';
 
 const defaultConfig: AppConfig = {
   activeChatEndpointId: 'default-openrouter',

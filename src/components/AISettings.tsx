@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger, DialogHeader } from "@/components/ui/dialog";
-import { Settings, Loader2, Check, X, RefreshCw, AlertCircle, Info, Plus, Trash2, Power } from "lucide-react";
+import { Settings, Loader2, Check, X, RefreshCw, Info, Plus, Trash2, Power } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -21,8 +21,7 @@ export interface AISettings {
   apiUrl: string;
   model: string;
   provider: string;
-  maxTokens?: number;
-  infTemp?: number;
+  inferenceSettings: InferenceSettings;  // Proper reference
 }
 
 export const DEFAULT_AI_SETTINGS: AISettings = {
@@ -30,8 +29,10 @@ export const DEFAULT_AI_SETTINGS: AISettings = {
   apiUrl: "https://openrouter.ai/api",
   model: "openrouter/free",
   provider: "openrouter",
-  maxTokens: 800,
-  infTemp: 0.7
+  inferenceSettings: {  // ✅ Correct nesting
+    maxTokens: 800,
+    temp: 0.7            // ✅ Correct property name
+  }
 };
 
 interface AISettingsProps {
