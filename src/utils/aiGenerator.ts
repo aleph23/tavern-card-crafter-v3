@@ -65,15 +65,19 @@ export const generateWithAI = async (
     console.log('Generating with AI using URL:', apiUrl);
     console.log('Provider:', settings.provider);
     console.log('Model:', settings.model);
-    console.log('Requires API key:', requiresKey);
 
     // Use a unified Open AI-compatible format
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
     };
 
-    // Only services that require a key will add an Authorization header
-    if (requiresKey && settings.apiKey) {
+    if (settings.provider === 'openrouter') {
+      headers['HTTP-Referer'] = 'https://github.com/aleph23/tavern-card-creator-v3';
+      headers['X-Title'] = 'CardCreator';
+    }
+
+    // Always add Authorization header if API key is present
+    if (settings.apiKey) {
       headers['Authorization'] = `Bearer ${settings.apiKey}`;
     }
 

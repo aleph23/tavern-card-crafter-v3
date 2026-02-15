@@ -10,12 +10,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { buildApiUrl } from "@/utils/buildApiUrl";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PromptEditor } from "./PromptEditor";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, } from "@/components/ui/accordion";
 import { configManager } from "@/utils/configManager";
 import { AppConfig, Endpoint } from "@/types/config";
 
@@ -50,52 +45,52 @@ export const AISettings = ({ onSettingsChange }: AISettingsProps) => {
       value: "openai",
       url: "https://api.openai.com",
       modelsUrl: "https://api.openai.com/v1/models",
-      models: ["gpt-4o", "gpt-4o-mini", "gpt-4-turbo", "gpt-4", "gpt-3.5-turbo"],
+      models: ["gpt-5.1", "gpt-120b-oss", "gpt-4-turbo", "gpt-4"],
       requiresKey: true,
-      tips: "Need an overseas network environment and an effective Open AI API Key"
+      tips: "Requires a valid OpenAI API Key."
     },
     {
-      name: "DeepSeek In-depth search",
+      name: "DeepSeek",
       value: "deepseek",
       url: "https://api.deepseek.com",
       modelsUrl: "https://api.deepseek.com/v1/models",
-      models: ["deepseek-chat", "deepseek-coder"],
+      models: ["deepseek-r1-0502", "deepseek-v3.2"],
       requiresKey: true,
-      tips: "Direct access in China, high cost performance"
+      tips: "DeepSeek API. Cost-effective and high performance."
     },
     {
-      name: "The dark side of the moon Moonshot",
+      name: "Moonshot AI",
       value: "moonshot",
-      url: "https://api.moonshot.cn",
-      modelsUrl: "https://api.moonshot.cn/v1/models",
-      models: ["moonshot-v1-8k", "moonshot-v1-32k", "moonshot-v1-128k"],
+      url: "https://api.moonshot.ai",
+      modelsUrl: "https://api.moonshot.ai/v1/models",
+      models: ["kimi-k2.5", "kimi-k2.5-thinking", "kimi-k2-0905-preview"],
       requiresKey: true,
-      tips: "Domestic API, support long context"
+      tips: "Moonshot AI (Kimi). Supports long context."
     },
     {
-      name: "Wisdom GLM",
+      name: "Zhipu AI (GLM)",
       value: "zhipu",
-      url: "https://open.bigmodel.cn/api/paas/v4",
-      modelsUrl: "https://open.bigmodel.cn/api/paas/v4/models",
-      models: ["glm-4-plus", "glm-4-0520", "glm-4", "glm-4-air", "glm-4-airx", "glm-4-flash"],
+      url: "https://api.z.ai/api/paas/v4/",
+      modelsUrl: "https://open.z.ai/api/paas/v4/models",
+      models: ["glm-5", "glm-4.6", "glm-4.7", "glm-4.5-air"],
       requiresKey: true,
-      tips: "Zhipu Qingyan API, domestic servicesn API, domestic services"
+      tips: "Zhipu AI / GLM models (Z-ai)."
     },
     {
-      name: "Zero 10,000 things Yi",
+      name: "01.AI (Yi)",
       value: "yi",
       url: "https://api.lingyiwanwu.com",
       modelsUrl: "https://api.lingyiwanwu.com/v1/models",
-      models: ["yi-large", "yi-medium", "yi-spark", "yi-large-rag"],
+      models: ["yi-lightning", "yi-medium", "yi-spark"],
       requiresKey: true,
-      tips: "Zero One All Things API"
+      tips: "01.AI (Lingyi Wanwu) models."
     },
     {
       name: "OpenRouter",
       value: "openrouter",
       url: "https://openrouter.ai/api",
       modelsUrl: "https://openrouter.ai/api/v1/models",
-      models: ["openai/gpt-4o", "anthropic/claude-3.5-sonnet", "google/gemini-2.0-flash-exp", "deepseek/deepseek-r1-distill-qwen-7b"],
+      models: ["openrouter/free"],
       requiresKey: true,
       tips: "Open Router unified interface, supports multiple models"
     },
@@ -104,7 +99,7 @@ export const AISettings = ({ onSettingsChange }: AISettingsProps) => {
       value: "ollama",
       url: "http://localhost:11434",
       modelsUrl: "http://localhost:11434/api/tags",
-      models: ["llama3.2", "llama3.1", "qwen2.5", "deepseek-coder", "codegemma", "mistral"],
+      models: ["your-model-here"],
       requiresKey: false,
       tips: "Local Ollama service, no API key required. You need to download the model first: ollama pull Model name. Default port 11434"
     },
@@ -120,20 +115,20 @@ export const AISettings = ({ onSettingsChange }: AISettingsProps) => {
     {
       name: "OneAPI/New API",
       value: "oneapi",
-      url: "http://localhost:3000",
+      url: "http://localhost:3000/v1",
       modelsUrl: "http://localhost:3000/v1/models",
       models: ["gpt-3.5-turbo", "gpt-4", "claude-3-sonnet"],
       requiresKey: true,
       tips: "One API unified interface supports multiple model proxy. Default port 3000"
     },
     {
-      name: "Customize Open AI Compatible interface",
+      name: "Custom (OpenAI Compatible)",
       value: "custom",
-      url: "",
-      modelsUrl: "",
-      models: ["gpt-3.5-turbo", "gpt-4"],
+      url: "http://localhost:5001/api/v1",
+      modelsUrl: "http://localhost:5001/api/v1/models",
+      models: ["your-model-here"],
       requiresKey: true,
-      tips: "Customize Open AI-compatible interface, please manually configure the API address and model name"
+      tips: "Custom OpenAI-compatible interface. Manually configure URL and models."
     }
   ];
 
@@ -146,7 +141,7 @@ export const AISettings = ({ onSettingsChange }: AISettingsProps) => {
     setConfig(loadedConfig);
   };
 
-  const handleEndpointChange = (index: number, field: keyof Endpoint, value: any) => {
+  const handleEndpointChange = <K extends keyof Endpoint>(index: number, field: K, value: Endpoint[K]) => {
     if (!config) return;
     const newEndpoints = [...config.endpoints];
     newEndpoints[index] = { ...newEndpoints[index], [field]: value };
@@ -158,10 +153,6 @@ export const AISettings = ({ onSettingsChange }: AISettingsProps) => {
         newEndpoints[index].apiUrl = provider.url;
         newEndpoints[index].availableModels = provider.models;
         newEndpoints[index].model = provider.models[0] || '';
-        // Clear API key if not required
-        if (!provider.requiresKey) {
-          newEndpoints[index].apiKey = '';
-        }
       }
     }
 
@@ -235,7 +226,7 @@ export const AISettings = ({ onSettingsChange }: AISettingsProps) => {
     return cleanUrl.includes('/v1') ? `${cleanUrl}/models` : `${cleanUrl}/v1/models`;
   };
 
-  const parseApiError = (error: any): string => {
+  const parseApiError = (error: unknown): string => {
     try {
       if (typeof error === 'string') {
         if (error.includes('model')) return "The model does not exist or is invalid.";
@@ -243,7 +234,7 @@ export const AISettings = ({ onSettingsChange }: AISettingsProps) => {
         if (error.includes('Failed to fetch')) return "Network connection failed. Check URL and server status.";
         return error;
       }
-      return error?.error?.message || "Unknown error";
+      return (error as any)?.error?.message || "Unknown error";
     } catch {
       return "Failed to parse error message";
     }
@@ -268,7 +259,11 @@ export const AISettings = ({ onSettingsChange }: AISettingsProps) => {
     try {
       const apiUrl = buildApiUrl(endpoint.apiUrl, endpoint.provider);
       const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (currentProvider?.requiresKey && endpoint.apiKey) {
+      if (endpoint.provider === 'openrouter') {
+        headers['HTTP-Referer'] = 'https://github.com/aleph23/tavern-card-creator-v3';
+        headers['X-Title'] = 'CardCreator';
+      }
+      if (endpoint.apiKey) {
         headers['Authorization'] = `Bearer ${endpoint.apiKey}`;
       }
 
@@ -325,7 +320,11 @@ export const AISettings = ({ onSettingsChange }: AISettingsProps) => {
     try {
       const modelsUrl = currentProvider?.modelsUrl || buildModelsUrl(endpoint.apiUrl, endpoint.provider);
       const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (currentProvider?.requiresKey && endpoint.apiKey) {
+      if (endpoint.provider === 'openrouter') {
+        headers['HTTP-Referer'] = 'https://github.com/aleph23/tavern-card-creator-v3';
+        headers['X-Title'] = 'CardCreator';
+      }
+      if (endpoint.apiKey) {
         headers['Authorization'] = `Bearer ${endpoint.apiKey}`;
       }
 
@@ -482,17 +481,15 @@ export const AISettings = ({ onSettingsChange }: AISettingsProps) => {
                           </div>
                         </div>
 
-                        {provider?.requiresKey && (
-                          <div className="space-y-2">
-                            <Label>API Key</Label>
-                            <Input
-                              type="password"
-                              value={endpoint.apiKey}
-                              onChange={(e) => handleEndpointChange(index, 'apiKey', e.target.value)}
-                              placeholder="sk-..."
-                            />
-                          </div>
-                        )}
+                        <div className="space-y-2">
+                          <Label>API Key {!provider?.requiresKey && <span className="text-xs font-normal text-muted-foreground ml-2">(Optional)</span>}</Label>
+                          <Input
+                            type="password"
+                            value={endpoint.apiKey}
+                            onChange={(e) => handleEndpointChange(index, 'apiKey', e.target.value)}
+                            placeholder={provider?.requiresKey ? "sk-..." : "Optional depending on your implementation"}
+                          />
+                        </div>
 
                         <div className="space-y-2">
                           <Label>API URL</Label>

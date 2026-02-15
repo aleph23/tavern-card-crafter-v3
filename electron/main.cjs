@@ -105,7 +105,7 @@ function deobfuscate(encoded) {
     // If prefix not found, assume it's a plain text legacy key
     return encoded;
   } catch (e) {
-    // console.error('Deobfuscation failed:', e);
+    console.error('Deobfuscation failed:', e);
     return encoded;
   }
 }
