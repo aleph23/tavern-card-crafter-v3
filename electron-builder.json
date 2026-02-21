@@ -1,7 +1,7 @@
 {
   "appId": "com.taverncard.crafter",
   "productName": "Tavern Card Crafter",
-  "buildVersion": "0.3.0",
+  "buildVersion": "0.3.1",
   "directories": {
     "output": "build-electron"
   },
