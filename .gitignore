@@ -56,3 +56,7 @@ tmp/
 .github/copilot-instructions.md
 prompts.json
 docs/
+.claude/
+prompts.json
+settings.json
+
