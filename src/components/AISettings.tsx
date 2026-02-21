@@ -342,7 +342,7 @@ export const AISettings = ({ onSettingsChange }: AISettingsProps) => {
         headers['HTTP-Referer'] = 'https://github.com/aleph23/tavern-card-creator-v3';
         headers['X-Title'] = 'CardCreator';
       }
-      if (endpoint.apiKey) {
+      if (currentProvider?.requiresKey || endpoint.apiKey) {
         headers['Authorization'] = `Bearer ${endpoint.apiKey}`;
       }
 
