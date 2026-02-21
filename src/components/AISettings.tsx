@@ -269,7 +269,7 @@ export const AISettings = ({ onSettingsChange }: AISettingsProps) => {
       }
 
       // If the user provides an API key, we should send it, even if the provider doesn't strictly require it (e.g. some local providers).
-      if (currentProvider?.requiresKey || endpoint.apiKey) {
+      if (endpoint.apiKey && (currentProvider?.requiresKey || endpoint.apiKey)) {
         headers['Authorization'] = `Bearer ${endpoint.apiKey}`;
       }
       
@@ -340,9 +340,9 @@ export const AISettings = ({ onSettingsChange }: AISettingsProps) => {
       
       if (endpoint.provider === 'openrouter') {
         headers['HTTP-Referer'] = 'https://github.com/aleph23/tavern-card-creator-v3';
-        headers['X-Title'] = 'CardCreator';
+        headers['X-Title'] = 'CharaCardCreator';
       }
-      if (currentProvider?.requiresKey || endpoint.apiKey) {
+      if (endpoint.apiKey && (currentProvider?.requiresKey || endpoint.apiKey)) {
         headers['Authorization'] = `Bearer ${endpoint.apiKey}`;
       }
 
