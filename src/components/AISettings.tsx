@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger, DialogHeader } from "@/components/ui/dialog";
-import { Settings, Loader2, Check, X, RefreshCw, Info, Plus, Trash2, Power } from "lucide-react";
+import { Settings as SettingsIcon, Loader2, Check, X, RefreshCw, Info, Plus, Trash2, Power } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -16,9 +16,6 @@ import { configManager } from "@/utils/configManager";
 import { AppConfig, Endpoint } from "@/types/config";
 import { Settings, DEFAULT_SETTINGS } from "@/types/settings";
 import { apiProviders } from "@/config/providers";
-
-// Re-export for compatibility with other components (aliased to Settings)
-export { Settings as AISettings, DEFAULT_SETTINGS as DEFAULT_AI_SETTINGS };
 
 interface AISettingsProps {
   onSettingsChange: (settings: Settings) => void;
@@ -270,6 +267,11 @@ export const AISettings = ({ onSettingsChange }: AISettingsProps) => {
         headers['HTTP-Referer'] = 'https://github.com/aleph23/tavern-card-creator-v3';
         headers['X-Title'] = 'CardCreator';
       }
+
+      // If the user provides an API key, we should send it, even if the provider doesn't strictly require it (e.g. some local providers).
+      if (endpoint.apiKey && (currentProvider?.requiresKey || endpoint.apiKey)) {
+        headers['Authorization'] = `Bearer ${endpoint.apiKey}`;
+      }
       
       const requestBody = {
         model: endpoint.model,
@@ -338,9 +340,9 @@ export const AISettings = ({ onSettingsChange }: AISettingsProps) => {
       
       if (endpoint.provider === 'openrouter') {
         headers['HTTP-Referer'] = 'https://github.com/aleph23/tavern-card-creator-v3';
-        headers['X-Title'] = 'CardCreator';
+        headers['X-Title'] = 'CharaCardCreator';
       }
-      if (endpoint.apiKey) {
+      if (endpoint.apiKey && (currentProvider?.requiresKey || endpoint.apiKey)) {
         headers['Authorization'] = `Bearer ${endpoint.apiKey}`;
       }
 
@@ -397,7 +399,7 @@ export const AISettings = ({ onSettingsChange }: AISettingsProps) => {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
-          <Settings className="w-4 h-4 mr-2" />
+          <SettingsIcon className="w-4 h-4 mr-2" />
           AI Settings
         </Button>
       </DialogTrigger>

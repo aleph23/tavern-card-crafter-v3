@@ -3,8 +3,14 @@ import { Settings } from "@/types/settings";
 import { buildApiUrl } from "./buildApiUrl";
 import { promptManager } from "./promptManager";
 
-// Initialize prompts
-promptManager.loadPrompts();
+// Helper to ensure prompts are loaded
+const ensurePromptsLoaded = async () => {
+  await promptManager.loadPrompts();
+};
+// Kick off loading immediately, but functions should ideally await it if needed.
+// Since loadPrompts manages its own state and is likely fast (local file),
+// keeping it as a side effect is acceptable but explicit initialization is better.
+ensurePromptsLoaded();
 
 export interface CharacterData {
   name: string;
