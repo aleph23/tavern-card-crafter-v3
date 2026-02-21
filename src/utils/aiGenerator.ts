@@ -1,5 +1,5 @@
 
-import { AISettings } from "@/types/aisettings";
+import { Settings } from "@/types/settings";
 import { buildApiUrl } from "./buildApiUrl";
 import { promptManager } from "./promptManager";
 
@@ -42,7 +42,7 @@ export const estimateTokens = (text: string): number => {
  * @throws Error If the API key is missing for a non-local service, if the API URL is not configured, if the API request fails, or if the response is empty.
  */
 export const generateWithAI = async (
-  settings: AISettings,
+  settings: Settings,
   prompt: string
 ): Promise<string> => {
   // Definition of local services that do not require a key

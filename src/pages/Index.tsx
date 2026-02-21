@@ -7,7 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AISettings from "@/components/AISettings";
-import { AISettings as AISettingsType, DEFAULT_AI_SETTINGS } from "@/types/aisettings";
+import { Settings as AISettingsType, DEFAULT_SETTINGS } from "@/types/settings";
 import Toolbar from "@/components/Toolbar";
 import BasicInfoSection from "@/components/CharacterForm/BasicInfoSection";
 import PersonalitySection from "@/components/CharacterForm/PersonalitySection";
@@ -123,11 +123,11 @@ const Index = () => {
         if (settings) {
           setAISettings(settings);
         } else {
-          setAISettings(DEFAULT_AI_SETTINGS);
+          setAISettings(DEFAULT_SETTINGS);
         }
       } catch (error) {
         console.error('Failed to load AI settings:', error);
-        setAISettings(DEFAULT_AI_SETTINGS);
+        setAISettings(DEFAULT_SETTINGS);
       }
     };
     loadSettings();

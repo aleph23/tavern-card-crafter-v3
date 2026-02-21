@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Wand, RefreshCcw, Download, X } from "lucide-react";
 import { generateWithAI } from "@/utils/aiGenerator";
-import { AISettings } from "@/types/aisettings";
+import { Settings } from "@/types/settings";
 
 interface ParsedCharacterData {
   name?: string;
@@ -29,7 +29,7 @@ interface ParsedCharacterData {
 }
 
 interface AIAssistantProps {
-  aiSettings: AISettings | null;
+  aiSettings: Settings | null;
   onInsertField: (field: string, value: string | string[]) => void;
 }
 

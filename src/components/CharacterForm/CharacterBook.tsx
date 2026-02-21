@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Plus, X, Sparkles, Loader2, RefreshCcw, Trash2 } from "lucide-react";
 import { generateWithAI, generateCharacterBookEntry } from "@/utils/aiGenerator";
-import { AISettings } from "@/types/aisettings";
+import { Settings } from "@/types/settings";
 import { useToast } from "@/hooks/use-toast";
 
 interface CharacterBookEntry {
@@ -20,7 +20,7 @@ interface CharacterBookEntry {
 interface CharacterBookProps {
   entries: CharacterBookEntry[];
   updateField: (field: string, value: any) => void;
-  aiSettings: AISettings | null;
+  aiSettings: Settings | null;
   characterData: any;
 }
 

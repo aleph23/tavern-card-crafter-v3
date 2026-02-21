@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { generateWithAI } from "@/utils/aiGenerator";
-import { AISettings } from "@/types/aisettings";
+import { Settings } from "@/types/settings";
 import { useToast } from "@/hooks/use-toast";
 
 // Optional: Define types for generation result/error callbacks for flexibility
@@ -11,7 +11,7 @@ type GenerateCallbacks = {
 };
 
 export const useAIGeneration = (
-  aiSettings: AISettings | null,
+  aiSettings: Settings | null,
   callbacks?: GenerateCallbacks
 ) => {
   const [loading, setLoading] = useState(false);

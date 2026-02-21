@@ -1,7 +1,7 @@
 import { InferenceSettings } from "@/types/config";
 
 // Re-export for compatibility with other components
-export interface AISettings {
+export interface Settings {
   apiKey: string;
   apiUrl: string;
   model: string;
@@ -9,7 +9,7 @@ export interface AISettings {
   inferenceSettings: InferenceSettings;  // Proper reference
 }
 
-export const DEFAULT_AI_SETTINGS: AISettings = {
+export const DEFAULT_SETTINGS: Settings = {
   apiKey: "",
   apiUrl: "https://openrouter.ai/api",
   model: "openrouter/free",

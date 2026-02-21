@@ -14,14 +14,15 @@ import { PromptEditor } from "./PromptEditor";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, } from "@/components/ui/accordion";
 import { configManager } from "@/utils/configManager";
 import { AppConfig, Endpoint } from "@/types/config";
-import { AISettings, DEFAULT_AI_SETTINGS } from "@/types/aisettings";
+import { Settings, DEFAULT_SETTINGS } from "@/types/settings";
 import { apiProviders } from "@/config/providers";
 
-export { AISettings, DEFAULT_AI_SETTINGS };
+// Re-export for compatibility with other components (aliased to Settings)
+export { Settings as AISettings, DEFAULT_SETTINGS as DEFAULT_AI_SETTINGS };
 
 interface AISettingsProps {
-  onSettingsChange: (settings: AISettings) => void;
-  currentSettings: AISettings | null; // Kept for interface compatibility but we'll use configManager mostly
+  onSettingsChange: (settings: Settings) => void;
+  currentSettings: Settings | null; // Kept for interface compatibility but we'll use configManager mostly
 }
 
 const createDefaultConfig = (): AppConfig => {

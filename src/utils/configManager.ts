@@ -1,5 +1,5 @@
 import { AppConfig, Endpoint, InferenceSettings } from '@/types/config';
-import { AISettings } from '@/types/aisettings';
+import { Settings } from '@/types/settings';
 
 const defaultConfig: AppConfig = {
   activeChatEndpointId: 'default-openrouter',
@@ -109,8 +109,8 @@ class ConfigManager {
     return this.config.endpoints.find(e => e.id === this.config.activeChatEndpointId);
   }
 
-  // Helper to convert internal config to the AISettings format expected by components
-  getActiveAISettings(): AISettings {
+  // Helper to convert internal config to the Settings format expected by components
+  getActiveAISettings(): Settings {
     const activeEndpoint = this.getActiveChatEndpoint();
     const { inferenceSettings } = this.config;
 

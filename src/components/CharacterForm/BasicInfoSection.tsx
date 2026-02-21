@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Upload, X, Sparkles, Loader2, RefreshCcw, Trash2 } from "lucide-react";
 import { useRef, useState, memo } from "react";
 import { generateWithAI, generateDescription } from "@/utils/aiGenerator";
-import { AISettings } from "@/types/aisettings";
+import { Settings } from "@/types/settings";
 import { useToast } from "@/hooks/use-toast";
 
 interface BasicInfoSectionProps {
@@ -15,7 +15,7 @@ interface BasicInfoSectionProps {
   updateField: (field: string, value: any) => void;
   characterImage: string | null;
   setCharacterImage: (image: string | null) => void;
-  aiSettings: AISettings | null;
+  aiSettings: Settings | null;
 }
 
 /**
