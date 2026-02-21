@@ -7,14 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { X, Plus, Sparkles, Loader2, RefreshCcw, Trash2 } from "lucide-react";
 import { generateWithAI, generateTags } from "@/utils/aiGenerator";
-import { AISettings } from "@/components/AISettings";
+import { Settings } from "@/types/settings";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface TagsSectionProps {
   tags: string[];
   updateField: (field: string, value: any) => void;
-  aiSettings: AISettings | null;
+  aiSettings: Settings | null;
   characterData: any;
 }
 

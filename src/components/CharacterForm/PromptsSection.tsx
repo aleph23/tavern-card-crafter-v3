@@ -6,13 +6,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Loader2, RefreshCcw, Trash2, X } from "lucide-react";
 import { generateWithAI, generateSystemPrompt, generatePostHistoryInstructions } from "@/utils/aiGenerator";
-import { AISettings } from "@/components/AISettings";
+import { Settings } from "@/types/settings";
 import { useToast } from "@/hooks/use-toast";
 
 interface PromptsSectionProps {
   data: any;
   updateField: (field: string, value: any) => void;
-  aiSettings: AISettings | null;
+  aiSettings: Settings | null;
 }
 
 /**

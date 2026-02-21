@@ -1,4 +1,5 @@
 import { AppConfig, Endpoint, InferenceSettings } from '@/types/config';
+import { Settings } from '@/types/settings';
 
 const defaultConfig: AppConfig = {
   activeChatEndpointId: 'default-openrouter',
@@ -108,11 +109,10 @@ class ConfigManager {
     return this.config.endpoints.find(e => e.id === this.config.activeChatEndpointId);
   }
 
-  // Helper to convert internal config to the AISettings format expected by components
-  getActiveAISettings(): AISettings {
+  // Helper to convert internal config to the Settings format expected by components
+  getActiveAISettings(): Settings {
     const activeEndpoint = this.getActiveChatEndpoint();
     const { inferenceSettings } = this.config;
-    const { maxTokens, temp } = inferenceSettings;
 
     if (!activeEndpoint) {
       // Return default if no active endpoint found
@@ -121,8 +121,7 @@ class ConfigManager {
         apiUrl: 'https://openrouter.ai/api',
         model: 'openrouter/free',
         provider: 'openrouter',
-        maxTokens,
-        infTemp: temp,
+        inferenceSettings,
       };
     }
 
@@ -133,8 +132,7 @@ class ConfigManager {
       apiUrl,
       model,
       provider,
-      maxTokens,
-      infTemp: temp,
+      inferenceSettings,
     };
   }
 }

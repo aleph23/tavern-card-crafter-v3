@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Plus, X, Edit2, Check, Sparkles, Loader2, RefreshCcw, Trash2 } from "lucide-react";
 import { generateWithAI, generateAlternateGreeting } from "@/utils/aiGenerator";
-import { AISettings } from "@/components/AISettings";
+import { Settings } from "@/types/settings";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -15,7 +15,7 @@ interface AlternateGreetingsProps {
   mes_example: string[];
   group_only_greetings: string[];
   updateField: (field: string, value: any) => void;
-  aiSettings: AISettings | null;
+  aiSettings: Settings | null;
   characterData: any;
 }
 
