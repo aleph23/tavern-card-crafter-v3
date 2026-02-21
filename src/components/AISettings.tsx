@@ -268,7 +268,8 @@ export const AISettings = ({ onSettingsChange }: AISettingsProps) => {
         headers['X-Title'] = 'CardCreator';
       }
 
-      if (currentProvider?.requiresKey && endpoint.apiKey) {
+      // If the user provides an API key, we should send it, even if the provider doesn't strictly require it (e.g. some local providers).
+      if (endpoint.apiKey) {
         headers['Authorization'] = `Bearer ${endpoint.apiKey}`;
       }
       
