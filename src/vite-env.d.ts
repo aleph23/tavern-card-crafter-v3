@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 
 import { PromptCollection } from './types/prompts';
-import { AppConfig } from './types/config';
+import { AppConfig } from './types/settings';
 
 declare global {
   interface Window {
