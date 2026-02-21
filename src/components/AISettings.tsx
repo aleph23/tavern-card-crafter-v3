@@ -13,8 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PromptEditor } from "./PromptEditor";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, } from "@/components/ui/accordion";
 import { configManager } from "@/utils/configManager";
-import { AppConfig, Endpoint } from "@/types/config";
-import { Settings, DEFAULT_SETTINGS } from "@/types/settings";
+import { AppConfig, Endpoint, Settings, DEFAULT_SETTINGS } from "@/types/settings";
 import { apiProviders } from "@/config/providers";
 
 interface AISettingsProps {
