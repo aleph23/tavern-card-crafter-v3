@@ -269,7 +269,7 @@ export const AISettings = ({ onSettingsChange }: AISettingsProps) => {
       }
 
       // If the user provides an API key, we should send it, even if the provider doesn't strictly require it (e.g. some local providers).
-      if (endpoint.apiKey) {
+      if (currentProvider?.requiresKey || endpoint.apiKey) {
         headers['Authorization'] = `Bearer ${endpoint.apiKey}`;
       }
       
