@@ -1,5 +1,5 @@
 
-import { AISettings } from "@/components/AISettings";
+import { AISettings } from "@/types/aisettings";
 import { buildApiUrl } from "./buildApiUrl";
 import { promptManager } from "./promptManager";
 

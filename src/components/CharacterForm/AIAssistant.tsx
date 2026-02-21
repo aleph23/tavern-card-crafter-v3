@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Wand, RefreshCcw, Download, X } from "lucide-react";
 import { generateWithAI } from "@/utils/aiGenerator";
-import { AISettings } from "@/components/AISettings";
+import { AISettings } from "@/types/aisettings";
 
 interface ParsedCharacterData {
   name?: string;

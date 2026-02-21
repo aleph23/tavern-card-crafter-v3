@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Upload, X, Sparkles, Loader2, RefreshCcw, Trash2 } from "lucide-react";
 import { useRef, useState, memo } from "react";
 import { generateWithAI, generateDescription } from "@/utils/aiGenerator";
-import { AISettings } from "@/components/AISettings";
+import { AISettings } from "@/types/aisettings";
 import { useToast } from "@/hooks/use-toast";
 
 interface BasicInfoSectionProps {

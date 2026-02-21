@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { generateWithAI } from "@/utils/aiGenerator";
-import { AISettings } from "@/components/AISettings";
+import { AISettings } from "@/types/aisettings";
 import { useToast } from "@/hooks/use-toast";
 
 // Optional: Define types for generation result/error callbacks for flexibility
