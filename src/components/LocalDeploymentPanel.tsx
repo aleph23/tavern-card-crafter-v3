@@ -271,9 +271,8 @@ pause`
                       <p className='text-sm text-muted-foreground mb-3'>
                         {language === 'en'
                           ? 'Automated startup script for Windows. Double-click to run after downloading project files.'
-                          : 'Windows Automatically start the script. After downloading the project file, double-click to run.'}
+                          : 'This should be maandarin.'}
                       </p>
-                      <Button onClick={downloadBatFile} className='w-full'>
                         <Download className='w-4 h-4 mr-2' />
                         {language === 'en' ? 'Download .bat File' : '下载 .bat 文件'}
                       </Button>
