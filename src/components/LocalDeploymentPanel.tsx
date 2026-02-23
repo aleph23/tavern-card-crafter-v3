@@ -273,9 +273,8 @@ pause`
                           ? 'Automated startup script for Windows. Double-click to run after downloading project files.'
                           : 'This should be maandarin.'}
                       </p>
-                        <Download className='w-4 h-4 mr-2' />
-                        {language === 'en' ? 'Download .bat File' : '下载 .bat 文件'}
-                      </Button>
+                      <Download className='w-4 h-4 mr-2' />
+                      {language === 'en' ? 'Download .bat File' : '下载 .bat 文件'}
                     </div>
                   </div>
                   <div className='space-y-3'>
@@ -286,10 +285,6 @@ pause`
                           ? 'Project configuration file containing all dependencies and scripts.'
                           : '项目配置文件，包含所有依赖和脚本。'}
                       </p>
-                      <Button onClick={downloadPackageJson} className='w-full' variant='outline'>
-                        <Download className='w-4 h-4 mr-2' />
-                        {language === 'en' ? 'Download package.json' : '下载 package.json'}
-                      </Button>
                     </div>
                   </div>
                 </div>
@@ -306,32 +301,7 @@ pause`
               </CardHeader>
               <CardContent>
                 <div className='space-y-4'>
-                  <div className='p-4 bg-blue-50 dark:bg-blue-950 rounded-lg'>
-                    <h4 className='font-medium mb-2 text-blue-900 dark:text-blue-100'>
-                      {language === 'en' ? 'Quick Start (Windows)' : '快速启动 (Windows)'}
-                    </h4>
-                    <ol className='text-sm space-y-1 text-blue-800 dark:text-blue-200'>
-                      <li>
-                        1.{' '}
-                        {language === 'en' ? 'Download all project files from Lovable' : '从 Lovable 下载所有项目文件'}
-                      </li>
-                      <li>
-                        2.{' '}
-                        {language === 'en'
-                          ? 'Download the start-server.bat file above'
-                          : '下载上面的 start-server.bat 文件'}{' '}
-                      </li>
-                      <li>
-                        3.{' '}
-                        {language === 'en'
-                          ? 'Place the .bat file in the project root directory'
-                          : '将 .bat 文件放在项目根目录'}
-                      </li>
-                      <li>
-                        4. {language === 'en' ? 'Double-click start-server.bat to run' : '双击 start-server.bat 运行'}
-                      </li>
-                    </ol>
-                  </div>
+                  <div className='p-4 bg-blue-50 dark:bg-blue-950 rounded-lg'></div>
 
                   <div className='p-4 bg-green-50 dark:bg-green-950 rounded-lg'>
                     <h4 className='font-medium mb-2 text-green-900 dark:text-green-100'>
