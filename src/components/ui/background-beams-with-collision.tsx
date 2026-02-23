@@ -14,58 +14,6 @@ export const BackgroundBeamsWithCollision = ({
   const parentRef = useRef<HTMLDivElement>(null);
 
   const beams = [
-<<<<<<< HEAD
-    {
-      initialX: 10,
-      translateX: 10,
-      duration: 7,
-      repeatDelay: 3,
-      delay: 2,
-    },
-    {
-      initialX: 600,
-      translateX: 600,
-      duration: 3,
-      repeatDelay: 3,
-      delay: 4,
-    },
-    {
-      initialX: 100,
-      translateX: 100,
-      duration: 7,
-      repeatDelay: 7,
-      className: "h-6",
-    },
-    {
-      initialX: 400,
-      translateX: 400,
-      duration: 5,
-      repeatDelay: 14,
-      delay: 4,
-    },
-    {
-      initialX: 800,
-      translateX: 800,
-      duration: 11,
-      repeatDelay: 2,
-      className: "h-20",
-    },
-    {
-      initialX: 1000,
-      translateX: 1000,
-      duration: 4,
-      repeatDelay: 2,
-      className: "h-12",
-    },
-    {
-      initialX: 1200,
-      translateX: 1200,
-      duration: 6,
-      repeatDelay: 4,
-      delay: 2,
-      className: "h-6",
-    },
-=======
     { initialX: 10, translateX: 10, duration: 7, repeatDelay: 3, delay: 2 },
     { initialX: 600, translateX: 600, duration: 3, repeatDelay: 3, delay: 4 },
     { initialX: 100, translateX: 100, duration: 7, repeatDelay: 7, className: "h-6" },
@@ -73,19 +21,15 @@ export const BackgroundBeamsWithCollision = ({
     { initialX: 800, translateX: 800, duration: 11, repeatDelay: 2, className: "h-20" },
     { initialX: 1000, translateX: 1000, duration: 4, repeatDelay: 2, className: "h-12" },
     { initialX: 1200, translateX: 1200, duration: 6, repeatDelay: 4, delay: 2, className: "h-6" },
->>>>>>> e783a8b3888ca86c7021b5ad89348742cc7f46f9
   ];
 
   return (
     <div
       ref={parentRef}
       className={cn(
-<<<<<<< HEAD
         "h-96 md:h-[40rem] bg-gradient-to-b from-white to-neutral-100 dark:from-neutral-950 dark:to-neutral-800 relative flex items-center w-full justify-center overflow-hidden",
         // h-screen if you want bigger
-=======
         "absolute inset-0 overflow-hidden",
->>>>>>> e783a8b3888ca86c7021b5ad89348742cc7f46f9
         className
       )}
     >
@@ -105,20 +49,12 @@ export const BackgroundBeamsWithCollision = ({
       {children}
       <div
         ref={containerRef}
-<<<<<<< HEAD
         className="absolute bottom-0 bg-neutral-100 w-full inset-x-0 pointer-events-none"
-=======
-        className="absolute bottom-0 w-full inset-x-0 pointer-events-none"
->>>>>>> e783a8b3888ca86c7021b5ad89348742cc7f46f9
         style={{
           boxShadow:
             "0 0 24px rgba(34, 42, 53, 0.06), 0 1px 1px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(34, 42, 53, 0.04), 0 0 4px rgba(34, 42, 53, 0.08), 0 16px 68px rgba(47, 48, 55, 0.05), 0 1px 0 rgba(255, 255, 255, 0.1) inset",
         }}
-<<<<<<< HEAD
-      ></div>
-=======
       />
->>>>>>> e783a8b3888ca86c7021b5ad89348742cc7f46f9
     </div>
   );
 };
@@ -126,13 +62,8 @@ export const BackgroundBeamsWithCollision = ({
 const CollisionMechanism = React.forwardRef<
   HTMLDivElement,
   {
-<<<<<<< HEAD
-    containerRef: React.RefObject<HTMLDivElement>;
-    parentRef: React.RefObject<HTMLDivElement>;
-=======
     containerRef: React.RefObject<HTMLDivElement | null>;
     parentRef: React.RefObject<HTMLDivElement | null>;
->>>>>>> e783a8b3888ca86c7021b5ad89348742cc7f46f9
     beamOptions?: {
       initialX?: number;
       translateX?: number;
@@ -176,14 +107,7 @@ const CollisionMechanism = React.forwardRef<
 
           setCollision({
             detected: true,
-<<<<<<< HEAD
-            coordinates: {
-              x: relativeX,
-              y: relativeY,
-            },
-=======
             coordinates: { x: relativeX, y: relativeY },
->>>>>>> e783a8b3888ca86c7021b5ad89348742cc7f46f9
           });
           setCycleCollisionDetected(true);
         }
@@ -191,10 +115,6 @@ const CollisionMechanism = React.forwardRef<
     };
 
     const animationInterval = setInterval(checkCollision, 50);
-<<<<<<< HEAD
-
-=======
->>>>>>> e783a8b3888ca86c7021b5ad89348742cc7f46f9
     return () => clearInterval(animationInterval);
   }, [cycleCollisionDetected, containerRef]);
 
@@ -238,11 +158,7 @@ const CollisionMechanism = React.forwardRef<
           repeatDelay: beamOptions.repeatDelay || 0,
         }}
         className={cn(
-<<<<<<< HEAD
           "absolute left-0 top-20 m-auto h-14 w-px rounded-full bg-gradient-to-t from-indigo-500 via-purple-500 to-transparent",
-=======
-          "absolute left-0 top-20 m-auto h-14 w-px rounded-full bg-gradient-to-t from-primary via-accent to-transparent",
->>>>>>> e783a8b3888ca86c7021b5ad89348742cc7f46f9
           beamOptions.className
         )}
       />
@@ -281,13 +197,8 @@ const Explosion = ({ ...props }: React.HTMLProps<HTMLDivElement>) => {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 1.5, ease: "easeOut" }}
-<<<<<<< HEAD
         className="absolute -inset-x-10 top-0 m-auto h-2 w-10 rounded-full bg-gradient-to-r from-transparent via-indigo-500 to-transparent blur-sm"
       ></motion.div>
-=======
-        className="absolute -inset-x-10 top-0 m-auto h-2 w-10 rounded-full bg-gradient-to-r from-transparent via-primary to-transparent blur-sm"
-      />
->>>>>>> e783a8b3888ca86c7021b5ad89348742cc7f46f9
       {spans.map((span) => (
         <motion.span
           key={span.id}
@@ -298,11 +209,7 @@ const Explosion = ({ ...props }: React.HTMLProps<HTMLDivElement>) => {
             opacity: 0,
           }}
           transition={{ duration: Math.random() * 1.5 + 0.5, ease: "easeOut" }}
-<<<<<<< HEAD
           className="absolute h-1 w-1 rounded-full bg-gradient-to-b from-indigo-500 to-purple-500"
-=======
-          className="absolute h-1 w-1 rounded-full bg-gradient-to-b from-primary to-accent"
->>>>>>> e783a8b3888ca86c7021b5ad89348742cc7f46f9
         />
       ))}
     </div>

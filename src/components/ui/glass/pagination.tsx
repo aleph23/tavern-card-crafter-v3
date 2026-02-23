@@ -1,4 +1,4 @@
-import * as React from "react"
+import * as React from 'react'
 import {
   Pagination as BasePagination,
   PaginationContent as BasePaginationContent,
@@ -7,8 +7,8 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination"
-import { cn } from "@/lib/utils"
+} from '@/components/ui/pagination'
+import { cn } from '@/lib/utils'
 
 export interface PaginationContentProps extends React.ComponentProps<typeof BasePaginationContent> {
   glow?: boolean
@@ -17,23 +17,19 @@ export interface PaginationContentProps extends React.ComponentProps<typeof Base
 /**
  * Glass UI Pagination - Enhanced pagination with glassy effects
  */
-export const PaginationContent = React.forwardRef<
-  HTMLUListElement,
-  PaginationContentProps
->(({ className, variant = "glass", glow = false, ...props }, ref) => {
-  return (
-    <BasePaginationContent
-      ref={ref}
-      variant={variant}
-      className={cn(
-        glow && "shadow-md shadow-purple-500/20",
-        className
-      )}
-      {...props}
-    />
-  )
-})
-PaginationContent.displayName = "PaginationContent"
+export const PaginationContent = React.forwardRef<HTMLUListElement, PaginationContentProps>(
+  ({ className, variant = 'glass', glow = false, ...props }, ref) => {
+    return (
+      <BasePaginationContent
+        ref={ref}
+        variant={variant}
+        className={cn(glow && 'shadow-md shadow-purple-500/20', className)}
+        {...props}
+      />
+    )
+  }
+)
+PaginationContent.displayName = 'PaginationContent'
 
 export {
   BasePagination as Pagination,
@@ -43,4 +39,3 @@ export {
   PaginationPrevious,
   PaginationEllipsis,
 }
-

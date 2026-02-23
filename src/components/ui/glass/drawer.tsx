@@ -1,4 +1,4 @@
-import * as React from "react"
+import * as React from 'react'
 import {
   Drawer as BaseDrawer,
   DrawerClose,
@@ -10,8 +10,8 @@ import {
   DrawerPortal,
   DrawerTitle,
   DrawerTrigger,
-} from "@/components/ui/drawer"
-import { cn } from "@/lib/utils"
+} from '@/components/ui/drawer'
+import { cn } from '@/lib/utils'
 
 export interface DrawerContentProps extends React.ComponentProps<typeof BaseDrawerContent> {
   glow?: boolean
@@ -20,23 +20,19 @@ export interface DrawerContentProps extends React.ComponentProps<typeof BaseDraw
 /**
  * Glass UI Drawer - Enhanced drawer with glassy effects
  */
-export const DrawerContent = React.forwardRef<
-  React.ElementRef<typeof BaseDrawerContent>,
-  DrawerContentProps
->(({ className, variant = "glass", glow = false, ...props }, ref) => {
-  return (
-    <BaseDrawerContent
-      ref={ref}
-      variant={variant}
-      className={cn(
-        glow && "shadow-lg shadow-purple-500/20",
-        className
-      )}
-      {...props}
-    />
-  )
-})
-DrawerContent.displayName = "DrawerContent"
+export const DrawerContent = React.forwardRef<React.ElementRef<typeof BaseDrawerContent>, DrawerContentProps>(
+  ({ className, variant = 'glass', glow = false, ...props }, ref) => {
+    return (
+      <BaseDrawerContent
+        ref={ref}
+        variant={variant}
+        className={cn(glow && 'shadow-lg shadow-purple-500/20', className)}
+        {...props}
+      />
+    )
+  }
+)
+DrawerContent.displayName = 'DrawerContent'
 
 export {
   BaseDrawer as Drawer,
@@ -49,4 +45,3 @@ export {
   DrawerTitle,
   DrawerDescription,
 }
-
