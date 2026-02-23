@@ -10,6 +10,7 @@ logs/
 .DS_Store
 .vscode/
 .idea/
+.qlty/
 .vs/
 *.suo
 *.ntvs*
@@ -60,3 +61,4 @@ docs/
 prompts.json
 settings.json
 
+bun.lockb

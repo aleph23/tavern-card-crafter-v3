@@ -27,7 +27,7 @@
   "messageExample": {
     "name": "Message Example",
     "description": "Generates conversational examples. {{user}} is a placeholder literal that should remain in the output.",
-    "template": "Generate a conversational example to help establish the character:\n\nCard name: {{name}}\nPhysical Description: {{description}}\nCharacter Personality: {{personality}}\nScene setting: {{scenario}}\n\nPlease generate 2 to 3 dialogues or monologues that truly capture the spirit of the character. The format is as follows:\n\n<START>\n{{user}}: User's words\n{{name}}: The character's answer\n{{name}}: *The character's actions.*\n\n<START>\n{{name}}: The character talks to themself and acts on their own.\n\nMake sure each conversation example starts with a <START> macro. Do not include it if it doesn't help to develop the character's actions and speaking behavior."
+    "template": "Generate a conversational example to help establish the character:\n\nCard name: {{name}}\nPhysical Description: {{description}}\nCharacter Personality: {{personality}}\nScene setting: {{scenario}}\n\nPlease generate 2 to 3 dialogues or monologues that truly capture the spirit of the character. The format is as follows:\n\n<START>\n{{user}}: User's words\n{{name}}: The character's answer\n{{name}}: *The character's actions.*\n\n<START>\n{{name}}: The character talks to themself and acts on their own.\n\nMake sure each conversation example starts with a <START> tag. Do not include it if it doesn't help to develop the character's actions and speaking behavior."
   },
   "systemPrompt": {
     "name": "System Prompt",

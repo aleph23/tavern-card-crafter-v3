@@ -1,10 +1,9 @@
-
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react'
 
 interface LanguageContextType {
-  language: 'zh' | 'en';
-  setLanguage: (lang: 'zh' | 'en') => void;
-  t: (key: string) => string;
+  language: 'zh' | 'en'
+  setLanguage: (lang: 'zh' | 'en') => void
+  t: (key: string) => string
 }
 
 const translations = {
@@ -191,10 +190,10 @@ const translations = {
     // Theme toggle
     lightMode: 'Light Mode',
     darkMode: 'Dark Mode',
-  }
-};
+  },
+}
 
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+const LanguageContext = createContext<LanguageContextType | undefined>(undefined)
 
 /**
  * Provides language context to its children components.
@@ -208,41 +207,37 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
  * @param {React.ReactNode} children - The child components that will have access to the language context.
  */
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [language, setLanguageState] = useState<'zh' | 'en'>('en');
+  const [language, setLanguageState] = useState<'zh' | 'en'>('en')
 
   useEffect(() => {
-    const savedLanguage = localStorage.getItem('language') as 'zh' | 'en';
+    const savedLanguage = localStorage.getItem('language') as 'zh' | 'en'
     if (savedLanguage) {
-      setLanguageState(savedLanguage);
+      setLanguageState(savedLanguage)
     }
-  }, []);
+  }, [])
 
   /**
    * Sets the application language and stores it in local storage.
    */
   const setLanguage = (lang: 'zh' | 'en') => {
-    setLanguageState(lang);
-    localStorage.setItem('language', lang);
-  };
+    setLanguageState(lang)
+    localStorage.setItem('language', lang)
+  }
 
   /**
    * Retrieves the translation for a given key based on the current language.
    */
   const t = (key: string): string => {
-    return translations[language][key as keyof typeof translations['zh']] || key;
-  };
+    return translations[language][key as keyof (typeof translations)['zh']] || key
+  }
 
-  return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
-      {children}
-    </LanguageContext.Provider>
-  );
-};
+  return <LanguageContext.Provider value={{ language, setLanguage, t }}>{children}</LanguageContext.Provider>
+}
 
 export const useLanguage = () => {
-  const context = useContext(LanguageContext);
+  const context = useContext(LanguageContext)
   if (context === undefined) {
-    throw new Error('useLanguage must be used within a LanguageProvider');
+    throw new Error('useLanguage must be used within a LanguageProvider')
   }
-  return context;
-};
+  return context
+}
