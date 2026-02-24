@@ -58,7 +58,7 @@ export function getGlassStyles(customization?: GlassCustomization): React.CSSPro
 
   // Handle background color and transparency
   if (customization.color || customization.transparency !== undefined) {
-    let bgColor = customization.color || 'rgba(255, 255, 255, 0.1)'
+    let bgColor = customization.color || 'var(--glass-bg)'
 
     // If transparency is provided, adjust the alpha channel
     if (customization.transparency !== undefined) {
@@ -101,7 +101,7 @@ export function getGlassStyles(customization?: GlassCustomization): React.CSSPro
     (customization.color || customization.transparency !== undefined || customization.blur !== undefined)
   ) {
     // Apply default border if glass customization is provided but outline is not
-    styles.borderColor = 'rgba(255, 255, 255, 0.3)'
+    styles.borderColor = 'var(--glass-border)'
     styles.borderWidth = '1px'
     styles.borderStyle = 'solid'
   }
@@ -114,7 +114,7 @@ export function getGlassStyles(customization?: GlassCustomization): React.CSSPro
     shadows.push(customization.shadow)
   } else if (customization.color || customization.transparency !== undefined || customization.blur !== undefined) {
     // Apply default glass shadow for depth
-    shadows.push('0 8px 32px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.05)')
+    shadows.push('var(--glass-shadow)')
   }
 
   // Add inner glow as inset shadow
@@ -145,7 +145,7 @@ export function getGlassCSSVars(customization?: GlassCustomization): Record<stri
   const vars: Record<string, string> = {}
 
   if (customization.color || customization.transparency !== undefined) {
-    let bgColor = customization.color || 'rgba(255, 255, 255, 0.1)'
+    let bgColor = customization.color || 'var(--glass-bg)'
 
     if (customization.transparency !== undefined) {
       const rgbaMatch = bgColor.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*[\d.]+)?\)/)

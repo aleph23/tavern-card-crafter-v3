@@ -145,18 +145,18 @@ const BasicInfoSection = ({
 
   return (
     <div className='space-y-6'>
-      <h3 className='text-lg font-semibold text-gray-800 mb-4'>Basic information</h3>
+      <h3 className='text-lg font-semibold text-foreground mb-4'>Basic information</h3>
 
       {/* Character avatar */}
       <div className='form-group'>
-        <Label className='text-sm font-medium text-gray-300'>Character avatar</Label>
+        <Label className='text-sm font-medium text-foreground/80'>Character avatar</Label>
         <div className='flex items-center gap-4 mt-2'>
           {characterImage && (
             <div className='relative'>
               <img
                 src={characterImage}
                 alt='Character avatar'
-                className='w-20 h-20 rounded-lg object-cover border-2 border-gray-200'
+                className='w-20 h-20 rounded-lg object-cover border-2 border-border'
               />
               <Button
                 size='sm'
@@ -180,7 +180,7 @@ const BasicInfoSection = ({
 
       {/* Card name */}
       <div className='form-group'>
-        <Label htmlFor='name' className='text-sm font-medium text-gray-300'>
+        <Label htmlFor='name' className='text-sm font-medium text-foreground/80'>
           Card name *
         </Label>
         <Input
@@ -194,7 +194,7 @@ const BasicInfoSection = ({
 
       {/* Nickname */}
       <div className='form-group'>
-        <Label htmlFor='nickname' className='text-sm font-medium text-gray-300'>
+        <Label htmlFor='nickname' className='text-sm font-medium text-foreground/80'>
           Nickname
         </Label>
         <Input
@@ -209,7 +209,7 @@ const BasicInfoSection = ({
       {/* Role description */}
       <div className='form-group'>
         <div className='flex items-center justify-between mb-2'>
-          <Label htmlFor='description' className='text-sm font-medium text-gray-300'>
+          <Label htmlFor='description' className='text-sm font-medium text-foreground/80'>
             Description *
           </Label>
           <div className='flex gap-1'>

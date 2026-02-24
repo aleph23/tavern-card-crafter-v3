@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { useState, useRef } from 'react'
 import { Label } from '@/components/ui/glass/label'
 import { Input } from '@/components/ui/glass/input'
@@ -155,7 +153,7 @@ const CharacterBook = ({ entries, updateField, aiSettings, characterData }: Char
   return (
     <div className='space-y-4'>
       <div className='flex items-center justify-between'>
-        <h3 className='text-lg font-semibold text-gray-800 mb-4'>Character Book</h3>
+        <h3 className='text-lg font-semibold text-foreground mb-4'>Character Book</h3>
         <div className='flex gap-1'>
           {!loading && (
             <Button size='sm' variant='outline' onClick={handleAIGenerateEntry} className='h-8 px-2 text-xs'>
@@ -190,7 +188,7 @@ const CharacterBook = ({ entries, updateField, aiSettings, characterData }: Char
       </div>
 
       <div>
-        <Label className='text-sm font-medium text-gray-700'>Add a new entry</Label>
+        <Label className='text-sm font-medium text-foreground/80'>Add a new entry</Label>
         <div className='space-y-2 mt-2'>
           <Input
             value={newEntryKeys}
@@ -213,14 +211,14 @@ const CharacterBook = ({ entries, updateField, aiSettings, characterData }: Char
 
       <div className='space-y-2'>
         {entries.map((entry, index) => (
-          <div key={index} className='p-3 bg-gray-50 rounded-lg relative'>
+          <div key={index} className='p-3 bg-muted/50 rounded-lg relative'>
             <Button size='sm' variant='ghost' className='absolute top-1 right-1' onClick={() => removeBookEntry(index)}>
               <X className='w-4 h-4' />
             </Button>
             <div className='pr-8'>
-              <div className='text-sm font-medium text-gray-300 mb-1'>Keywords: {entry.keys.join(', ')}</div>
-              <p className='text-sm text-gray-400 mb-2'>{entry.content}</p>
-              <div className='text-xs text-gray-400'>
+              <div className='text-sm font-medium text-foreground/80 mb-1'>Keywords: {entry.keys.join(', ')}</div>
+              <p className='text-sm text-muted-foreground mb-2'>{entry.content}</p>
+              <div className='text-xs text-muted-foreground'>
                 character: {entry.content.length} | Token: {Math.ceil(entry.content.length * 0.75)}
               </div>
             </div>

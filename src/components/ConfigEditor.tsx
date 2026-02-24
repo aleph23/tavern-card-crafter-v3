@@ -1,15 +1,17 @@
 /* eslint-disable prefer-const */
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/glass/button'
 import { Input } from '@/components/ui/glass/input'
 import { Label } from '@/components/ui/glass/label'
-import { Dialog, DialogContent, DialogTitle, DialogTrigger, DialogHeader } from '@/components/ui/glass/dialog'
-import { Settings as SettingsIcon, Loader2, Check, X, RefreshCw, Info, Plus, Trash2, Power } from 'lucide-react'
+import { Drawer, DrawerContent, DrawerTitle, DrawerTrigger, DrawerHeader } from '@/components/ui/glass/drawer'
+import { Loader2, Check, X, RefreshCw, Info, Plus, Trash2, Power } from 'lucide-react'
+import { SettingsIcon, SettingsIconHandle } from '@/components/ui/settings'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/glass/select'
 import { useToast } from '@/hooks/use-toast'
 import { Alert, AlertDescription } from '@/components/ui/glass/alert'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/glass/tabs'
 import { PromptEditor } from './PromptEditor'
+import AppearanceSettings from './AppearanceSettings'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/glass/accordion'
 import { buildApiUrl } from '@/utils/buildApiUrl'
 import { configManager } from '@/utils/configManager'
@@ -372,32 +374,45 @@ export const ConfigEditor = ({ onSettingsChange }: ConfigEditorProps) => {
     }
   }
 
+  const settingsRef = useRef<SettingsIconHandle>(null)
+
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button variant='outline' size='sm'>
-          <SettingsIcon className='w-4 h-4 mr-2' />
-          AI Settings
+    <Drawer open={isOpen} onOpenChange={setIsOpen}>
+      <DrawerTrigger asChild>
+        <Button
+          variant='outline'
+          size='sm'
+          // The Sensor Logic
+          onMouseEnter={() => settingsRef.current?.startAnimation()}
+          onMouseLeave={() => settingsRef.current?.stopAnimation()}
+        >
+          <SettingsIcon
+            ref={settingsRef}
+            /* Note: 'w-4 h-4' is removed to allow your 1.1em SSoT.
+             'mr-2' is kept for layout spacing.
+          */
+            className='mr-2'
+          />
+          Settings
         </Button>
-      </DialogTrigger>
-      <DialogContent className='sm:max-w-[800px] max-h-[85vh] overflow-y-auto'>
+      </DrawerTrigger>
+      <DrawerContent className='sm:max-w-[1200px] max-h-[100vh] flex flex-col' overflow-y-auto>
         {!config ? (
-          <div className='flex justify-center items-center p-8'>
-            <Loader2 className='h-8 w-8 animate-spin text-primary' />
+          <div className='flex justify-center items-center p-4'>
+            <Loader2 className='h-6 w-6 animate-spin text-primary' />
           </div>
         ) : (
           <>
-            <DialogHeader>
-              <DialogTitle>AI Settings</DialogTitle>
-            </DialogHeader>
-
-            <Tabs defaultValue='connection'>
-              <TabsList className='grid w-full grid-cols-2'>
-                <TabsTrigger value='connection'>Connection & Parameters</TabsTrigger>
+            <DrawerHeader>
+              <DrawerTitle>Settings</DrawerTitle>
+            </DrawerHeader>
+            <Tabs defaultValue='connection' className='flex-1 flex flex-col min-h-0'>
+              <TabsList className='grid w-full grid-cols-3 flex-shrink-0'>
+                <TabsTrigger value='connection'>API & Inference Parameters</TabsTrigger>
                 <TabsTrigger value='prompts'>Prompt Templates</TabsTrigger>
+                <TabsTrigger value='appearance'>UI Appearance</TabsTrigger>
               </TabsList>
-
-              <TabsContent value='connection' className='space-y-6 py-4'>
+              <TabsContent value='connection' className='space-y-6 py-4 flex-1 overflow-y-auto min-h-0 pr-2'>
                 <div className='space-y-4'>
                   <div className='flex items-center justify-between'>
                     <Label className='text-lg font-semibold'>API Providers</Label>
@@ -408,7 +423,6 @@ export const ConfigEditor = ({ onSettingsChange }: ConfigEditorProps) => {
                       </Button>
                     )}
                   </div>
-
                   <Accordion type='single' collapsible className='w-full'>
                     {config.endpoints.map((endpoint, index) => {
                       const isActive = endpoint.id === config.activeChatEndpointId
@@ -421,7 +435,7 @@ export const ConfigEditor = ({ onSettingsChange }: ConfigEditorProps) => {
                               <Button
                                 variant={isActive ? 'default' : 'ghost'}
                                 size='icon'
-                                className={`h-6 w-6 rounded-full ${isActive ? 'bg-green-500 hover:bg-green-600' : 'text-gray-400'}`}
+                                className={`h-4 w-4 rounded-full text-foreground/50 ${isActive ? 'bg-success text-primary-foreground hover:bg-success/90' : 'hover:bg-muted'}`}
                                 onClick={(e) => {
                                   e.stopPropagation()
                                   handleSetActive(endpoint.id)
@@ -430,9 +444,7 @@ export const ConfigEditor = ({ onSettingsChange }: ConfigEditorProps) => {
                               >
                                 <Power className='h-3 w-3' />
                               </Button>
-                              <span
-                                className={`flex-1 text-left ${isActive ? 'font-bold text-green-600 dark:text-green-400' : ''}`}
-                              >
+                              <span className={`flex-1 text-left ${isActive ? 'font-bold text-success' : ''}`}>
                                 {endpoint.name || 'Unnamed Endpoint'}
                               </span>
                               {config.endpoints.length > 1 && (
@@ -550,7 +562,7 @@ export const ConfigEditor = ({ onSettingsChange }: ConfigEditorProps) => {
                                 {testingEndpointId === endpoint.id ? (
                                   <Loader2 className='h-4 w-4 animate-spin mr-2' />
                                 ) : connectionStatus[endpoint.id] === 'success' ? (
-                                  <Check className='h-4 w-4 mr-2 text-green-500' />
+                                  <Check className='h-4 w-4 mr-2 --success' />
                                 ) : connectionStatus[endpoint.id] === 'error' ? (
                                   <X className='h-4 w-4 mr-2 text-destructive' />
                                 ) : null}
@@ -565,7 +577,6 @@ export const ConfigEditor = ({ onSettingsChange }: ConfigEditorProps) => {
                                 </span>
                               )}
                             </div>
-
                             {provider?.tips && (
                               <Alert>
                                 <Info className='h-4 w-4' />
@@ -578,7 +589,6 @@ export const ConfigEditor = ({ onSettingsChange }: ConfigEditorProps) => {
                     })}
                   </Accordion>
                 </div>
-
                 <div className='space-y-4 border-t pt-4'>
                   <h4 className='font-medium text-lg'>Inference Settings (Global)</h4>
                   <div className='grid grid-cols-2 gap-4'>
@@ -592,10 +602,7 @@ export const ConfigEditor = ({ onSettingsChange }: ConfigEditorProps) => {
                         onChange={(e) =>
                           setConfig({
                             ...config,
-                            inferenceSettings: {
-                              ...config.inferenceSettings,
-                              maxTokens: parseInt(e.target.value) || 800,
-                            },
+                            inferenceSettings: { ...config.inferenceSettings, maxTokens: parseInt(e.target.value) },
                           })
                         }
                       />
@@ -606,12 +613,12 @@ export const ConfigEditor = ({ onSettingsChange }: ConfigEditorProps) => {
                         type='number'
                         min='0'
                         max='2'
-                        step='0.1'
+                        step='0.05'
                         value={config.inferenceSettings.temp}
                         onChange={(e) =>
                           setConfig({
                             ...config,
-                            inferenceSettings: { ...config.inferenceSettings, temp: parseFloat(e.target.value) || 1.0 },
+                            inferenceSettings: { ...config.inferenceSettings, temp: parseFloat(e.target.value) },
                           })
                         }
                       />
@@ -620,23 +627,24 @@ export const ConfigEditor = ({ onSettingsChange }: ConfigEditorProps) => {
                 </div>
 
                 <div className='pt-4'>
-                  <Button
-                    onClick={handleSave}
-                    className='w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700'
-                  >
+                  <Button onClick={handleSave} className='w-full cta-button-gradient'>
                     Save All Settings
                   </Button>
                 </div>
               </TabsContent>
 
-              <TabsContent value='prompts'>
+              <TabsContent value='prompts' className='flex-1 overflow-y-auto min-h-0'>
                 <PromptEditor />
+              </TabsContent>
+
+              <TabsContent value='appearance' className='flex-1 overflow-y-auto min-h-0 pr-2 pt-4'>
+                <AppearanceSettings />
               </TabsContent>
             </Tabs>
           </>
         )}
-      </DialogContent>
-    </Dialog>
+      </DrawerContent>
+    </Drawer>
   )
 }
 

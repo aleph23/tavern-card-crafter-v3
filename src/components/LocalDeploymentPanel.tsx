@@ -301,13 +301,11 @@ pause`
               </CardHeader>
               <CardContent>
                 <div className='space-y-4'>
-                  <div className='p-4 bg-blue-50 dark:bg-blue-950 rounded-lg'></div>
+                  <div className='p-4 bg-primary/5 rounded-lg'></div>
 
-                  <div className='p-4 bg-green-50 dark:bg-green-950 rounded-lg'>
-                    <h4 className='font-medium mb-2 text-green-900 dark:text-green-100'>
-                      {language === 'en' ? 'Manual Setup' : '手动设置'}
-                    </h4>
-                    <ol className='text-sm space-y-1 text-green-800 dark:text-green-200'>
+                  <div className='p-4 bg-success/10 rounded-lg'>
+                    <h4 className='font-medium mb-2 success'>{language === 'en' ? 'Manual Setup' : '手动设置'}</h4>
+                    <ol className='text-sm space-y-1 success'>
                       <li>
                         1.{' '}
                         {language === 'en'

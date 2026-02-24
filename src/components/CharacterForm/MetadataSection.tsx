@@ -15,11 +15,11 @@ interface MetadataSectionProps {
 const MetadataSection = ({ data, updateField }: MetadataSectionProps) => {
   return (
     <div className='space-y-6'>
-      <h3 className='text-lg font-semibold text-gray-800 mb-4'>Creative information</h3>
+      <h3 className='text-lg font-semibold text-foreground mb-4'>Creative information</h3>
 
       {/* Creator */}
       <div className='form-group'>
-        <Label htmlFor='creator' className='text-sm font-medium text-gray-300'>
+        <Label htmlFor='creator' className='text-sm font-medium text-foreground/80'>
           Creator
         </Label>
         <Input
@@ -33,7 +33,7 @@ const MetadataSection = ({ data, updateField }: MetadataSectionProps) => {
 
       {/* Version */}
       <div className='form-group'>
-        <Label htmlFor='character_version' className='text-sm font-medium text-gray-300'>
+        <Label htmlFor='character_version' className='text-sm font-medium text-foreground/80'>
           Role Version
         </Label>
         <Input
@@ -47,7 +47,7 @@ const MetadataSection = ({ data, updateField }: MetadataSectionProps) => {
 
       {/* Source link */}
       <div className='form-group'>
-        <Label htmlFor='source' className='text-sm font-medium text-gray-300'>
+        <Label htmlFor='source' className='text-sm font-medium text-foreground/80'>
           Source link
         </Label>
         <Input
@@ -61,7 +61,7 @@ const MetadataSection = ({ data, updateField }: MetadataSectionProps) => {
 
       {/* Creation Notes */}
       <div className='form-group'>
-        <Label htmlFor='creator_notes' className='text-sm font-medium text-gray-300'>
+        <Label htmlFor='creator_notes' className='text-sm font-medium text-foreground/80'>
           Creation Notes
         </Label>
         <Textarea

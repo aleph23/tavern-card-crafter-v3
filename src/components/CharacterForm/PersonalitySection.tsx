@@ -156,11 +156,11 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
 
   return (
     <div className='space-y-4'>
-      <h3 className='text-lg font-semibold text-gray-400 mb-4'>Character setting</h3>
+      <h3 className='text-lg font-semibold text-muted-foreground mb-4'>Character setting</h3>
 
       <div>
         <div className='flex items-center justify-between mb-2'>
-          <Label htmlFor='personality' className='text-sm font-medium text-gray-300'>
+          <Label htmlFor='personality' className='text-sm font-medium text-foreground/80'>
             Character traits *
           </Label>
           {renderFieldButtons('personality', generatePersonality, ['name', 'description'])}
@@ -177,7 +177,7 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
 
       <div>
         <div className='flex items-center justify-between mb-2'>
-          <Label htmlFor='scenario' className='text-sm font-medium text-gray-300'>
+          <Label htmlFor='scenario' className='text-sm font-medium text-foreground/80'>
             Scene setting *
           </Label>
           {renderFieldButtons('scenario', generateScenario, ['name', 'description', 'personality'])}
@@ -194,7 +194,7 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
 
       <div>
         <div className='flex items-center justify-between mb-2'>
-          <Label htmlFor='first_mes' className='text-sm font-medium text-gray-300'>
+          <Label htmlFor='first_mes' className='text-sm font-medium text-foreground/80'>
             First message *
           </Label>
           {renderFieldButtons('first_mes', generateFirstMes, ['name', 'description', 'personality', 'scenario'])}
@@ -211,7 +211,7 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
 
       <div>
         <div className='flex items-center justify-between mb-2'>
-          <Label htmlFor='mes_example' className='text-sm font-medium text-gray-300'>
+          <Label htmlFor='mes_example' className='text-sm font-medium text-foreground/80'>
             Dialogue example
           </Label>
           {renderFieldButtons('mes_example', generateMesExample, ['name', 'description', 'personality', 'first_mes'])}

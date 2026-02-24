@@ -333,10 +333,8 @@ This is a historic character (real or fictional), please generate:
   return (
     <Card className='h-full'>
       <CardHeader>
-        <CardTitle className='text-lg font-semibold text-gray-800 dark:text-gray-200'>
-          AI character card assistant
-        </CardTitle>
-        <p className='text-sm text-gray-600 dark:text-gray-400'>
+        <CardTitle className='text-lg font-semibold text-foreground'>AI character card assistant</CardTitle>
+        <p className='text-sm text-muted-foreground'>
           Paste any text content, select the role type, and the AI will intelligently extract and generate detailed role
           information
         </p>
@@ -344,7 +342,7 @@ This is a historic character (real or fictional), please generate:
       <CardContent className='space-y-4'>
         <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
           <div className='md:col-span-1'>
-            <label className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2'>Role Type</label>
+            <label className='block text-sm font-medium text-foreground/80 mb-2'>Role Type</label>
             <Select value={characterType} onValueChange={setCharacterType}>
               <SelectTrigger className='w-full'>
                 <SelectValue />
@@ -354,7 +352,7 @@ This is a historic character (real or fictional), please generate:
                   <SelectItem key={type.value} value={type.value}>
                     <div>
                       <div className='font-medium'>{type.label}</div>
-                      <div className='text-xs text-gray-500'>{type.description}</div>
+                      <div className='text-xs text-muted-foreground'>{type.description}</div>
                     </div>
                   </SelectItem>
                 ))}
@@ -363,7 +361,7 @@ This is a historic character (real or fictional), please generate:
           </div>
 
           <div className='md:col-span-3'>
-            <label className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2'>Text content</label>
+            <label className='block text-sm font-medium text-foreground/80 mb-2'>Text content</label>
             <Textarea
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
@@ -411,25 +409,27 @@ etc...'
         {parsedData && (
           <div className='space-y-4 border-t pt-4'>
             <div className='flex items-center justify-between'>
-              <h4 className='font-medium text-gray-400 dark:text-gray-200'>AI parsing results</h4>
-              <Button onClick={insertAllFields} size='sm' className='bg-green-600 hover:bg-green-700'>
+              <h4 className='font-medium text-foreground'>AI parsing results</h4>
+              <Button
+                onClick={insertAllFields}
+                size='sm'
+                className='bg-success hover:bg-success/90 text-primary-foreground'
+              >
                 <Download className='w-4 h-4 mr-2' />
                 Insert all with one click
               </Button>
             </div>
 
-            <div className='space-y-3 max-h-[400px] overflow-y-auto bg-gray-50 dark:bg-gray-400 rounded-lg p-3 scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-300 dark:scrollbar-track-gray-300 dark:scrollbar-thumb-gray-600 hover:scrollbar-thumb-gray-400 dark:hover:scrollbar-thumb-gray-500'>
+            <div className='space-y-3 max-h-[400px] overflow-y-auto bg-muted/50 rounded-lg p-3 scrollbar'>
               {Object.entries(parsedData).map(([key, value]) => {
                 if (!value || (Array.isArray(value) && value.length === 0)) {
                   return null
                 }
 
                 return (
-                  <div key={key} className='border-b border-gray-200 dark:border-gray-300 pb-2 last:border-b-0'>
-                    <div className='font-medium text-sm text-gray-300 dark:text-gray-300 mb-1'>
-                      {getFieldLabel(key)}
-                    </div>
-                    <div className='text-sm text-gray-600 dark:text-gray-400 break-words leading-relaxed'>
+                  <div key={key} className='border-b border-border pb-2 last:border-b-0'>
+                    <div className='font-medium text-sm text-foreground/80 mb-1'>{getFieldLabel(key)}</div>
+                    <div className='text-sm text-muted-foreground break-words leading-relaxed'>
                       {getPreviewText(value)}
                     </div>
                   </div>
@@ -437,7 +437,7 @@ etc...'
               })}
             </div>
 
-            <div className='text-xs text-gray-500 dark:text-gray-400 bg-blue-50 dark:bg-blue-900/20 p-2 rounded'>
+            <div className='text-xs text-muted-foreground bg-accent/10 p-2 rounded'>
               Click "Insert All with One Click" to automatically fill all the parsing results into the corresponding
               form fields. You can further edit and improve them in the form below.
             </div>

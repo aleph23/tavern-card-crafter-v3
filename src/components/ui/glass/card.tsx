@@ -57,7 +57,7 @@ export interface CardProps extends React.ComponentProps<typeof BaseCard> {
  */
 export const Card = React.forwardRef<HTMLDivElement, CardProps>(
   (
-    { className, variant = 'glass', gradient = false, animated = false, hover = 'none', glass, children, ...props },
+    { className, variant = 'glass', gradient = true, animated = true, hover = 'none', glass, children, ...props },
     ref
   ) => {
     return (
@@ -67,7 +67,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
         glass={glass}
         className={cn(
           'relative overflow-hidden',
-          gradient && 'bg-gradient-to-br from-purple-500/10 via-blue-500/10 to-pink-500/10',
+          gradient && 'bg-gradient-to-br from-primary/10 via-border/10 to-accent/10',
           animated && 'transition-all duration-300 hover:scale-[1.02] hover:shadow-[var(--glass-shadow-lg)]',
           hoverEffects({ hover }),
           className

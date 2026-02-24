@@ -1,3 +1,4 @@
+/* eslint-disable prefer-const */
 'use client'
 import { cn } from '@/lib/utils'
 import React, { useEffect, useRef } from 'react'
@@ -155,7 +156,6 @@ export const Vortex = (props: VortexProps) => {
     particleProps[i3] = vx
     particleProps[i4] = vy
     particleProps[i5] = life
-
     ;(checkBounds(x, y, canvas) || life > ttl) && initParticle(i)
   }
 

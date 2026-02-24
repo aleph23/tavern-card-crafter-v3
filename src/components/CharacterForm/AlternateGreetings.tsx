@@ -8,15 +8,15 @@ import { Plus, X, Edit2, Check, Sparkles, Loader2, RefreshCcw, Trash2 } from 'lu
 import { generateWithAI, generateAlternateGreeting } from '@/utils/aiGenerator'
 import { Settings } from '@/types/settings'
 import { useLanguage } from '@/contexts/LanguageContext'
+import { CharacterData } from './utils/aiGenerator.ts'
 
 interface AlternateGreetingsProps {
   greetings: string[]
   alternate_greetings: string[]
-  mes_example: string[]
+  mes_example: CharacterData['mes_example']
   group_only_greetings: string[]
   updateField: (field: string, value: any) => void
   aiSettings: Settings | null
-  characterData: any
 }
 
 const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData }: AlternateGreetingsProps) => {
@@ -133,7 +133,7 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
   return (
     <div className='space-y-4'>
       <div className='flex items-center justify-between'>
-        <h3 className='text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4'>{t('alternateGreetings')}</h3>
+        <h3 className='text-lg font-semibold text-foreground mb-4'>{t('alternateGreetings')}</h3>
         <div className='flex gap-1'>
           {!loading && (
             <Button size='sm' variant='outline' onClick={handleAIGenerateGreeting} className='h-8 px-2 text-xs'>
@@ -168,15 +168,13 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
       </div>
 
       <div className='form-group'>
-        <Label className='text-sm font-medium text-gray-700 dark:text-gray-200'>
-          {t('addNewGreeting') || 'Add new greetings'}
-        </Label>
+        <Label className='text-sm font-medium text-foreground/80'>{t('addNewGreeting') || 'Add new greetings'}</Label>
         <div className='flex gap-2 mt-1'>
           <Textarea
             value={newGreeting}
             onChange={(e) => setNewGreeting(e.target.value)}
             placeholder={t('addAlternateGreetingPlaceholder') || 'Add alternate greetings...'}
-            className='min-h-[60px]'
+            className='min-h-[60px] flex-1'
           />
           <Button
             onClick={addGreeting}
@@ -190,8 +188,8 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
 
       <div className='space-y-3'>
         {greetings.map((greeting, index) => (
-          <div key={index} className='p-4 bg-gray-50 dark:bg-gray-800 rounded-lg relative'>
-            <div className='absolute top-2 left-2 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs font-medium px-2 py-1 rounded-full'>
+          <div key={index} className='p-4 bg-muted/50 rounded-lg relative'>
+            <div className='absolute top-2 left-2 bg-primary/20 text-primary text-xs font-medium px-2 py-1 rounded-full'>
               {t('greeting') || 'Greetings'} {index + 1}
             </div>
             {editingIndex === index ? (
@@ -221,7 +219,7 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
                     <X className='w-4 h-4' />
                   </Button>
                 </div>
-                <p className='text-sm pr-16 pt-6 whitespace-pre-wrap text-gray-300 dark:text-gray-200'>{greeting}</p>
+                <p className='text-sm pr-16 pt-6 whitespace-pre-wrap text-foreground/90'>{greeting}</p>
               </>
             )}
           </div>

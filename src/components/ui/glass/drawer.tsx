@@ -21,12 +21,12 @@ export interface DrawerContentProps extends React.ComponentProps<typeof BaseDraw
  * Glass UI Drawer - Enhanced drawer with glassy effects
  */
 export const DrawerContent = React.forwardRef<React.ElementRef<typeof BaseDrawerContent>, DrawerContentProps>(
-  ({ className, variant = 'glass', glow = false, ...props }, ref) => {
+  ({ className, variant = 'glass', glow = true, ...props }, ref) => {
     return (
       <BaseDrawerContent
         ref={ref}
         variant={variant}
-        className={cn(glow && 'shadow-lg shadow-purple-500/20', className)}
+        className={cn(glow && 'shadow-lg shadow-card', className)}
         {...props}
       />
     )

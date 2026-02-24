@@ -156,11 +156,11 @@ const PromptsSection = ({ data, updateField, aiSettings }: PromptsSectionProps) 
 
   return (
     <div className='space-y-4'>
-      <h3 className='text-lg font-semibold text-gray-800 mb-4'>Prompt word settings</h3>
+      <h3 className='text-lg font-semibold text-foreground mb-4'>Prompt word settings</h3>
 
       <div>
         <div className='flex items-center justify-between mb-2'>
-          <Label htmlFor='system_prompt' className='text-sm font-medium text-gray-300'>
+          <Label htmlFor='system_prompt' className='text-sm font-medium text-foreground/80'>
             System prompt words
           </Label>
           {renderFieldButtons('system_prompt', generateSystemPrompt)}
@@ -177,7 +177,7 @@ const PromptsSection = ({ data, updateField, aiSettings }: PromptsSectionProps) 
 
       <div>
         <div className='flex items-center justify-between mb-2'>
-          <Label htmlFor='post_history' className='text-sm font-medium text-gray-300'>
+          <Label htmlFor='post_history' className='text-sm font-medium text-foreground/80'>
             Post-historical instructions
           </Label>
           {renderFieldButtons('post_history_instructions', generatePostHistoryInstructions)}

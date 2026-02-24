@@ -1,4 +1,12 @@
 // Define types for app settings
+export interface ThemeColors {
+  primary: string
+  secondary: string
+  primaryForeground: string
+  secondaryForeground: string
+  border: string
+}
+
 export interface InferenceSettings {
   maxTokens: number
   temp: number
@@ -20,6 +28,7 @@ export interface AppConfig {
   // activeImageEndpointId?: string;  // Image endpoints are not yet supported
   inferenceSettings: InferenceSettings
   endpoints: Endpoint[]
+  themeColors?: ThemeColors
 }
 
 // Re-export for compatibility with other components

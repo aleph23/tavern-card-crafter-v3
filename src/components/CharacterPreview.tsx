@@ -291,17 +291,17 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
     return json.replace(
       /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\\-]?\d+)?)/g,
       (match) => {
-        let cls = 'text-yellow-300'
+        let cls = 'text-accent'
         if (/^"/.test(match)) {
           if (/:$/.test(match)) {
-            cls = 'text-blue-300 font-semibold' // Key
+            cls = 'text-primary font-semibold' // Key
           } else {
-            cls = 'text-green-300' // String
+            cls = 'text-success' // String
           }
         } else if (/true|false/.test(match)) {
-          cls = 'text-purple-300' // Boolean
+          cls = 'text-primary/70' // Boolean (or a variant)
         } else if (/null/.test(match)) {
-          cls = 'text-red-300' // Null
+          cls = 'text-destructive' // Null
         }
 
         // SECURITY FIX: Escape the content BEFORE wrapping it in HTML.
@@ -315,20 +315,16 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
   const highlightedJson = syntaxHighlight(JSON.stringify(characterData, null, 2))
 
   return (
-    <Card className='shadow-lg border-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm'>
+    <Card className='shadow-lg border-0 bg-card/80 backdrop-blur-sm'>
       <CardHeader className='pb-4'>
-        <CardTitle className='text-xl font-semibold text-gray-400 dark:text-gray-200 flex items-start justify-between flex-col gap-3'>
+        <CardTitle className='text-xl font-semibold text-foreground/80 flex items-start justify-between flex-col gap-3'>
           <span>{t('jsonPreview')}</span>
           <div className='flex flex-col sm:flex-row gap-2 w-full'>
             <Button onClick={copyToClipboard} size='sm' variant='outline' className='flex-1 min-w-0'>
               <Copy className='w-4 h-4 mr-2 flex-shrink-0' />
               <span className='truncate'>{t('copy')}</span>
             </Button>
-            <Button
-              onClick={downloadJson}
-              size='sm'
-              className='bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 flex-1 min-w-0'
-            >
+            <Button onClick={downloadJson} size='sm' className='cta-button-gradient shadow-md flex-1 min-w-0'>
               <Download className='w-4 h-4 mr-2 flex-shrink-0' />
               <span className='truncate'>{t('exportJson')}</span>
             </Button>
@@ -338,7 +334,8 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
             </Button>
           </div>
         </CardTitle>
-        <div className='text-sm text-gray-600 dark:text-gray-400 mt-2 flex flex-col sm:flex-row gap-2 sm:gap-4'>
+
+        <div className='text-sm text-muted-foreground mt-2 flex flex-col sm:flex-row gap-2 sm:gap-4'>
           <span>
             {t('totalChars')}: {totalChars}
           </span>
@@ -349,8 +346,8 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
       </CardHeader>
       <CardContent>
         <ScrollArea className='h-[600px] custom-scrollbar'>
-          <div className='bg-gray-900 dark:bg-gray-800 p-4 rounded-lg text-sm font-mono whitespace-pre-wrap break-all'>
-            <div className='text-gray-300' dangerouslySetInnerHTML={{ __html: highlightedJson }} />
+          <div className='bg-muted p-4 rounded-lg text-sm font-mono whitespace-pre-wrap break-all border border-border/10'>
+            <div className='text-foreground/90 leading-relaxed' dangerouslySetInnerHTML={{ __html: highlightedJson }} />
           </div>
         </ScrollArea>
       </CardContent>

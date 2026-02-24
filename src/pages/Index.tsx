@@ -1,11 +1,10 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/glass/card'
 import { Button } from '@/components/ui/glass/button'
-import { Upload, Bot, User, FileText } from 'lucide-react'
+import { Upload, User, FileText } from 'lucide-react'
+import { BotMessageSquareIcon as Bot } from '@/components/ui/bot-message-square'
 import { useToast } from '@/hooks/use-toast'
 import { ScrollArea } from '@/components/ui/glass/scroll-area'
 import { useLanguage } from '@/contexts/LanguageContext'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/glass/tabs'
 import ConfigEditor from '@/components/ConfigEditor'
 import { Settings as AISettingsType } from '@/types/settings'
 import { DEFAULT_SETTINGS } from '@/config/defaultSettings'
@@ -21,6 +20,8 @@ import CharacterPreview from '@/components/CharacterPreview'
 import AIAssistant from '@/components/CharacterForm/AIAssistant'
 import { CharacterData } from '../utils/aiGenerator'
 import { configManager } from '@/utils/configManager'
+
+type GenericField = string | string[] | CharacterBookEntry[] | Record<string, unknown> | Asset[] | boolean | number
 
 interface CharacterBookEntry {
   keys: string[]
@@ -40,10 +41,33 @@ interface CharacterCardV3 {
   spec: string
   spec_version: string
   data: {
-    name: string
-    nickname?: string
-    description: string
-    personality: string
+    name: CharacterData['name']
+    nickname?: CharacterData['nickname']
+    description: CharacterData['description']
+    personality: CharacterData['personality']
+    first_mes: CharacterData['first_mes']
+    alternate_greetings: CharacterData['alternate_greetings']
+    tags: CharacterData['tags']
+    creator: string
+    character_version: string
+    creator_notes: string
+    mes_example: CharacterData['mes_example']
+    scenario: CharacterData['scenario']
+    system_prompt: CharacterData['system_prompt']
+    post_history_instructions: CharacterData['post_history_instructions']
+    character_book: { entries: CharacterBookEntry[] }
+    group_only_greetings: string[]
+    creation_date: string
+    modification_date: string
+    extensions: Record<string, string>
+    assets: Asset[]
+  }
+}
+
+interface CharacterCardV2 {
+  spec: string
+  spec_version: string
+  data: {
     mes_example: string
     scenario: string
     first_mes: string
@@ -60,7 +84,7 @@ interface CharacterCardV3 {
     creation_date?: string
     modification_date?: string
     source?: string
-    extensions: Record<string, any>
+    extensions: Record<string, string[]>
     assets: Asset[]
   }
 }
@@ -100,8 +124,7 @@ const Index = () => {
       post_history_instructions: '',
       character_book: { entries: [] },
       group_only_greetings: [],
-      // sourcery skip: simplify-ternary
-      creation_date: '' ? '' : today, // if you later load data, keep it
+      creation_date: today,
       modification_date: today,
       extensions: {},
       assets: [],
@@ -142,7 +165,7 @@ const Index = () => {
   /**
    * Updates a specified field in the character data with a new value and sets the modification date.
    */
-  const updateField = useCallback((field: string, value: any) => {
+  const updateField = useCallback((field: string, value: GenericField) => {
     setCharacterData((prev) => ({
       ...prev,
       data: { ...prev.data, [field]: value, modification_date: new Date().toISOString().split('T')[0] },
@@ -172,7 +195,7 @@ const Index = () => {
    * @returns A promise that resolves with the extracted character data.
    * @throws Error If the file cannot be read or if no character data is found.
    */
-  const extractPNGCharacterData = async (file: File): Promise<any> => {
+  const extractPNGCharacterData = async (file: File): Promise<GenericField> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader()
       reader.onload = (e) => {
@@ -216,7 +239,7 @@ const Index = () => {
                   console.log('tEXt keyword:', keyword)
 
                   // Check whether it is a keyword related to a character card
-                  if (keyword === 'chara' || keyword === 'ccv3' || keyword === 'ccv2' || keyword === 'Comment') {
+                  if (keyword === 'chara' || keyword === 'card_v3' || keyword === 'card_v2' || keyword === 'Comment') {
                     const dataStart = keyEnd + 1
                     const textDataBytes = uint8Array.slice(dataStart, textEnd)
 
@@ -429,93 +452,53 @@ const Index = () => {
         return
       }
 
-      // Compatible with different versions of the role card format
-      if (parsedData.spec === 'chara_card_v3' || parsedData.spec_version === '3.0') {
-        setCharacterData(parsedData)
-      } else if (parsedData.spec === 'chara_card_v2' || parsedData.data) {
-        // V2 Convert format to V3
-        const v3Data: CharacterCardV3 = {
-          spec: 'chara_card_v3',
-          spec_version: '3.0',
-          data: {
-            name: parsedData.data?.name || parsedData.name || '',
-            nickname: parsedData.data?.nickname,
-            description: parsedData.data?.description || parsedData.description || '',
-            personality: parsedData.data?.personality || parsedData.personality || '',
-            scenario: parsedData.data?.scenario || parsedData.scenario || '',
-            first_mes: parsedData.data?.first_mes || parsedData.first_mes || '',
-            mes_example: parsedData.data?.mes_example || parsedData.mes_example || '',
-            creator_notes: parsedData.data?.creator_notes || parsedData.creator_notes || '',
-            system_prompt: parsedData.data?.system_prompt || '',
-            post_history_instructions: parsedData.data?.post_history_instructions || '',
-            alternate_greetings: Array.isArray(parsedData.data?.alternate_greetings)
-              ? parsedData.data.alternate_greetings
-              : typeof parsedData.data?.alternate_greetings === 'string' &&
-                  parsedData.data.alternate_greetings.length > 0
-                ? [parsedData.data.alternate_greetings]
-                : [],
-            character_book: parsedData.data?.character_book || { entries: [] },
-            tags: parsedData.data?.tags || [],
-            creator: parsedData.data?.creator || '',
-            character_version: parsedData.data?.character_version || '1.0',
-            group_only_greetings: Array.isArray(parsedData.data?.group_only_greetings)
-              ? parsedData.data.group_only_greetings
-              : typeof parsedData.data?.group_only_greetings === 'string' &&
-                  parsedData.data.group_only_greetings.length > 0
-                ? [parsedData.data.group_only_greetings]
-                : [],
-            creation_date: parsedData.data?.creation_date || new Date().toISOString().split('T')[0],
-            modification_date: new Date().toISOString().split('T')[0],
-            extensions: parsedData.data?.extensions || {},
-            assets: Array.isArray(parsedData.data?.assets)
-              ? parsedData.data.assets
-              : typeof parsedData.data?.assets === 'string' && parsedData.data.assets.length > 0
-                ? [parsedData.data.assets]
-                : [],
-          },
-        }
-        setCharacterData(v3Data)
-      } else {
-        // V1 Format or other format
-        const v3Data: CharacterCardV3 = {
-          spec: 'chara_card_v3',
-          spec_version: '3.0',
-          data: {
-            name: parsedData.name || '',
-            description: parsedData.description || '',
-            personality: parsedData.personality || '',
-            scenario: parsedData.scenario || '',
-            first_mes: parsedData.first_mes || '',
-            mes_example: parsedData.mes_example || '',
-            creator_notes: parsedData.creator_notes || '',
-            system_prompt: '',
-            post_history_instructions: '',
-            alternate_greetings: Array.isArray(parsedData.alternate_greetings)
-              ? parsedData.alternate_greetings
-              : typeof parsedData.alternate_greetings === 'string' && parsedData.alternate_greetings.length > 0
-                ? [parsedData.alternate_greetings]
-                : [],
-            character_book: { entries: [] },
-            tags: parsedData.tags || [],
-            creator: parsedData.creator || '',
-            character_version: '1.0',
-            group_only_greetings: Array.isArray(parsedData.group_only_greetings)
-              ? parsedData.group_only_greetings
-              : typeof parsedData.group_only_greetings === 'string' && parsedData.group_only_greetings.length > 0
-                ? [parsedData.group_only_greetings]
-                : [],
-            creation_date: parsedData.creation_date || new Date().toISOString().split('T')[0],
-            modification_date: new Date().toISOString().split('T')[0],
-            extensions: {},
-            assets: Array.isArray(parsedData.assets)
-              ? parsedData.assets
-              : typeof parsedData.assets === 'string' && parsedData.assets.length > 0
-                ? [parsedData.assets]
-                : [],
-          },
-        }
-        setCharacterData(v3Data)
+      // Helper to safely get array fields
+      const getArrayField = (source: GenericField, key: string) => {
+        const val = source?.[key]
+        if (Array.isArray(val)) return val
+        if (typeof val === 'string' && val.length > 0) return [val]
+        return []
       }
+
+      // Normalize data source (V2/V3 uses .data, V1 uses root)
+      const src = parsedData.data || parsedData
+      const root = parsedData // Keep root for fallback access
+
+      const v3Data: CharacterCardV3 = {
+        spec: 'chara_card_v3',
+        spec_version: '3.0',
+        data: {
+          // Name mapping: prioritize char_name (often used for real name) over name
+          name: src.char_name || src.name || root.char_name || root.name || '',
+          nickname: src.nickname || root.nickname || '',
+          description: src.description || root.description || '',
+          personality: src.personality || root.personality || '',
+          scenario: src.scenario || root.scenario || '',
+          first_mes: src.first_mes || root.first_mes || '',
+          mes_example: src.mes_example || root.mes_example || '',
+          creator_notes: src.creator_notes || root.creator_notes || '',
+          system_prompt: src.system_prompt || root.system_prompt || '',
+          post_history_instructions: src.post_history_instructions || root.post_history_instructions || '',
+          alternate_greetings: getArrayField(src, 'alternate_greetings'),
+          character_book: src.character_book || root.character_book || { entries: [] },
+          tags: src.tags || root.tags || [],
+          creator: src.creator || root.creator || '',
+          character_version: src.character_version || root.character_version || '1.0',
+          group_only_greetings: getArrayField(src, 'group_only_greetings'),
+          // Date logic: Prioritize existing date in data, then root, then create_date (V1/V2), then fallback to today ONLY if missing
+          creation_date:
+            src.creation_date ||
+            root.creation_date ||
+            src.create_date ||
+            root.create_date ||
+            new Date().toISOString().split('T')[0],
+          modification_date: new Date().toISOString().split('T')[0],
+          extensions: src.extensions || root.extensions || {},
+          assets: getArrayField(src, 'assets'),
+        },
+      }
+
+      setCharacterData(v3Data)
 
       toast({ title: t('importSuccess'), description: t('importSuccessDesc') })
     } catch (error) {
@@ -531,23 +514,25 @@ const Index = () => {
   }
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 dark:from-purple-900 dark:via-blue-900 dark:to-indigo-900 p-4'>
+    <div className='min-h-screen p-4'>
       <div className='max-w-7xl mx-auto'>
         <div className='text-center mb-8'>
           <div className='flex justify-end mb-4'>
             <Toolbar />
           </div>
-          <h1 className='text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-4'>
-            {t('pageTitle')}
-          </h1>
-          <p className='text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-4'>{t('pageDescription')}</p>
+          <h1 className='text-4xl font-bold text-gradient mb-4'>{t('pageTitle')}</h1>
+          <p className='text-lg text-muted-foreground max-w-2xl mx-auto mb-4'>{t('pageDescription')}</p>
           <div className='flex justify-center gap-4'>
-            <input type='file' ref={fileInputRef} onChange={handleFileImport} accept='.json,.png' className='hidden' />
-            <Button
-              onClick={() => fileInputRef.current?.click()}
-              className='mb-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700'
-            >
-              <Upload className='w-4 h-4 mr-2' />
+            <input
+              type='file'
+              ref={fileInputRef}
+              onChange={handleFileImport}
+              accept='.json,.png'
+              className='hidden'
+              title={t('importCard')}
+            />
+            <Button onClick={() => fileInputRef.current?.click()} className='mb-4 cta-button-gradient'>
+              <Upload className='mr-2' />
               {t('importCard')}
             </Button>
             <ConfigEditor onSettingsChange={handleAISettingsChange} />
@@ -555,11 +540,11 @@ const Index = () => {
         </div>
 
         {/* Full screen sidebar tab layout */}
-        <div className='flex h-[calc(100vh-180px)] bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm rounded-lg overflow-hidden shadow-lg'>
+        <div className='flex h-[calc(100vh-180px)] bg-background/50 backdrop-blur-sm rounded-lg shadow-lg'>
           {/* Left sidebar */}
-          <div className='w-56 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-r border-gray-200 dark:border-gray-700 flex flex-col'>
-            <div className='p-4 border-b border-gray-200 dark:border-gray-700'>
-              <h2 className='text-lg font-semibold text-gray-800 dark:text-gray-200'>Feature Panel</h2>
+          <div className='w-56 glass-panel border-r border-border flex flex-col'>
+            <div className='p-4 border-b border-border'>
+              <h2 className='text-lg font-semibold text-foreground'>Feature Panel</h2>
             </div>
             <nav className='flex-1 p-2'>
               <div className='space-y-1'>
@@ -567,8 +552,8 @@ const Index = () => {
                   onClick={() => setActiveTab('assistant')}
                   className={`w-full flex items-center gap-3 px-3 py-3 text-left rounded-lg transition-all duration-200 ${
                     activeTab === 'assistant'
-                      ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-md'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                      ? 'cta-button-gradient text-primary-foreground shadow-md'
+                      : 'text-foreground/80 hover:bg-muted'
                   }`}
                 >
                   <Bot className='w-5 h-5' />
@@ -578,8 +563,8 @@ const Index = () => {
                   onClick={() => setActiveTab('editor')}
                   className={`w-full flex items-center gap-3 px-3 py-3 text-left rounded-lg transition-all duration-200 ${
                     activeTab === 'editor'
-                      ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-md'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                      ? 'cta-button-gradient text-primary-foreground shadow-md'
+                      : 'text-foreground/80 hover:bg-muted'
                   }`}
                 >
                   <User className='w-5 h-5' />
@@ -589,8 +574,8 @@ const Index = () => {
                   onClick={() => setActiveTab('preview')}
                   className={`w-full flex items-center gap-3 px-3 py-3 text-left rounded-lg transition-all duration-200 ${
                     activeTab === 'preview'
-                      ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-md'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                      ? 'cta-button-gradient text-primary-foreground shadow-md'
+                      : 'text-foreground/80 hover:bg-muted'
                   }`}
                 >
                   <FileText className='w-5 h-5' />
@@ -612,8 +597,8 @@ const Index = () => {
             {/* Role Information Editing Panel */}
             {activeTab === 'editor' && (
               <div className='flex-1 flex flex-col min-h-0'>
-                <div className='p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0'>
-                  <h1 className='text-2xl font-semibold text-gray-800 dark:text-gray-200'>{t('characterInfo')}</h1>
+                <div className='p-6 border-b border-border flex-shrink-0'>
+                  <h1 className='text-2xl font-semibold text-foreground'>{t('characterInfo')}</h1>
                 </div>
                 <div className='flex-1 min-h-0'>
                   <ScrollArea className='h-full'>

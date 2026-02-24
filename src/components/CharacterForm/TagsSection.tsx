@@ -135,7 +135,7 @@ const TagsSection = ({ tags, updateField, aiSettings, characterData }: TagsSecti
   return (
     <div className='space-y-4'>
       <div className='flex items-center justify-between'>
-        <h3 className='text-lg font-semibold text-gray-800 dark:text-gray-100'>{t('tags')}</h3>
+        <h3 className='text-lg font-semibold text-foreground'>{t('tags')}</h3>
         <div className='flex gap-1'>
           {!loading && (
             <Button size='sm' variant='outline' onClick={handleAIGenerateTags} className='h-8 px-2 text-xs'>

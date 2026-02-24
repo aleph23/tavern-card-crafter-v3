@@ -154,9 +154,9 @@ export const PromptEditor: React.FC = () => {
 
       <div className='flex flex-col md:flex-row gap-4 h-[600px]'>
         {/* Left sidebar - styled like Index.tsx */}
-        <div className='w-full md:w-1/4 h-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border rounded-lg overflow-hidden'>
-          <div className='p-3 border-b border-gray-200 dark:border-gray-700'>
-            <h3 className='text-sm font-semibold text-gray-800 dark:text-gray-200'>Prompt Templates</h3>
+        <div className='w-full md:w-1/4 h-full bg-card/80 backdrop-blur-sm border rounded-lg overflow-hidden'>
+          <div className='p-3 border-b border-border'>
+            <h3 className='text-sm font-semibold text-foreground/90'>Prompt Templates</h3>
           </div>
           <ScrollArea className='h-[calc(100%-48px)]'>
             <nav className='p-2'>
@@ -167,8 +167,8 @@ export const PromptEditor: React.FC = () => {
                     onClick={() => setActiveTab(key)}
                     className={`w-full flex items-center gap-2 px-3 py-2 text-left text-sm rounded-lg transition-all duration-200 ${
                       activeTab === key
-                        ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-md'
-                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                        ? 'cta-button-gradient text-white shadow-md'
+                        : 'text-foreground/70 hover:bg-muted'
                     }`}
                   >
                     <FileText className='w-4 h-4 flex-shrink-0' />
@@ -182,8 +182,8 @@ export const PromptEditor: React.FC = () => {
 
         <Card className='flex-1 flex flex-col'>
           <CardHeader className='py-4'>
-            <CardTitle>{prompts[activeTab]?.name}</CardTitle>
-            <CardDescription>{prompts[activeTab]?.description}</CardDescription>
+            <CardTitle className='text-foreground'>{prompts[activeTab]?.name}</CardTitle>
+            <CardDescription className='text-muted-foreground'>{prompts[activeTab]?.description}</CardDescription>
           </CardHeader>
           <CardContent className='flex-1 p-4 pt-0'>
             <Textarea
