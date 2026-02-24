@@ -42,9 +42,9 @@
   /* Glass effect variables */
   --glass-bg: var(--background) 20%;
   --glass-border: var(--border) 80%;
-  --glass-shadow: 0 8px 32px var(--border / 0.4), 0 0 0 1px var(--border / 0.1) inset;
-  --glass-shadow-lg: 0 16px 48px var(--border / 0.4), 0 0 0 1px var(--border / 0.1) inset;
-  --glass-shadow-sm: 0 4px 16px var(--border / 0.4), 0 0 0 1px var(--border / 0.1) inset;
+  --glass-shadow: 0 8px 32px var(--border) / 0.4, 0 0 0 1px var(--border) / 0.1 inset;
+  --glass-shadow-lg: 0 16px 48px var(--border) / 0.4, 0 0 0 1px var(--border) / 0.1 inset;
+  --glass-shadow-sm: 0 4px 16px var(--border) / 0.4, 0 0 0 1px var(--border) / 0.1 inset;
   --blur: 8px;
   --blur-sm: 2px;
   --blur-lg: 18px;
@@ -308,7 +308,7 @@ textarea:focus-visible {
   /* Rendering Strategy for High-DPI & Interp Displays */
   /* This prevents the 0.6px line from 'shimmering' on your HD+ resolution */
   shape-rendering: geometricPrecision;
-
+}
 
 .app {
   display: grid;
