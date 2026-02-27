@@ -8,6 +8,10 @@ export interface ThemeColors {
 }
 
 export interface InferenceSettings {
+  apiKey: string
+  apiUrl: string
+  model: string
+  provider: string
   maxTokens: number
   temp: number
 }
@@ -33,9 +37,5 @@ export interface AppConfig {
 
 // Re-export for compatibility with other components
 export interface Settings {
-  apiKey: string
-  apiUrl: string
-  model: string
-  provider: string
   inferenceSettings: InferenceSettings
 }

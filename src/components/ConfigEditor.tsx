@@ -35,8 +35,8 @@ const createDefaultConfig = (): AppConfig => DEFAULT_APP_CONFIG()
  * user feedback through toasts.
  *
  * @param {function} onSettingsChange - Callback function to handle changes in settings.
- * @param {AISettings} currentSettings - The current settings to initialize the component state.
- * @returns {JSX.Element} representing the AISettings component.
+ * @param {ConfigEditorProps} currentSettings - The current settings to initialize the component state.
+ * @returns {JSX.Element} Everything.  The contents of self, file ConfigEditor.tsx.
  */
 export const ConfigEditor = ({ onSettingsChange }: ConfigEditorProps) => {
   const { toast } = useToast()
@@ -67,7 +67,7 @@ export const ConfigEditor = ({ onSettingsChange }: ConfigEditorProps) => {
    * array and, if found, updates the settings with the provider's URL, model, and API key. Additionally, it sets the available
    * models based on the selected provider or defaults to a predefined set of models if none are available.
    *
-   * @param {string} providerValue - The value of the selected provider.
+   * @param {string} newEndpoints - The value of the selected provider.
    */
   const handleEndpointChange = <K extends keyof Endpoint>(index: number, field: K, value: Endpoint[K]) => {
     if (!config) return
@@ -649,3 +649,4 @@ export const ConfigEditor = ({ onSettingsChange }: ConfigEditorProps) => {
 }
 
 export default ConfigEditor
++

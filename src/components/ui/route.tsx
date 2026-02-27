@@ -24,7 +24,7 @@ const CIRCLE_VARIANTS: Variants = {
 }
 
 const RouteIcon = forwardRef<RouteIconHandle, RouteIconProps>(
-  ({ onMouseEnter, onMouseLeave, className, size = 28, ...props }, ref) => {
+  ({ onMouseEnter, onMouseLeave, className, ...props }, ref) => {
     const controls = useAnimation()
     const isControlledRef = useRef(false)
 

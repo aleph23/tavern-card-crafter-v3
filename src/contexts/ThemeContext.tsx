@@ -31,7 +31,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     root.style.setProperty('--primary', colors.primary)
     root.style.setProperty('--secondary', colors.secondary)
     root.style.setProperty('--primary-foreground', colors.primaryForeground)
-    root.style.setProperty('--secondary-foreground', colors.secondaryForeground)
+    root.style.setProperty('--secondary-foreground', colors.secondaryForeground)  // second-fore and accent are the same
     root.style.setProperty('--border', colors.border)
 
     // Derived colors
@@ -43,21 +43,23 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     // but the request implies "whatever is being muted".
     // Usually --muted and --muted-foreground. Let's derive them from background and foreground.)
     // For now, let's stick to the prompt's rule: "subtracting 10 percent intensity from whatever is being muted"
-    // We'll apply this to --muted (from background) and --muted-foreground (from foreground)
+    // We'll apply this to --muted (from primary) and --muted-foreground (from foreground)
 
-    // Background is currently fixed at oklch(0.11 0.04 280) in index.css
-    // Let's make background and foreground reactive if they weren't already?
-    // Actually the user only gave us 5 tokens.
-    // Let's see what index.css has for muted.
+    const primary = 'var(--primary)'
+    const foreground = 'var(--foreground)' // Current index.css value
+    const accent = 'var(--secondary-foreground)'
+    const border = 'var(--border)'
 
-    const background = 'oklch(0.11 0.04 280)' // Current index.css value
-    const foreground = 'oklch(0.96 0.015 285)' // Current index.css value
-
-    const muted = deriveMutedColor(background)
+    const muted = deriveMutedColor(primary)
     const mutedForeground = deriveMutedColor(foreground)
+    const mutedAccent: string = deriveMutedColor(accent)
+    const mutedBorder: string = deriveMutedColor(border)
 
     root.style.setProperty('--muted', muted)
     root.style.setProperty('--muted-foreground', mutedForeground)
+    root.style.setProperty('--muted-accent', mutedAccent)
+    root.style.setProperty('--muted-border', mutedBorder)
+
 
     // Save to configManager (which also handles persistence)
     const currentConfig = configManager.getConfig()

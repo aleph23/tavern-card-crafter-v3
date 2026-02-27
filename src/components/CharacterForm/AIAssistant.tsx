@@ -1,35 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useRef } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/glass/card'
-import { Button } from '@/components/ui/glass/button'
-import { Textarea } from '@/components/ui/glass/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/glass/select'
-import { useToast } from '@/hooks/use-toast'
-import { useLanguage } from '@/contexts/LanguageContext'
-import { Wand, RefreshCcw, Download, X } from 'lucide-react'
-import { generateWithAI } from '@/utils/aiGenerator'
-import { Settings } from '@/types/settings'
+import {useRef, useState} from 'react'
+import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/glass/card'
+import {Button} from '@/components/ui/glass/button'
+import {Textarea} from '@/components/ui/glass/textarea'
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/glass/select'
+import {useToast} from '@/hooks/use-toast'
+import {useLanguage} from '@/contexts/LanguageContext'
+import {Download, RefreshCcw, Wand, X} from 'lucide-react'
+import {CharacterDataV3} from '@/types/charactercard'
+import {generateWithAI} from '@/utils/aiGenerator'
+import {InferenceSettings} from '@/types/settings'
 
-interface ParsedCharacterData {
-  name?: string
-  description?: string
-  personality?: string
-  scenario?: string
-  first_mes?: string
-  alternate_greetings?: string[]
-  mes_example?: string
-  system_prompt?: string
-  post_history_instructions?: string
-  group_only_greetings?: string[]
-  tags?: string[]
-  creator?: string
-  creator_notes?: string
-  character_book?: any
-  assets?: any
-}
 
 interface AIAssistantProps {
-  aiSettings: Settings | null
+  aiSettings: InferenceSettings | null
   onInsertField: (field: string, value: string | string[]) => void
 }
 
@@ -82,7 +66,7 @@ const AIAssistant = ({ aiSettings, onInsertField }: AIAssistantProps) => {
   const { t } = useLanguage()
   const [inputText, setInputText] = useState('')
   const [characterType, setCharacterType] = useState('general')
-  const [parsedData, setParsedData] = useState<ParsedCharacterData | null>(null)
+  const [parsedData, setParsedData] = useState<CharacterDataV3 | null>(null)
   const [isGenerating, setIsGenerating] = useState(false)
   const abortControllerRef = useRef<AbortController | null>(null)
 
@@ -98,24 +82,21 @@ const AIAssistant = ({ aiSettings, onInsertField }: AIAssistantProps) => {
 Enter content:
 ${truncatedContent}
 
-Please output strictly in JSON format and do not add any other text:`
+Output strictly in JSON format and do not add any other text:`
 
     const jsonFormat = `
 {
-"name": "Card name",
+"name": "Character and scene name",
+"nickname": "Primary Character's First Name",
 "description": "Detailed character appearance description",
-"personality": "Detailed description of personality traits",
+"personality": "Detailed description of personality traits. Lists are okay, but should be a single string response per key",
 "scenario": "Detailed scene setting description",
-"first_mes": "The character's opening remark",
-"mes_example": "Dialogue example, format: <START>\\n{{user}}: User Discourse\\nCard name: Role answer",
-"system_prompt": "System prompt word to guide AI how to play this role",
-"post_history_instructions": "post history instructions",
-"tags": ["Related tags"],
-"creator_notes": "creator notes"
+"first_mes": "The first events that start game play. Must include both the character and the user, referenced as {{user}}.",
+"mes_example": "<START>\\n{{user}}: User Discourse\\n{{char}}: The Character's example answer",
+"creator_notes": "Any notes you have about the character"
 }`
 
-    const typeSpecificPrompts = {
-      general: `${baseInstructions}
+    const typeSpecificPrompts = {general: `${baseInstructions}
 
 Intelligent analysis and extract role information based on the content.${jsonFormat}`,
 
@@ -178,7 +159,7 @@ This is a historic character (real or fictional), please generate:
     }
 
     if (!aiSettings) {
-      toast({ title: 'hint', description: 'Please configure AI settings first', variant: 'destructive' })
+      toast({ title: 'hint', description: 'Please configure API settings first', variant: 'destructive' })
       return
     }
 
@@ -219,7 +200,7 @@ This is a historic character (real or fictional), please generate:
               'The role information has been successfully parsed and can be inserted into the form with one click.',
           })
         } else {
-          throw new Error('The parsing result is incorrect format')
+          throw new Error('The API response did not parse correctly.')
         }
       } catch (parseError) {
         console.error('JSON parsing failed:', parseError)
@@ -233,7 +214,7 @@ This is a historic character (real or fictional), please generate:
     } catch (error) {
       // Check whether the user actively cancels it
       if (error instanceof Error && error.name === 'AbortError') {
-        toast({ title: 'Canceled', description: 'AI generation has been canceled by the user' })
+        toast({ title: 'Canceled', description: 'AI generation was canceled by the user' })
       } else {
         console.error('Generation failed:', error)
         toast({
@@ -302,19 +283,19 @@ This is a historic character (real or fictional), please generate:
   // * Retrieves the label for a given field.
   const getFieldLabel = (field: string): string => {
     const labels: Record<string, string> = {
-      name: 'card name',
-      nickname: 'nickname',
-      description: 'Role description',
-      personality: 'character traits',
-      scenario: 'Scene Setting',
-      first_mes: 'First message',
+      name: 'Card Name or Character Fullname',
+      nickname: 'Character First Name',
+      description: 'Character Physical Description',
+      personality: 'Character Personality Traits',
+      scenario: 'Scene / World Setting',
+      first_mes: 'First message / Greeting',
       alternate_greetings: 'Alternate greetings',
       mes_example: 'Conversation Example',
-      system_prompt: 'system prompt word',
-      post_history_instructions: 'Post history instructions',
-      tags: 'tag',
-      creator: 'Creator',
-      creator_notes: 'Creator notes',
+      system_prompt: 'system prompt (not typically set in a character card',
+      post_history_instructions: 'Post history instruction (Only used in very exceptional circumstances).',
+      tags: 'SEO Keywords',
+      creator: 'You, the Author',
+      creator_notes: 'Your notes',
     }
     return labels[field] || field
   }
@@ -386,17 +367,6 @@ etc...'
             variant={isGenerating ? 'destructive' : 'default'}
             className='flex-1'
           >
-            {isGenerating ? (
-              <>
-                <X className='w-4 h-4 mr-2' />
-                Cancel Generate
-              </>
-            ) : (
-              <>
-                <Wand className='w-4 h-4 mr-2' />
-                {`AI analysis generation(${selectedType?.label})`}
-              </>
-            )}
           </Button>
 
           {parsedData && !isGenerating && (

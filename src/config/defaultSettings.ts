@@ -13,11 +13,11 @@ export const DEFAULT_SETTINGS: Settings = {
 }
 
 export const DEFAULT_THEME_COLORS: ThemeColors = {
-  primary: 'oklch(0.42 0.22 280)',
-  secondary: 'oklch(0.22 0.16 325)',
-  primaryForeground: 'oklch(0.97 0.02 285)',
-  secondaryForeground: 'oklch(0.78 0.18 65)',
-  border: 'oklch(0.62 0.28 325)',
+  primary: 'oklch(0.197 0.12 278.979)',
+  secondary: 'oklch(0.188 0.087 328.363)',
+  primaryForeground: 'oklch(0.952 0.023 277.957)',
+  secondaryForeground: 'oklch(0.727 0.188 51.746)',
+  border: 'oklch(0.702 0.322 328.363)',
 }
 
 // Single source of truth for the initial app configuration

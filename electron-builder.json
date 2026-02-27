@@ -1,14 +1,17 @@
 {
-  "appId": "com.taverncard.crafter",
-  "productName": "Tavern Card Crafter",
+  "appId": "com.aleph23.characardcreator",
+  "productName": "CharaCardCreator",
   "buildVersion": "0.4.0",
   "directories": {
+    "buildResources": "res/**/*",
     "output": "build-electron"
   },
-  "files": [
-    "dist/**/*",
-    "electron/**/*",
-    "package.json"
+  "files": ["package.json"
+    {
+      "from": ["dist", "electron"],
+      "to": "build-electron",
+      "filter": "**/*"
+    }
   ],
   "extraResources": [
     {
@@ -18,14 +21,16 @@
   ],
   "mac": {
     "category": "public.app-category.games",
-    "target": "dmg"
+    "target": "dmg",
+    "icon": "res/pencilicon.icns"
   },
   "win": {
     "target": "portable",
     "forceCodeSigning": false,
+    "icon": "res/pencilicon.ico"
   },
   "linux": {
-    "target": "AppImage",
+    "target": ["appimage", "deb"],
     "category": "Entertainment;Game;"
   },
   "nsis": {

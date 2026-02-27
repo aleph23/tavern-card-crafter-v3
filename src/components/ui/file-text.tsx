@@ -16,7 +16,7 @@ interface FileTextIconProps extends HTMLAttributes<HTMLDivElement> {
   size?: number
 }
 
-const FILE_TEXT = forwardRef<FileTextIconHandle, FileTextIconProps>(({ onMouseEnter, onMouseLeave, ...props }, ref) => {
+const FILE_TEXT = forwardRef<FileTextIconHandle, FileTextIconProps>(({ onMouseEnter, onMouseLeave, className, ...props }, ref) => {
   const controls = useAnimation()
   const isControlledRef = useRef(false)
 

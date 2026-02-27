@@ -15,7 +15,7 @@ export const hoverEffects = cva('transition-all duration-300', {
   variants: {
     hover: {
       none: '',
-      glow: 'shadow-lg shadow-purple-500/50 hover:shadow-xl hover:shadow-purple-500/70',
+      glow: 'shadow-lg var(--primary) hover:shadow-xl hover:shadow-purple-500/70',
       shimmer:
         'relative overflow-hidden before:absolute before:inset-0 before:-translate-x-full before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent hover:before:translate-x-full before:transition-transform before:duration-1000',
       ripple:

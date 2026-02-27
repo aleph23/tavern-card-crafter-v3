@@ -1,0 +1,282 @@
+/**
+ * Character Book Entry (used in both V2 and V3)
+ *
+ * CRITICAL RULES:
+ * 1. If content is empty/null, the entire entry is ignored
+ * 2. If content exists, all boolean/structural fields become mandatory
+ * 3. If constant === false (default), 'keys' is required
+ * 4. If constant === true, keys can be empty (entry always matches)
+ *
+ *  # **MOST CRITICAL RULE**
+ *  While we advise the user if they violate requirements, we do NOT enforce requirements at the type level, allowing for
+ *  maximum flexibility and user freedom. This means that while the types define the structure, they do not prevent
+ *  continued use of the software. Instead, if a check fails, we inform user how and in what way the checks failed,
+ *  but they are still free to save invalid files or wrongly populate fields, leave mandatory fields as null, etc.
+ *  We create a notification for the user with detailed information about what is wrong with the entry and in what way
+ *  the present input is in violation.
+ *  This allows for a flexible user experience while still providing guidance on best practice.  The user should be
+ *  free to capture their creativity as it arises without worrying about adhering to rigid code requirements.  We
+ *  ensure type correctness on the backend, turning a string to a string[] when necessary, for example.
+ */
+export interface CharacterBookEntry {
+  // Content - determines if entry is valid
+  content: string  // If empty, entry is ignored regardless of other fields
+
+  // Keys - required UNLESS constant === true
+  keys: string[]  // Can be empty array only if constant === true
+
+  // Structural fields - mandatory when content exists
+  insertion_order: number  // Default: 10
+  enabled: boolean         // Default: true
+  use_regex: boolean       // Default: false (V3 requirement)
+  case_sensitive: boolean  // Default: false
+  constant: boolean        // Default: false (if true, keys can be empty)
+  priority: number         // Default: 100
+  position: 'before_char' | 'after_char'  // Default: 'after_char'
+  selective?: boolean      // Default: false. Second test? If true secondary_keys must have valid array.
+
+  // Metadata - truly optional
+  name?: string
+  id?: number | string
+  comment?: string
+
+  // Conditional matching - optional
+  secondary_keys?: string[]
+
+  // Extensions - optional - where diiferent systems put their special platform-specific additions.
+  extensions?: Record<string, unknown>
+}
+
+/**
+ * Asset definition (used in both V2 and V3). These are most often, but not exclusively, embedded base64
+ * image files. Intended for any character-defining multimedia (img, vid, vox sample, emote icons, etc).
+ *
+ * @param type - indicates usage. Examples: avatar | background | emote | voice_sample | custom_role_icon | etc.
+ * This is a freeform string that can be used by different platforms to determine how to use the asset, though for
+ * obvious reasons a standard should be attempted whenever possible.  The type is not used by the core spec but can
+ * be used by platforms to determine how to utilize the asset.
+ * @param uri  - The actual data or path: base64 data URL, HTTP(S) URL, embeded://path, or ccdefault:
+ * @param name - Identifier for the asset (e.g., "main", "happy", "forest")
+ * @param ext  - File extension without dot (e.g., "png", "mp4", "mp3", "unknown")
+ */
+export interface Asset {
+  type: string
+  uri: string
+  name: string
+  ext: string
+}
+
+/**
+ * Character Book structure (Lorebook in V3 spec)
+ */
+export interface CharacterBook {
+  entries: CharacterBookEntry[]
+  name?: string
+  description?: string
+  scan_depth?: number
+  token_budget?: number
+  recursive_scanning?: boolean
+  extensions?: Record<string, unknown>
+}
+
+/**
+ * Base character data fields (common to V1/V2/V3)
+ */
+export interface BaseCharacterData {
+  name: string
+  description: string
+  personality: string
+  scenario: string
+  first_mes: string
+  mes_example: string
+}
+
+/**
+ * Character Card V2 Data
+ */
+export interface CharacterDataV2 extends BaseCharacterData {
+  alternate_greetings: string[]
+  tags: string[]
+  creator: string
+  character_version: string
+  creator_notes: string
+  creator_notes_multilingual?: Record<string, string>
+  system_prompt: string
+  post_history_instructions: string
+  character_book?: CharacterBook
+  group_only_greetings: string[]
+  creation_date?: string                // This should be a string-representation of unix seconds.
+  modification_date?: string            // This should be a string-representation of unix seconds.
+  source?: string | string[]
+  extensions: Record<string, unknown>
+  assets: Asset[]
+}
+
+/**
+ * Character Card V3 Data (extends V2 with additional fields)
+ * V3 is a superset of V2 - character_book remains optional in both specs
+ */
+export interface CharacterDataV3 extends CharacterDataV2 {
+  nickname?: string
+  source?: string[]  // V3 changes source to array
+}
+
+/**
+ * Character Card V2 (full spec)
+ */
+export interface CharacterCardV2 {
+  spec: 'chara_card_v2'
+  spec_version: '2.0'
+  data: CharacterDataV2
+}
+
+/**
+ * Character Card V3 (full spec)
+ */
+export interface CharacterCardV3 {
+  spec: 'chara_card_v3'
+  spec_version: '3.0'
+  data: CharacterDataV3
+}
+
+/**
+ * Union type for any character card version
+ */
+export type CharacterCard = CharacterCardV2 | CharacterCardV3
+
+/**
+ * Partial character data used for AI generation and editing sessions.
+ * This is a subset of the full character data with fields that are
+ * commonly accessed during AI generation and user editing.
+ */
+export interface UsedCharacterData {
+  // Core fields for AI generation
+  name: string
+  description: string
+  nickname?: string
+  personality?: string
+  scenario?: string
+  first_mes?: string
+  mes_example?: string
+  alternate_greetings?: string[]
+  system_prompt?: string
+  post_history_instructions?: string
+  character_book?: CharacterBook
+  tags?: string[]
+
+  // Metadata fields users may edit in a session
+  creator: string
+  character_version: string
+  creator_notes: string
+  creation_date?: string                // This should be a string-representation of unix seconds.
+  modification_date?: string            // This should be a string-representation of unix seconds.
+  source?: string  // 'Home' for this card. Typically a public URL.
+
+  // Future features (commented out until implemented)
+  // group_only_greetings: string[]  // Not yet functional. Will be.
+  // assets: Asset[]                 // Not yet functional. Will be.
+}
+
+/**
+ * Helper to create a new CharacterBookEntry with proper defaults.
+ * Only content and keys are required from the user.
+ */
+export function createCharacterBookEntry(params: {
+  content: string
+  keys: string[]
+  insertion_order?: number
+  enabled?: boolean
+  use_regex?: boolean
+  case_sensitive?: boolean
+  constant?: boolean
+  priority?: number
+  position?: 'before_char' | 'after_char'
+  name?: string
+  id?: number | string
+  comment?: string
+  selective?: boolean
+  secondary_keys?: string[]
+  extensions?: Record<string, unknown>
+}): CharacterBookEntry {
+  const constant = params.constant ?? false
+
+  // Validate: if constant is false, keys must not be empty
+  if (!constant && (!params.keys || params.keys.length === 0)) {
+    throw new Error('CharacterBookEntry: keys cannot be empty when constant is false')
+  }
+
+  return {
+    content: params.content,
+    keys: params.keys,
+    insertion_order: params.insertion_order ?? 10,
+    enabled: params.enabled ?? true,
+    use_regex: params.use_regex ?? false,
+    case_sensitive: params.case_sensitive ?? false,
+    constant: constant,
+    priority: params.priority ?? 100,
+    position: params.position ?? 'after_char',
+    name: params.name,
+    id: params.id,
+    comment: params.comment,
+    selective: params.selective,
+    secondary_keys: params.secondary_keys,
+    extensions: params.extensions,
+  }
+}
+
+/**
+ * Type guard to check if an entry should be processed.
+ * Returns false if content is empty/null.
+ */
+export function isValidCharacterBookEntry(entry: CharacterBookEntry): boolean {
+  if (!entry.content || entry.content.trim() === '') {
+    return false
+  }
+
+  // If constant is false, keys must not be empty
+  if (!entry.constant && (!entry.keys || entry.keys.length === 0)) {
+    return false
+  }
+
+  return true
+}
+
+/**
+ * Ensures a CharacterBookEntry has all required defaults set.
+ * Useful when importing entries from external sources that may be incomplete.
+ */
+export function normalizeCharacterBookEntry(entry: Partial<CharacterBookEntry>): CharacterBookEntry {
+  const constant = entry.constant ?? false
+
+  return {
+    content: entry.content ?? '',
+    keys: entry.keys ?? [],
+    insertion_order: entry.insertion_order ?? 10,
+    enabled: entry.enabled ?? true,
+    use_regex: entry.use_regex ?? false,
+    case_sensitive: entry.case_sensitive ?? false,
+    constant: constant,
+    priority: entry.priority ?? 100,
+    position: entry.position ?? 'after_char',
+    name: entry.name,
+    id: entry.id,
+    comment: entry.comment,
+    selective: entry.selective,
+    secondary_keys: entry.secondary_keys,
+    extensions: entry.extensions,
+  }
+}
+
+/**
+ * Type guard to check if a card is V3
+ */
+export function isCharacterCardV3(card: CharacterCard): card is CharacterCardV3 {
+  return card.spec === 'chara_card_v3'
+}
+
+/**
+ * Type guard to check if a card is V2
+ */
+export function isCharacterCardV2(card: CharacterCard): card is CharacterCardV2 {
+  return card.spec === 'chara_card_v2'
+}

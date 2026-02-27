@@ -26,7 +26,7 @@ const CIRCLE_VARIANT: Variants = {
   animate: { pathLength: [0, 1], pathOffset: [1, 0], scale: [0.5, 1] },
 }
 
-const UserIcon = forwardRef<UserIconHandle, UserIconProps>(({ onMouseEnter, onMouseLeave, ...props }, ref) => {
+const UserIcon = forwardRef<UserIconHandle, UserIconProps>(({ onMouseEnter, onMouseLeave, className, ...props }, ref) => {
   const controls = useAnimation()
   const isControlledRef = useRef(false)
 

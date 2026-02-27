@@ -1,6 +1,8 @@
+/* eslint-disable prefer-const */
 import { Settings } from '@/types/settings'
 import { buildApiUrl } from './buildApiUrl'
 import { promptManager } from './promptManager'
+import { UsedCharacterData } from '@/types/charactercard'
 
 // Helper to ensure prompts are loaded
 const ensurePromptsLoaded = async () => {
@@ -10,21 +12,6 @@ const ensurePromptsLoaded = async () => {
 // Since loadPrompts manages its own state and is likely fast (local file),
 // keeping it as a side effect is acceptable but explicit initialization is better.
 ensurePromptsLoaded()
-
-export interface CharacterData {
-  name: string
-  nickname?: string
-  description: string
-  personality?: string
-  scenario?: string
-  first_mes?: string
-  mes_example?: string
-  alternate_greetings?: string[]
-  system_prompt?: string
-  post_history_instructions?: string
-  character_book?: string[]
-  tags?: string[]
-}
 
 // Token calculation function (rough estimation)
 export const estimateTokens = (text: string): number => {
@@ -69,7 +56,7 @@ export const generateWithAI = async (settings: Settings, prompt: string): Promis
     console.log('Model:', settings.model)
 
     // Use a unified Open AI-compatible format
-    const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+    let headers: Record<string, string> = { 'Content-Type': 'application/json' }
 
     if (settings.provider === 'openrouter') {
       headers['Http-Referer'] = 'https://github.com/aleph23/tavern-card-creator-v3'
@@ -267,7 +254,7 @@ export const generateTags = (data: CharacterData): string => {
 /**
  * Generates an alternate greeting based on character data.
  */
-export const generateAlternateGreeting = (data: CharacterData): string => {
+export const generateAlternateGreeting = (data: string[]): string => {
   const template = promptManager.getPrompt('alternateGreeting')
   return promptManager.interpolatePrompt(template, data)
 }

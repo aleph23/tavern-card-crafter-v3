@@ -25,29 +25,31 @@
   --destructive-foreground: oklch(96.896% 0.13236 113.67);
   --success: oklch(0.7216 0.2455 142.5);
 
-  --background: linear-gradient(
-    135deg,
-    var(--primary) 0%,
-    black 50%,
-    var(--secondary) 100%
-  ); /* Very dark indigo-black */
   --card: var(--glass-bg);
   --card-foreground: var(--foreground);
   --popover: var(--glass-bg);
   --popover-foreground: var(--foreground);
-  --muted: var(--primary-muted);
-  --muted-foreground: var(--primary-muted-foreground);
+  --muted: oklch(0 0 0);
+  --muted-foreground: oklch(0.569 0 89.876);
+  --muted-accent: oklch(from var(--accent) l calc(c - 0.2) h);
+  --muted-border: oklch(from var(--border) l calc(c - 0.2) h);
   --input: oklch(0.2 0.06 280);
 
+    /* Shadows */
+  --shadow: 0 8px 32px var(--secondary), 0 0 0 1px var(--primary) inset;
+  --shadow-lg: 0 16px 48px var(--secondary), 0 0 0 1px var(--primary) inset;
+  --shadow-sm: 0 4px 16px var(--secondary), 0 0 0 1px var(--primary) inset;
+
+
   /* Glass effect variables */
-  --glass-bg: var(--background) 20%;
-  --glass-border: var(--border) 80%;
-  --glass-shadow: 0 8px 32px var(--border) / 0.4, 0 0 0 1px var(--border) / 0.1 inset;
-  --glass-shadow-lg: 0 16px 48px var(--border) / 0.4, 0 0 0 1px var(--border) / 0.1 inset;
-  --glass-shadow-sm: 0 4px 16px var(--border) / 0.4, 0 0 0 1px var(--border) / 0.1 inset;
-  --blur: 8px;
-  --blur-sm: 2px;
-  --blur-lg: 18px;
+  --glass-bg: rgba(0 0 0 0.8); /* Semi-transparent black for glass panels */
+  --glass-border: var(--border);
+  --glass-shadow: 0 8px 32px var(--secondary) / 0.4, 0 0 0 1px var(--primary) / 0.1 inset;
+  --glass-shadow-lg: 0 16px 48px var(--secondary) / 0.4, 0 0 0 1px var(--primary) / 0.1 inset;
+  --glass-shadow-sm: 0 4px 16px var(--secondary) / 0.4, 0 0 0 1px var(--primary) / 0.1 inset;
+  --blur: 18px;
+  --blur-sm: 10px;
+  --blur-lg: 26px;
 
   /* Page gradient background */
   --page-bg-from: var(--primary);
@@ -73,47 +75,11 @@
   --scrollbar-thumb-hover: oklch(0.35 0.08 280 / 0.7);
 }
 
-/* .dark mirrors :root — app is always dark. Kept for Radix/shadcn compatibility. */
-.dark {
-  --primary: oklch(0.42 0.22 280);
-  --secondary: oklch(0.22 0.16 325);
-  --primary-foreground: oklch(0.97 0.02 285);
-  --secondary-foreground: oklch(0.78 0.18 65);
-  --border: oklch(0.62 0.28 325);
-  --foreground: oklch(0.96 0.015 285);
-  --accent: oklch(0.78 0.18 65);
-  --accent-foreground: oklch(0.28 0.18 280);
-  --ring: oklch(0.75 0.18 195);
-  --destructive: oklch(0.6 0.22 20);
-  --destructive-foreground: oklch(0.97 0.02 195);
-  --success: oklch(0.65 0.25 145);
-  --background: oklch(0.11 0.04 280);
-  --card: var(--glass-bg);
-  --card-foreground: var(--foreground);
-  --popover: var(--glass-bg);
-  --popover-foreground: var(--foreground);
-  --muted: var(--primary-muted);
-  --muted-foreground: var(--primary-muted-foreground);
-  --input: oklch(0.2 0.06 280);
-  --glass-border: var(--border);
-  --sidebar-background: oklch(0.14 0.05 280);
-  --sidebar-foreground: oklch(0.88 0.02 285);
-  --sidebar-primary: oklch(0.42 0.22 280);
-  --sidebar-primary-foreground: oklch(0.97 0.02 285);
-  --sidebar-accent: oklch(0.78 0.18 65);
-  --sidebar-accent-foreground: oklch(0.28 0.18 280);
-  --sidebar-border: oklch(0.62 0.28 325);
-  --sidebar-ring: oklch(0.75 0.18 195);
-  --scrollbar-thumb: oklch(0.42 0.08 280 / 0.5);
-  --scrollbar-thumb-hover: oklch(0.35 0.08 280 / 0.7);
-}
-
 /* ============================================================
    TOKEN → TAILWIND BRIDGE (v4 @theme block)
    This is what generates bg-primary, text-foreground etc.
    ============================================================ */
 @theme inline {
-  --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
@@ -141,9 +107,9 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  --radius-sm: calc(var(--radius) - 3px);
-  --radius-md: calc(var(--radius) - 6px);
-  --radius-lg: calc(var(--radius) - 9px);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 10px);
+  --radius-lg: calc(var(--radius) - 18px);
 }
 
 /* ============================================================
@@ -156,7 +122,7 @@
   body {
     @apply bg-background text-foreground font-sans antialiased;
     font-family: 'Inter', sans-serif;
-    background: linear-gradient(135deg, var(--page-bg-from), var(--page-bg-via), var(--page-bg-to));
+    background: linear-gradient(135deg, var(--page-bg-from), var(--page-bg-via), var(--page-bg-to), var(--page-bg-via), var(--page-bg-from));
     min-height: 100vh;
   }
   .font-mono {
@@ -183,7 +149,7 @@
   }
 
   .cta-button-gradient {
-    background: linear-gradient(to right, var(--cta-gradient-from), var(--cta-gradient-to));
+    background: linear-gradient(to right, var(--cta-gradient-from), black, var(--cta-gradient-to));
   }
   .cta-button-gradient:hover {
     background: linear-gradient(
@@ -214,7 +180,7 @@
   }
 
   .text-gradient {
-    @apply bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-ring to-accent bg-clip-text text-transparent;
   }
 
   /* Color picker swatch styling */
@@ -223,11 +189,11 @@
     appearance: none;
     width: 2.5rem;
     height: 2.5rem;
-    border: none;
+    border: 1px;
     border-radius: var(--radius);
-    cursor: pointer;
-    padding: 0;
-    background: none;
+    cursor: crosshair;
+    padding: 1px;
+    background: var(--glass-bg);
   }
   input[type='color']::-webkit-color-swatch-wrapper {
     padding: 0;
@@ -246,7 +212,7 @@ html {
   scrollbar-color: var(--scrollbar-thumb) transparent;
 }
 html::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 html::-webkit-scrollbar-track {
   background: transparent;
@@ -265,7 +231,7 @@ html::-webkit-scrollbar-thumb:hover {
    ============================================================ */
 input:focus-visible,
 textarea:focus-visible {
-  outline: none !important;
+  outline: none;
   border-color: var(--ring) !important;
   box-shadow: 0 0 0 2px var(--ring) !important;
   z-index: 10;
@@ -312,7 +278,7 @@ textarea:focus-visible {
 
 .app {
   display: grid;
-  grid-template-columns: none;
-  grid-template-rows: none;
+  grid-template-columns: 1fr minmax(auto, 1200px) 1fr;
+  grid-template-rows: auto;
   gap: 2px;
 }

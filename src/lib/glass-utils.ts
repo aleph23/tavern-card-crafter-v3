@@ -9,7 +9,7 @@ export interface GlassCustomization {
    * Transparency/opacity for the background (0-1)
    * If provided, will override the alpha channel in color
    */
-  transparency?: number
+  transparency?:  number
 
   /**
    * Blur amount in pixels
@@ -27,7 +27,7 @@ export interface GlassCustomization {
    * Border/outline width in pixels
    * Default: 1px
    */
-  outlineWidth?: number | string
+  outlineWidth?: string
 
   /**
    * Shadow for the glass effect
@@ -58,7 +58,7 @@ export function getGlassStyles(customization?: GlassCustomization): React.CSSPro
 
   // Handle background color and transparency
   if (customization.color || customization.transparency !== undefined) {
-    let bgColor = customization.color || 'var(--glass-bg)'
+    let bgColor = customization.color || 'var(--primary-color)'
 
     // If transparency is provided, adjust the alpha channel
     if (customization.transparency !== undefined) {

@@ -6,20 +6,18 @@ import { Button } from '@/components/ui/glass/button'
 import { useToast } from '@/hooks/use-toast'
 import { Plus, X, Edit2, Check, Sparkles, Loader2, RefreshCcw, Trash2 } from 'lucide-react'
 import { generateWithAI, generateAlternateGreeting } from '@/utils/aiGenerator'
-import { Settings } from '@/types/settings'
+import { InferenceSettings } from '@/types/settings'
 import { useLanguage } from '@/contexts/LanguageContext'
-import { CharacterData } from './utils/aiGenerator.ts'
+import { UsedCharacterData } from '@/types/charactercard.ts'
 
 interface AlternateGreetingsProps {
   greetings: string[]
-  alternate_greetings: string[]
-  mes_example: CharacterData['mes_example']
-  group_only_greetings: string[]
-  updateField: (field: string, value: any) => void
-  aiSettings: Settings | null
+  updateField: (field: string, value: string | string[]) => void
+  aiSettings: InferenceSettings
+  charaData: UsedCharacterData
 }
 
-const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData }: AlternateGreetingsProps) => {
+const AlternateGreetings = ({ greetings, updateField, aiSettings, charaData }: AlternateGreetingsProps) => {
   const [newGreeting, setNewGreeting] = useState('')
   const [editingIndex, setEditingIndex] = useState<number | null>(null)
   const [editingText, setEditingText] = useState('')
@@ -77,10 +75,11 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
       return
     }
 
-    if (!characterData.name || !characterData.description) {
+    if (!charaData.name || !charaData.description) {
       toast({
         title: t('incompleteInfo') || 'Incomplete information',
-        description: t('fillNameDesc') || 'Please fill in the Card name and role description first',
+        description: t('fillNameDesc') || 'In order to create an appropriate greeting, the character must first have' +
+          ' a name and description.',
         variant: 'destructive',
       })
       return
@@ -90,7 +89,7 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
     setLoading(true)
 
     try {
-      const prompt = generateAlternateGreeting(characterData)
+      const prompt = generateAlternateGreeting(charaData)
       const result = await generateWithAI(aiSettings, prompt)
       updateField('alternate_greetings', [...greetings, result])
       toast({
@@ -145,7 +144,7 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, characterData 
             size='sm'
             variant={loading ? 'destructive' : 'outline'}
             onClick={loading ? cancelGeneration : handleAIGenerateGreeting}
-            disabled={!loading && (!characterData.name || !characterData.description)}
+            disabled={!loading && (!charaData.name || !charaData.description)}
             className='h-8 px-2 text-xs'
           >
             {loading ? (

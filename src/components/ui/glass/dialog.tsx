@@ -35,19 +35,14 @@ export interface DialogContentProps extends Omit<React.ComponentProps<typeof Bas
  * </DialogContent>
  * ```
  */
-export const DialogContent = React.forwardRef<React.ElementRef<typeof BaseDialogContent>, DialogContentProps>(
-   ({ className, variant = 'glass', animated = true, glass, children, ...props }, ref) => {
+export const DialogContent = React.forwardRef<React.ComponentRef<typeof BaseDialogContent>, DialogContentProps>(
+  ({ className, variant = 'glass', animated = true, glass, children, ...props }, ref) => {
     return (
       <BaseDialogContent
         ref={ref}
         variant={variant}
         glass={glass}
-        className={cn(
-          'relative overflow-hidden',
-          animated && 'backdrop-blur-[var(--blur-lg)]',
-          hoverEffects({ hover }),
-          className
-        )}
+        className={cn('relative', animated && 'backdrop-blur-[var(--blur-lg)]', className)}
         {...props}
       >
         {children}

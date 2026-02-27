@@ -1,10 +1,13 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/glass/button'
-import { Upload, User, FileText } from 'lucide-react'
+import { Upload } from 'lucide-react'
+import { UserIcon as User } from '@/components/ui/user'
+import { FileTextIcon as FileText } from '@/components/ui/file-text'
 import { BotMessageSquareIcon as Bot } from '@/components/ui/bot-message-square'
 import { useToast } from '@/hooks/use-toast'
 import { ScrollArea } from '@/components/ui/glass/scroll-area'
 import { useLanguage } from '@/contexts/LanguageContext'
+import { CharacterCardV3, CharacterCardV2, CharacterDataV3, CharacterBookEntry, Asset } from '@/types/charactercard'
 import ConfigEditor from '@/components/ConfigEditor'
 import { Settings as AISettingsType } from '@/types/settings'
 import { DEFAULT_SETTINGS } from '@/config/defaultSettings'
@@ -18,76 +21,9 @@ import TagsSection from '@/components/CharacterForm/TagsSection'
 import MetadataSection from '@/components/CharacterForm/MetadataSection'
 import CharacterPreview from '@/components/CharacterPreview'
 import AIAssistant from '@/components/CharacterForm/AIAssistant'
-import { CharacterData } from '../utils/aiGenerator'
 import { configManager } from '@/utils/configManager'
 
 type GenericField = string | string[] | CharacterBookEntry[] | Record<string, unknown> | Asset[] | boolean | number
-
-interface CharacterBookEntry {
-  keys: string[]
-  content: string
-  insertion_order: number
-  enabled: boolean
-}
-
-interface Asset {
-  type: string
-  uri: string
-  name: string
-  ext: string
-}
-
-interface CharacterCardV3 {
-  spec: string
-  spec_version: string
-  data: {
-    name: CharacterData['name']
-    nickname?: CharacterData['nickname']
-    description: CharacterData['description']
-    personality: CharacterData['personality']
-    first_mes: CharacterData['first_mes']
-    alternate_greetings: CharacterData['alternate_greetings']
-    tags: CharacterData['tags']
-    creator: string
-    character_version: string
-    creator_notes: string
-    mes_example: CharacterData['mes_example']
-    scenario: CharacterData['scenario']
-    system_prompt: CharacterData['system_prompt']
-    post_history_instructions: CharacterData['post_history_instructions']
-    character_book: { entries: CharacterBookEntry[] }
-    group_only_greetings: string[]
-    creation_date: string
-    modification_date: string
-    extensions: Record<string, string>
-    assets: Asset[]
-  }
-}
-
-interface CharacterCardV2 {
-  spec: string
-  spec_version: string
-  data: {
-    mes_example: string
-    scenario: string
-    first_mes: string
-    alternate_greetings: string[]
-    tags: string[]
-    creator: string
-    character_version: string
-    creator_notes: string
-    creator_notes_multilingual?: { [key: string]: string }
-    system_prompt: string
-    post_history_instructions: string
-    character_book?: { entries: CharacterBookEntry[] }
-    group_only_greetings: string[]
-    creation_date?: string
-    modification_date?: string
-    source?: string
-    extensions: Record<string, string[]>
-    assets: Asset[]
-  }
-}
 
 /**
  * Main component for managing AI character card functionality.
@@ -120,11 +56,12 @@ const Index = () => {
       creator: '',
       character_version: '',
       creator_notes: '',
+      creator_notes_multilingual: {},
       system_prompt: '',
       post_history_instructions: '',
       character_book: { entries: [] },
       group_only_greetings: [],
-      creation_date: today,
+      creation_date: '',
       modification_date: today,
       extensions: {},
       assets: [],
@@ -487,10 +424,10 @@ const Index = () => {
           group_only_greetings: getArrayField(src, 'group_only_greetings'),
           // Date logic: Prioritize existing date in data, then root, then create_date (V1/V2), then fallback to today ONLY if missing
           creation_date:
-            src.creation_date ||
-            root.creation_date ||
-            src.create_date ||
-            root.create_date ||
+            src.creation_date ??
+            root.creation_date ??
+            src.create_date ??
+            root.create_date ??
             new Date().toISOString().split('T')[0],
           modification_date: new Date().toISOString().split('T')[0],
           extensions: src.extensions || root.extensions || {},
@@ -523,12 +460,7 @@ const Index = () => {
           <h1 className='text-4xl font-bold text-gradient mb-4'>{t('pageTitle')}</h1>
           <p className='text-lg text-muted-foreground max-w-2xl mx-auto mb-4'>{t('pageDescription')}</p>
           <div className='flex justify-center gap-4'>
-            <input
-              type='file'
-              ref={fileInputRef}
-              onChange={handleFileImport}
-              accept='.json,.png'
-              className='hidden'
+            <input type='file' ref={fileInputRef} onChange={handleFileImport} accept='.json,.png' className='hidden'
               title={t('importCard')}
             />
             <Button onClick={() => fileInputRef.current?.click()} className='mb-4 cta-button-gradient'>
@@ -615,24 +547,18 @@ const Index = () => {
 
                       <PromptsSection data={characterData.data} updateField={updateField} aiSettings={aiSettings} />
 
-                      <AlternateGreetings
-                        greetings={
-                          Array.isArray(characterData.data.alternate_greetings)
-                            ? (characterData.data.alternate_greetings as string[])
+                      <AlternateGreetings  greetings={ Array.isArray(characterData.data.alternate_greetings)
+                            ? (characterData.data.alternate_greetings)
                             : typeof characterData.data.alternate_greetings === 'string'
-                              ? [characterData.data.alternate_greetings]
-                              : []
+                              ? [characterData.data.alternate_greetings] : []
                         }
-                        group_only_greetings={
-                          Array.isArray(characterData.data.group_only_greetings)
-                            ? (characterData.data.group_only_greetings as string[])
+                        group_only_greetings={ Array.isArray(characterData.data.group_only_greetings)
+                            ? (characterData.data.group_only_greetings)
                             : typeof characterData.data.group_only_greetings === 'string'
-                              ? [characterData.data.group_only_greetings]
-                              : []
+                              ? [characterData.data.group_only_greetings] : []
                         }
                         updateField={updateField}
                         aiSettings={aiSettings}
-                        characterData={characterData.data}
                       />
 
                       <CharacterBook

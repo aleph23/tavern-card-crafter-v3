@@ -223,7 +223,7 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
   /**
    * Calculates the total character count and token estimate from character data fields.
    *
-   * This function extracts various fields from the characterData object, including name, nickname,
+   * This function extracts various fields from the charaData object, including name, nickname,
    * description, and others. It iterates through these fields, checking if they are non-empty strings,
    * and accumulates their lengths for totalChars and estimates tokens using the estimateTokens function
    * for totalTokens. The results are returned as an object containing both totals.
