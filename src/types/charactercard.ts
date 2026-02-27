@@ -1,13 +1,22 @@
-// src/types/charactercard.ts
-
 /**
  * Character Book Entry (used in both V2 and V3)
  *
  * CRITICAL RULES:
  * 1. If content is empty/null, the entire entry is ignored
  * 2. If content exists, all boolean/structural fields become mandatory
- * 3. If constant === false (default), keys is required
+ * 3. If constant === false (default), 'keys' is required
  * 4. If constant === true, keys can be empty (entry always matches)
+ *
+ *  # **MOST CRITICAL RULE**
+ *  While we advise the user if they violate requirements, we do NOT enforce requirements at the type level, allowing for
+ *  maximum flexibility and user freedom. This means that while the types define the structure, they do not prevent
+ *  continued use of the software. Instead, if a check fails, we inform user how and in what way the checks failed,
+ *  but they are still free to save invalid files or wrongly populate fields, leave mandatory fields as null, etc.
+ *  We create a notification for the user with detailed information about what is wrong with the entry and in what way
+ *  the present input is in violation.
+ *  This allows for a flexible user experience while still providing guidance on best practice.  The user should be
+ *  free to capture their creativity as it arises without worrying about adhering to rigid code requirements.  We
+ *  ensure type correctness on the backend, turning a string to a string[] when necessary, for example.
  */
 export interface CharacterBookEntry {
   // Content - determines if entry is valid
@@ -42,7 +51,10 @@ export interface CharacterBookEntry {
  * Asset definition (used in both V2 and V3). These are most often, but not exclusively, embedded base64
  * image files. Intended for any character-defining multimedia (img, vid, vox sample, emote icons, etc).
  *
- * @param type - Asset category: image | video | audio | icon | background | emotion | user_icon
+ * @param type - indicates usage. Examples: avatar | background | emote | voice_sample | custom_role_icon | etc.
+ * This is a freeform string that can be used by different platforms to determine how to use the asset, though for
+ * obvious reasons a standard should be attempted whenever possible.  The type is not used by the core spec but can
+ * be used by platforms to determine how to utilize the asset.
  * @param uri  - The actual data or path: base64 data URL, HTTP(S) URL, embeded://path, or ccdefault:
  * @param name - Identifier for the asset (e.g., "main", "happy", "forest")
  * @param ext  - File extension without dot (e.g., "png", "mp4", "mp3", "unknown")
@@ -93,9 +105,9 @@ export interface CharacterDataV2 extends BaseCharacterData {
   post_history_instructions: string
   character_book?: CharacterBook
   group_only_greetings: string[]
-  creation_date?: string
-  modification_date?: string
-  source?: string
+  creation_date?: string                // This should be a string-representation of unix seconds.
+  modification_date?: string            // This should be a string-representation of unix seconds.
+  source?: string | string[]
   extensions: Record<string, unknown>
   assets: Asset[]
 }
@@ -156,9 +168,9 @@ export interface UsedCharacterData {
   creator: string
   character_version: string
   creator_notes: string
-  creation_date?: string
-  modification_date?: string
-  source?: string | string[]  // 'Home' for this card. Typically a public URL.
+  creation_date?: string                // This should be a string-representation of unix seconds.
+  modification_date?: string            // This should be a string-representation of unix seconds.
+  source?: string  // 'Home' for this card. Typically a public URL.
 
   // Future features (commented out until implemented)
   // group_only_greetings: string[]  // Not yet functional. Will be.
