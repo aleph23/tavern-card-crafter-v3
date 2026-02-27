@@ -562,7 +562,7 @@ const Index = () => {
                             ? [characterData.data.group_only_greetings]
                             : []
                         }
-                        characterData={characterData.data}
+                        charaData={characterData.data}
                         updateField={updateField}
                         aiSettings={aiSettings}
                       />
