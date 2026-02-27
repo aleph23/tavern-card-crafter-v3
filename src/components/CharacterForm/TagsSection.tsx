@@ -1,21 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useState, useRef } from 'react'
-import { Label } from '@/components/ui/glass/label'
 import { Input } from '@/components/ui/glass/input'
 import { Button } from '@/components/ui/glass/button'
 import { Badge } from '@/components/ui/glass/badge'
-import { X, Plus, Sparkles, Loader2, RefreshCcw, Trash2 } from 'lucide-react'
+import { X, Plus, Sparkles, RefreshCcw, Trash2 } from 'lucide-react'
 import { generateWithAI, generateTags } from '@/utils/aiGenerator'
 import { Settings } from '@/types/settings'
 import { useToast } from '@/hooks/use-toast'
 import { useLanguage } from '@/contexts/LanguageContext'
+import { CharacterDataV3, UsedCharacterData } from '@/types/charactercard'
 
 interface TagsSectionProps {
   tags: string[]
   updateField: (field: string, value: any) => void
   aiSettings: Settings | null
-  characterData: any
+  characterData: CharacterDataV3
 }
 
 const TagsSection = ({ tags, updateField, aiSettings, characterData }: TagsSectionProps) => {
@@ -81,7 +81,7 @@ const TagsSection = ({ tags, updateField, aiSettings, characterData }: TagsSecti
     setLoading(true)
 
     try {
-      const prompt = generateTags(characterData)
+      const prompt = generateTags(characterData as unknown as UsedCharacterData)
       const result = await generateWithAI(aiSettings, prompt)
 
       // Parses tag strings returned by AI

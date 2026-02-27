@@ -186,7 +186,7 @@ export const generateWithAI = async (settings: Settings, prompt: string): Promis
 /**
  * Generates a character description based on provided data.
  */
-export const generateDescription = (data: CharacterData): string => {
+export const generateDescription = (data: UsedCharacterData): string => {
   const existingDescription = data.description.trim()
 
   if (existingDescription) {
@@ -201,7 +201,7 @@ export const generateDescription = (data: CharacterData): string => {
 /**
  * Generates a personality description based on character data.
  */
-export const generatePersonality = (data: CharacterData): string => {
+export const generatePersonality = (data: UsedCharacterData): string => {
   const template = promptManager.getPrompt('personality')
   return promptManager.interpolatePrompt(template, data)
 }
@@ -209,12 +209,12 @@ export const generatePersonality = (data: CharacterData): string => {
 /**
  * Generates a meta-scenario based on character data.
  */
-export const generateScenario = (data: CharacterData): string => {
+export const generateScenario = (data: UsedCharacterData): string => {
   const template = promptManager.getPrompt('scenario')
   return promptManager.interpolatePrompt(template, data)
 }
 
-export const generateFirstMes = (data: CharacterData): string => {
+export const generateFirstMes = (data: UsedCharacterData): string => {
   const template = promptManager.getPrompt('firstMessage')
   return promptManager.interpolatePrompt(template, data)
 }
@@ -222,7 +222,7 @@ export const generateFirstMes = (data: CharacterData): string => {
 /**
  * Generates a conversational example based on character data.
  */
-export const generateMesExample = (data: CharacterData): string => {
+export const generateMesExample = (data: UsedCharacterData): string => {
   const template = promptManager.getPrompt('messageExample')
   // Pass {{user}} as user_placeholder if needed, but since we rely on unknown keys staying as placeholders,
   // and {{user}} is in the template as {{user}}, and data probably doesn't have "user" key, it should be fine.
@@ -233,7 +233,7 @@ export const generateMesExample = (data: CharacterData): string => {
 /**
  * Generates a system prompt based on character data.
  */
-export const generateSystemPrompt = (data: CharacterData): string => {
+export const generateSystemPrompt = (data: UsedCharacterData): string => {
   const template = promptManager.getPrompt('systemPrompt')
   return promptManager.interpolatePrompt(template, data)
 }
@@ -241,12 +241,12 @@ export const generateSystemPrompt = (data: CharacterData): string => {
 /**
  * Generates brief instructions for the AI based on character data.
  */
-export const generatePostHistoryInstructions = (data: CharacterData): string => {
+export const generatePostHistoryInstructions = (data: UsedCharacterData): string => {
   const template = promptManager.getPrompt('postHistoryInstructions')
   return promptManager.interpolatePrompt(template, data)
 }
 
-export const generateTags = (data: CharacterData): string => {
+export const generateTags = (data: UsedCharacterData): string => {
   const template = promptManager.getPrompt('tags')
   return promptManager.interpolatePrompt(template, data)
 }
@@ -254,7 +254,7 @@ export const generateTags = (data: CharacterData): string => {
 /**
  * Generates an alternate greeting based on character data.
  */
-export const generateAlternateGreeting = (data: string[]): string => {
+export const generateAlternateGreeting = (data: UsedCharacterData): string => {
   const template = promptManager.getPrompt('alternateGreeting')
   return promptManager.interpolatePrompt(template, data)
 }
@@ -262,7 +262,7 @@ export const generateAlternateGreeting = (data: string[]): string => {
 /**
  * Generates a character book entry based on character data and optional context.
  */
-export const generateCharacterBookEntry = (data: CharacterData): string => {
+export const generateCharacterBookEntry = (data: UsedCharacterData): string => {
   const template = promptManager.getPrompt('characterBookEntry')
   return promptManager.interpolatePrompt(template, data)
 }

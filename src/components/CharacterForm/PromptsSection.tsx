@@ -6,9 +6,10 @@ import { Sparkles, Loader2, RefreshCcw, Trash2, X } from 'lucide-react'
 import { generateWithAI, generateSystemPrompt, generatePostHistoryInstructions } from '@/utils/aiGenerator'
 import { Settings } from '@/types/settings'
 import { useToast } from '@/hooks/use-toast'
+import { CharacterDataV3, UsedCharacterData } from '@/types/charactercard'
 
 interface PromptsSectionProps {
-  data: any
+  data: CharacterDataV3
   updateField: (field: string, value: any) => void
   aiSettings: Settings | null
 }
@@ -38,7 +39,7 @@ const PromptsSection = ({ data, updateField, aiSettings }: PromptsSectionProps) 
    * @param field - The field for which AI generation is to be handled.
    * @param promptGenerator - A function that generates a prompt string based on the provided data.
    */
-  const handleAIGenerate = async (field: string, promptGenerator: (data: any) => string) => {
+  const handleAIGenerate = async (field: string, promptGenerator: (data: UsedCharacterData) => string) => {
     if (!aiSettings?.apiKey && !['ollama', 'lmstudio'].includes(aiSettings?.provider?.toLowerCase() || '')) {
       toast({
         title: 'Configuration error',
@@ -61,7 +62,7 @@ const PromptsSection = ({ data, updateField, aiSettings }: PromptsSectionProps) 
     setLoading((prev) => ({ ...prev, [field]: true }))
 
     try {
-      const prompt = promptGenerator(data)
+      const prompt = promptGenerator(data as unknown as UsedCharacterData)
       const result = await generateWithAI(aiSettings, prompt)
       updateField(field, result)
       toast({ title: 'Generate successfully', description: `${field} Generated completed` })
@@ -109,7 +110,7 @@ const PromptsSection = ({ data, updateField, aiSettings }: PromptsSectionProps) 
    * @param {string} field - The identifier for the field being rendered.
    * @param {(data: any) => string} promptGenerator - A function that generates a prompt based on the provided data.
    */
-  const renderFieldButtons = (field: string, promptGenerator: (data: any) => string) => {
+  const renderFieldButtons = (field: string, promptGenerator: (data: UsedCharacterData) => string) => {
     const isLoading = loading[field]
     const canGenerate = data.name && data.description && data.personality
 

@@ -3,9 +3,10 @@
 import { Label } from '@/components/ui/glass/label'
 import { Input } from '@/components/ui/glass/input'
 import { Textarea } from '@/components/ui/glass/textarea'
+import { CharacterDataV3 } from '@/types/charactercard'
 
 interface MetadataSectionProps {
-  data: any
+  data: CharacterDataV3
   updateField: (field: string, value: any) => void
 }
 
@@ -52,8 +53,10 @@ const MetadataSection = ({ data, updateField }: MetadataSectionProps) => {
         </Label>
         <Input
           id='source'
-          value={data.source || ''}
-          onChange={(e) => updateField('source', e.target.value)}
+          value={Array.isArray(data.source) ? data.source.join(', ') : (data.source || '')}
+          onChange={(e) => {
+             updateField('source', e.target.value.split(',').map(s => s.trim()))
+          }}
           placeholder='Enter the source link...'
           className='mt-1 w-full max-w-none'
         />

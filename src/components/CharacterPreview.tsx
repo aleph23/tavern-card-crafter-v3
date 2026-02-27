@@ -7,9 +7,10 @@ import { Copy, Download, ImageIcon } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { estimateTokens } from '@/utils/aiGenerator'
+import { CharacterCardV3 } from '@/types/charactercard'
 
 interface CharacterPreviewProps {
-  characterData: any
+  characterData: CharacterCardV3
   characterImage: string | null
 }
 
@@ -246,7 +247,7 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
       data.post_history_instructions,
       ...(data.alternate_greetings || []),
       ...(data.tags || []).join(', '),
-      ...(data.character_book?.entries || []).map((entry: any) => entry.content).join(' '),
+      ...(data.character_book?.entries || []).map((entry) => entry.content).join(' '),
     ]
 
     fields.forEach((field) => {

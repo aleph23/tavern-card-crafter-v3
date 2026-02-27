@@ -9,9 +9,10 @@ import { useRef, useState, memo } from 'react'
 import { generateWithAI, generateDescription } from '@/utils/aiGenerator'
 import { Settings } from '@/types/settings'
 import { useToast } from '@/hooks/use-toast'
+import { CharacterDataV3, UsedCharacterData } from '@/types/charactercard'
 
 interface BasicInfoSectionProps {
-  data: any
+  data: CharacterDataV3
   updateField: (field: string, value: any) => void
   characterImage: string | null
   setCharacterImage: (image: string | null) => void
@@ -103,7 +104,8 @@ const BasicInfoSection = ({
     setLoading(true)
 
     try {
-      const prompt = generateDescription(data)
+      // Cast data to UsedCharacterData. Safe because CharacterDataV3 is compatible.
+      const prompt = generateDescription(data as unknown as UsedCharacterData)
       const result = await generateWithAI(aiSettings, prompt)
       updateField('description', result)
       toast({ title: 'Generate successfully', description: 'Role description has been generated' })

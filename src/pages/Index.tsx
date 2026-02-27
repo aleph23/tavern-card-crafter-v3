@@ -547,16 +547,22 @@ const Index = () => {
 
                       <PromptsSection data={characterData.data} updateField={updateField} aiSettings={aiSettings} />
 
-                      <AlternateGreetings  greetings={ Array.isArray(characterData.data.alternate_greetings)
-                            ? (characterData.data.alternate_greetings)
+                      <AlternateGreetings
+                        greetings={
+                          Array.isArray(characterData.data.alternate_greetings)
+                            ? characterData.data.alternate_greetings
                             : typeof characterData.data.alternate_greetings === 'string'
-                              ? [characterData.data.alternate_greetings] : []
+                            ? [characterData.data.alternate_greetings]
+                            : []
                         }
-                        group_only_greetings={ Array.isArray(characterData.data.group_only_greetings)
-                            ? (characterData.data.group_only_greetings)
+                        group_only_greetings={
+                          Array.isArray(characterData.data.group_only_greetings)
+                            ? characterData.data.group_only_greetings
                             : typeof characterData.data.group_only_greetings === 'string'
-                              ? [characterData.data.group_only_greetings] : []
+                            ? [characterData.data.group_only_greetings]
+                            : []
                         }
+                        characterData={characterData.data}
                         updateField={updateField}
                         aiSettings={aiSettings}
                       />

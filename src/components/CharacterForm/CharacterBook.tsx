@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useRef } from 'react'
 import { Label } from '@/components/ui/glass/label'
 import { Input } from '@/components/ui/glass/input'
@@ -7,19 +8,13 @@ import { Plus, X, Sparkles, Loader2, RefreshCcw, Trash2 } from 'lucide-react'
 import { generateWithAI, generateCharacterBookEntry } from '@/utils/aiGenerator'
 import { Settings } from '@/types/settings'
 import { useToast } from '@/hooks/use-toast'
-
-interface CharacterBookEntry {
-  keys: string[]
-  content: string
-  insertion_order: number
-  enabled: boolean
-}
+import { CharacterBookEntry, CharacterDataV3, UsedCharacterData, createCharacterBookEntry } from '@/types/charactercard'
 
 interface CharacterBookProps {
   entries: CharacterBookEntry[]
   updateField: (field: string, value: any) => void
   aiSettings: Settings | null
-  characterData: any
+  characterData: CharacterDataV3
 }
 
 const CharacterBook = ({ entries, updateField, aiSettings, characterData }: CharacterBookProps) => {
@@ -38,7 +33,13 @@ const CharacterBook = ({ entries, updateField, aiSettings, characterData }: Char
         .split(',')
         .map((k) => k.trim())
         .filter((k) => k)
-      const entry: CharacterBookEntry = { keys, content: newEntryContent.trim(), insertion_order: 100, enabled: true }
+
+      const entry = createCharacterBookEntry({
+        keys,
+        content: newEntryContent.trim(),
+        insertion_order: 100,
+        enabled: true
+      })
 
       updateField('character_book', { entries: [...entries, entry] })
 
@@ -77,7 +78,7 @@ const CharacterBook = ({ entries, updateField, aiSettings, characterData }: Char
     setLoading(true)
 
     try {
-      const prompt = generateCharacterBookEntry(characterData)
+      const prompt = generateCharacterBookEntry(characterData as unknown as UsedCharacterData)
       const result = await generateWithAI(aiSettings, prompt)
 
       // Analyze the content returned by AI and try to extract keywords and content
@@ -112,7 +113,12 @@ const CharacterBook = ({ entries, updateField, aiSettings, characterData }: Char
         keys = [characterData.name]
       }
 
-      const entry: CharacterBookEntry = { keys, content: content.trim(), insertion_order: 100, enabled: true }
+      const entry = createCharacterBookEntry({
+        keys,
+        content: content.trim(),
+        insertion_order: 100,
+        enabled: true
+      })
 
       updateField('character_book', { entries: [...entries, entry] })
 
