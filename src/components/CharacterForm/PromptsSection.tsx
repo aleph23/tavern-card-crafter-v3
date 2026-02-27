@@ -4,13 +4,14 @@ import { Textarea } from '@/components/ui/glass/textarea'
 import { Button } from '@/components/ui/glass/button'
 import { Sparkles, Loader2, RefreshCcw, Trash2, X } from 'lucide-react'
 import { generateWithAI, generateSystemPrompt, generatePostHistoryInstructions } from '@/utils/aiGenerator'
-import { Settings } from '@/types/settings'
+import { InferenceSettings } from '@/types/settings'
 import { useToast } from '@/hooks/use-toast'
+import { UsedCharacterData } from '@/types/charactercard'
 
 interface PromptsSectionProps {
-  data: any
-  updateField: (field: string, value: any) => void
-  aiSettings: Settings | null
+  data: UsedCharacterData
+  updateField: (field: string, value: string) => void
+  aiSettings: InferenceSettings | null
 }
 
 /**
@@ -38,8 +39,11 @@ const PromptsSection = ({ data, updateField, aiSettings }: PromptsSectionProps) 
    * @param field - The field for which AI generation is to be handled.
    * @param promptGenerator - A function that generates a prompt string based on the provided data.
    */
-  const handleAIGenerate = async (field: string, promptGenerator: (data: any) => string) => {
-    if (!aiSettings?.apiKey && !['ollama', 'lmstudio'].includes(aiSettings?.provider?.toLowerCase() || '')) {
+  const handleAIGenerate = async (field: string, promptGenerator: (data: UsedCharacterData) => string) => {
+    if (
+      !aiSettings?.endpoint?.apiKey &&
+      !['ollama', 'lmstudio'].includes(aiSettings?.endpoint?.provider?.toLowerCase() || '')
+    ) {
       toast({
         title: 'Configuration error',
         description: 'Please configure the API key in the AI settings first',

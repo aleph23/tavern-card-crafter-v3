@@ -7,15 +7,16 @@ import { Button } from '@/components/ui/glass/button'
 import { Badge } from '@/components/ui/glass/badge'
 import { X, Plus, Sparkles, Loader2, RefreshCcw, Trash2 } from 'lucide-react'
 import { generateWithAI, generateTags } from '@/utils/aiGenerator'
-import { Settings } from '@/types/settings'
+import { InferenceSettings } from '@/types/settings'
 import { useToast } from '@/hooks/use-toast'
 import { useLanguage } from '@/contexts/LanguageContext'
+import { UsedCharacterData } from '@/types/charactercard'
 
 interface TagsSectionProps {
   tags: string[]
   updateField: (field: string, value: any) => void
-  aiSettings: Settings | null
-  characterData: any
+  aiSettings: InferenceSettings | null
+  characterData: UsedCharacterData
 }
 
 const TagsSection = ({ tags, updateField, aiSettings, characterData }: TagsSectionProps) => {
@@ -58,8 +59,11 @@ const TagsSection = ({ tags, updateField, aiSettings, characterData }: TagsSecti
    *
    * @returns {Promise<void>} A promise that resolves when the tag generation process is complete.
    */
-  const handleAIGenerateTags = async () => {
-    if (!aiSettings?.apiKey && !['ollama', 'lmstudio'].includes(aiSettings?.provider?.toLowerCase() || '')) {
+  const handleAIGenerate = async () => {
+    if (
+      !aiSettings?.endpoint?.apiKey &&
+      !['ollama', 'lmstudio'].includes(aiSettings?.endpoint?.provider?.toLowerCase() || '')
+    ) {
       toast({
         title: t('configError') || 'Configuration error',
         description: t('configApiKey') || 'Please configure the API key in the AI settings first',
@@ -138,7 +142,7 @@ const TagsSection = ({ tags, updateField, aiSettings, characterData }: TagsSecti
         <h3 className='text-lg font-semibold text-foreground'>{t('tags')}</h3>
         <div className='flex gap-1'>
           {!loading && (
-            <Button size='sm' variant='outline' onClick={handleAIGenerateTags} className='h-8 px-2 text-xs'>
+            <Button size='sm' variant='outline' onClick={handleAIGenerate} className='h-8 px-2 text-xs'>
               <RefreshCcw className='w-3 h-3 mr-1' />
               Regenerate
             </Button>
@@ -146,7 +150,7 @@ const TagsSection = ({ tags, updateField, aiSettings, characterData }: TagsSecti
           <Button
             size='sm'
             variant={loading ? 'destructive' : 'outline'}
-            onClick={loading ? cancelGeneration : handleAIGenerateTags}
+            onClick={loading ? cancelGeneration : handleAIGenerate}
             disabled={!loading && (!characterData.name || !characterData.description)}
             className='h-8 px-2 text-xs'
           >

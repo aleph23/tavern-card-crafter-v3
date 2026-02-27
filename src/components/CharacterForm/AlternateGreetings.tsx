@@ -4,16 +4,16 @@ import { Label } from '@/components/ui/glass/label'
 import { Textarea } from '@/components/ui/glass/textarea'
 import { Button } from '@/components/ui/glass/button'
 import { useToast } from '@/hooks/use-toast'
-import { Plus, X, Edit2, Check, Sparkles, Loader2, RefreshCcw, Trash2 } from 'lucide-react'
+import { Plus, X, Edit2, Check, RefreshCcw, Trash2, Wand, Sparkles } from 'lucide-react'
 import { generateWithAI, generateAlternateGreeting } from '@/utils/aiGenerator'
 import { InferenceSettings } from '@/types/settings'
 import { useLanguage } from '@/contexts/LanguageContext'
-import { UsedCharacterData, CharacterDataV3 } from '@/types/charactercard.ts'
+import { UsedCharacterData } from '@/types/charactercard.ts'
 
 interface AlternateGreetingsProps {
   greetings: string[]
-  updateField: (field: string, value: string | string[]) => void
-  aiSettings: InferenceSettings
+  updateField: (field: string, value: any) => void
+  aiSettings: InferenceSettings | null
   charaData: UsedCharacterData
 }
 
@@ -66,7 +66,10 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, charaData }: A
   }
 
   const handleAIGenerateGreeting = async () => {
-    if (!aiSettings?.apiKey && !['ollama', 'lmstudio'].includes(aiSettings?.provider?.toLowerCase() || '')) {
+    if (
+      !aiSettings?.endpoint?.apiKey &&
+      !['ollama', 'lmstudio'].includes(aiSettings?.endpoint?.provider?.toLowerCase() || '')
+    ) {
       toast({
         title: t('configError') || 'Configuration error',
         description: t('configApiKey') || 'Please configure the API key in the AI settings first',
@@ -78,8 +81,9 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, charaData }: A
     if (!charaData.name || !charaData.description) {
       toast({
         title: t('incompleteInfo') || 'Incomplete information',
-        description: t('fillNameDesc') || 'In order to create an appropriate greeting, the character must first have' +
-          ' a name and description.',
+        description:
+          t('fillNameDesc') ||
+          'In order to create an appropriate greeting, the character must first have' + ' a name and description.',
         variant: 'destructive',
       })
       return

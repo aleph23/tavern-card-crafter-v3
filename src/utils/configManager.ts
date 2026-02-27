@@ -1,4 +1,4 @@
-import { AppConfig, Endpoint, InferenceSettings, Settings } from '@/types/settings'
+import { AppConfig, Endpoint, InferenceSettings } from '@/types/settings'
 import { DEFAULT_APP_CONFIG, DEFAULT_SETTINGS } from '@/config/defaultSettings'
 
 const defaultConfig: AppConfig = DEFAULT_APP_CONFIG()
@@ -86,25 +86,17 @@ class ConfigManager {
     return this.config.endpoints.find((e) => e.id === this.config.activeChatEndpointId)
   }
 
-  // Helper to convert internal config to the Settings format expected by components
-  getActiveAISettings(): Settings {
+  // Helper to convert internal config to the format expected by components
+  getActiveAISettings(): InferenceSettings {
     const activeEndpoint = this.getActiveChatEndpoint()
     const { inferenceSettings } = this.config
 
     if (!activeEndpoint) {
       // Return configured defaults if no active endpoint found
-      return {
-        apiKey: DEFAULT_SETTINGS.apiKey,
-        apiUrl: DEFAULT_SETTINGS.apiUrl,
-        model: DEFAULT_SETTINGS.model,
-        provider: DEFAULT_SETTINGS.provider,
-        inferenceSettings,
-      }
+      return { ...DEFAULT_SETTINGS }
     }
 
-    const { apiKey, apiUrl, model, provider } = activeEndpoint
-
-    return { apiKey, apiUrl, model, provider, inferenceSettings }
+    return { ...inferenceSettings, endpoint: activeEndpoint }
   }
 }
 

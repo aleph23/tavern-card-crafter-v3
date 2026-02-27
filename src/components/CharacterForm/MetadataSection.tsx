@@ -3,9 +3,10 @@
 import { Label } from '@/components/ui/glass/label'
 import { Input } from '@/components/ui/glass/input'
 import { Textarea } from '@/components/ui/glass/textarea'
+import { UsedCharacterData } from '@/types/charactercard'
 
 interface MetadataSectionProps {
-  data: any
+  data: UsedCharacterData
   updateField: (field: string, value: any) => void
 }
 

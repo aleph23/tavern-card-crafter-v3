@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { Label } from '@/components/ui/glass/label'
 import { Input } from '@/components/ui/glass/input'
 import { Textarea } from '@/components/ui/glass/textarea'
@@ -7,15 +5,16 @@ import { Button } from '@/components/ui/glass/button'
 import { Upload, X, Sparkles, Loader2, RefreshCcw, Trash2 } from 'lucide-react'
 import { useRef, useState, memo } from 'react'
 import { generateWithAI, generateDescription } from '@/utils/aiGenerator'
-import { Settings } from '@/types/settings'
+import { InferenceSettings } from '@/types/settings'
 import { useToast } from '@/hooks/use-toast'
+import { UsedCharacterData } from '@/types/charactercard'
 
 interface BasicInfoSectionProps {
-  data: any
-  updateField: (field: string, value: any) => void
+  data: UsedCharacterData
+  updateField: (field: string, value: string) => void
   characterImage: string | null
   setCharacterImage: (image: string | null) => void
-  aiSettings: Settings | null
+  aiSettings: InferenceSettings | null
 }
 
 /**
@@ -81,7 +80,10 @@ const BasicInfoSection = ({
    * @throws {Error} If the generation fails or is canceled.
    */
   const handleAIGenerateDescription = async () => {
-    if (!aiSettings?.apiKey && !['ollama', 'lmstudio'].includes(aiSettings?.provider?.toLowerCase() || '')) {
+    if (
+      !aiSettings?.endpoint?.apiKey &&
+      !['ollama', 'lmstudio'].includes(aiSettings?.endpoint?.provider?.toLowerCase() || '')
+    ) {
       toast({
         title: 'Configuration error',
         description: 'Please configure the API key in the AI settings first',

@@ -12,13 +12,14 @@ import {
   generateFirstMes,
   generateMesExample,
 } from '@/utils/aiGenerator'
-import { Settings } from '@/types/settings'
+import { InferenceSettings } from '@/types/settings'
 import { useToast } from '@/hooks/use-toast'
+import { UsedCharacterData } from '@/types/charactercard'
 
 interface PersonalitySectionProps {
-  data: any
+  data: UsedCharacterData
   updateField: (field: string, value: any) => void
-  aiSettings: Settings | null
+  infSettings: InferenceSettings | null
 }
 
 /**
@@ -29,15 +30,18 @@ interface PersonalitySectionProps {
  * @param {Object} props - The properties for the PersonalitySection component.
  * @param {Object} props.data - The current data for the personality section.
  * @param {Function} props.updateField - Function to update a specific field in the data.
- * @param {Object} props.aiSettings - Configuration settings for AI generation.
+ * @param {Object} props.infSettings - Configuration settings for AI generation.
  */
-const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectionProps) => {
+const PersonalitySection = ({ data, updateField, infSettings }: PersonalitySectionProps) => {
   const [loading, setLoading] = useState<{ [key: string]: boolean }>({})
   const abortControllerRefs = useRef<{ [key: string]: AbortController | null }>({})
   const { toast } = useToast()
 
   const handleAIGenerate = async (field: string, promptGenerator: (data: any) => string) => {
-    if (!aiSettings?.apiKey && !['ollama', 'lmstudio'].includes(aiSettings?.provider?.toLowerCase() || '')) {
+    if (
+      !infSettings?.endpoint?.apiKey &&
+      !['ollama', 'lmstudio'].includes(infSettings?.endpoint?.provider?.toLowerCase() || '')
+    ) {
       toast({
         title: 'Configuration error',
         description: 'Please configure the API key in the AI settings first',
@@ -60,7 +64,7 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
 
     try {
       const prompt = promptGenerator(data)
-      const result = await generateWithAI(aiSettings, prompt)
+      const result = await generateWithAI(infSettings, prompt)
       updateField(field, result)
       toast({ title: 'Generate successfully', description: `${field} Generated completed` })
     } catch (error) {
@@ -132,7 +136,7 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
           variant={isLoading ? 'destructive' : 'outline'}
           onClick={isLoading ? () => cancelGeneration(field) : () => handleAIGenerate(field, promptGenerator)}
           disabled={!isLoading && !canGenerate}
-          className='h-8 px-2 text-xs'
+          className='px-2 text-xs'
         >
           {isLoading ? (
             <>
@@ -237,7 +241,7 @@ export default memo(PersonalitySection, (prevProps, nextProps) => {
     prevProps.data.scenario === nextProps.data.scenario &&
     prevProps.data.first_mes === nextProps.data.first_mes &&
     prevProps.data.mes_example === nextProps.data.mes_example &&
-    prevProps.aiSettings === nextProps.aiSettings &&
+    prevProps.infSettings === nextProps.infSettings &&
     prevProps.updateField === nextProps.updateField
   )
 })

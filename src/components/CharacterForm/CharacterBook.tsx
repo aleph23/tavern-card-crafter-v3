@@ -5,21 +5,15 @@ import { Textarea } from '@/components/ui/glass/textarea'
 import { Button } from '@/components/ui/glass/button'
 import { Plus, X, Sparkles, Loader2, RefreshCcw, Trash2 } from 'lucide-react'
 import { generateWithAI, generateCharacterBookEntry } from '@/utils/aiGenerator'
-import { Settings } from '@/types/settings'
+import { InferenceSettings } from '@/types/settings'
 import { useToast } from '@/hooks/use-toast'
-
-interface CharacterBookEntry {
-  keys: string[]
-  content: string
-  insertion_order: number
-  enabled: boolean
-}
+import { CharacterBookEntry, UsedCharacterData, createCharacterBookEntry } from '@/types/charactercard'
 
 interface CharacterBookProps {
   entries: CharacterBookEntry[]
   updateField: (field: string, value: any) => void
-  aiSettings: Settings | null
-  characterData: any
+  aiSettings: InferenceSettings | null
+  characterData: UsedCharacterData
 }
 
 const CharacterBook = ({ entries, updateField, aiSettings, characterData }: CharacterBookProps) => {
@@ -34,11 +28,13 @@ const CharacterBook = ({ entries, updateField, aiSettings, characterData }: Char
    */
   const addBookEntry = () => {
     if (newEntryKeys.trim() && newEntryContent.trim()) {
-      const keys = newEntryKeys
-        .split(',')
-        .map((k) => k.trim())
-        .filter((k) => k)
-      const entry: CharacterBookEntry = { keys, content: newEntryContent.trim(), insertion_order: 100, enabled: true }
+      const keys = newEntryKeys.split(',').map((k) => k.trim())
+      const entry = createCharacterBookEntry({
+        keys,
+        content: newEntryContent.trim(),
+        insertion_order: 100,
+        enabled: true,
+      })
 
       updateField('character_book', { entries: [...entries, entry] })
 
@@ -55,7 +51,10 @@ const CharacterBook = ({ entries, updateField, aiSettings, characterData }: Char
   }
 
   const handleAIGenerateEntry = async () => {
-    if (!aiSettings?.apiKey && !['ollama', 'lmstudio'].includes(aiSettings?.provider?.toLowerCase() || '')) {
+    if (
+      !aiSettings?.endpoint?.apiKey &&
+      !['ollama', 'lmstudio'].includes(aiSettings?.endpoint?.provider?.toLowerCase() || '')
+    ) {
       toast({
         title: 'Configuration error',
         description: 'Please configure the API key in the AI settings first',
@@ -112,7 +111,7 @@ const CharacterBook = ({ entries, updateField, aiSettings, characterData }: Char
         keys = [characterData.name]
       }
 
-      const entry: CharacterBookEntry = { keys, content: content.trim(), insertion_order: 100, enabled: true }
+      const entry = createCharacterBookEntry({ keys, content: content.trim(), insertion_order: 100, enabled: true })
 
       updateField('character_book', { entries: [...entries, entry] })
 

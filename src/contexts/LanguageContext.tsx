@@ -101,8 +101,8 @@ const translations = {
   },
   en: {
     // Page titles
-    pageTitle: 'SillyTavern Character Card V3 Generator',
-    pageDescription: 'Create professional SillyTavern V3 format character cards with V1/V2/V3 import/export support',
+    pageTitle: 'CharaCard Creator',
+    pageDescription: 'Create SillyTavern V3 format character cards with V1/V2/V3 import support',
 
     // Buttons
     importCard: 'Import Card',
@@ -114,7 +114,7 @@ const translations = {
     cancel: 'Cancel',
 
     // Form titles
-    characterInfo: 'Character Information Editor',
+    characterInfo: 'Character Editor',
     basicInfo: 'Basic Information',
     personality: 'Personality',
     prompts: 'Prompts',
@@ -124,25 +124,25 @@ const translations = {
     metadata: 'Metadata',
 
     // Field labels
-    name: 'Card Name',
-    nickname: 'Character name',
-    description: 'Character Description',
+    name: 'Character Name',
+    nickname: 'Characters first name',
+    description: 'Character Physical Description',
     personalityDescription: 'Personality',
     scenario: 'Scenario',
     first_mes: 'First Message',
-    mes_example: 'Message Example',
-    creatorNotes: 'Creator Notes',
+    mes_example: 'Example of communication style',
+    creatorNotes: 'Your Notes',
     systemPrompt: 'System Prompt',
     postHistoryInstructions: 'Post History Instructions',
-    creator: 'Creator',
+    creator: 'You',
     characterVersion: 'Character Version',
 
     // Preview
     jsonPreview: 'JSON Preview',
     totalChars: 'Total Characters',
-    totalTokens: 'Total Tokens',
+    totalTokens: 'Token Estimate',
     chars: 'Characters',
-    tokens: 'Tokens',
+    tokens: '~Tokens',
 
     // Messages
     importSuccess: 'Import Successful',

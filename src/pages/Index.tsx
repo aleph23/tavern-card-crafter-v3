@@ -7,9 +7,16 @@ import { BotMessageSquareIcon as Bot } from '@/components/ui/bot-message-square'
 import { useToast } from '@/hooks/use-toast'
 import { ScrollArea } from '@/components/ui/glass/scroll-area'
 import { useLanguage } from '@/contexts/LanguageContext'
-import { CharacterCardV3, CharacterCardV2, CharacterDataV3, CharacterBookEntry, Asset } from '@/types/charactercard'
+import {
+  CharacterCardV3,
+  CharacterCardV2,
+  CharacterDataV3,
+  CharacterBookEntry,
+  Asset,
+  UsedCharacterData,
+} from '@/types/charactercard'
 import ConfigEditor from '@/components/ConfigEditor'
-import { Settings as AISettingsType } from '@/types/settings'
+import { InferenceSettings } from '@/types/settings'
 import { DEFAULT_SETTINGS } from '@/config/defaultSettings'
 import Toolbar from '@/components/Toolbar'
 import BasicInfoSection from '@/components/CharacterForm/BasicInfoSection'
@@ -37,35 +44,38 @@ const Index = () => {
   const { t } = useLanguage()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [activeTab, setActiveTab] = useState('assistant')
-  const [aiSettings, setAISettings] = useState<AISettingsType | null>(null)
-  const today = new Date().toISOString().split('T')[0]
+  const [infSettings, setInfSettings] = useState<InferenceSettings | null>(null)
 
-  const [characterData, setCharacterData] = useState<CharacterCardV3>({
-    spec: 'chara_card_v3',
-    spec_version: '3.0',
-    data: {
-      name: '',
-      nickname: '',
-      description: '',
-      personality: '',
-      mes_example: '',
-      scenario: '',
-      first_mes: '',
-      alternate_greetings: [],
-      tags: [],
-      creator: '',
-      character_version: '',
-      creator_notes: '',
-      creator_notes_multilingual: {},
-      system_prompt: '',
-      post_history_instructions: '',
-      character_book: { entries: [] },
-      group_only_greetings: [],
-      creation_date: '',
-      modification_date: today,
-      extensions: {},
-      assets: [],
-    },
+  const [charaData, setCharacterData] = useState<CharacterCardV3>(() => {
+    const today = Math.floor(Date.now() / 1000).toString()
+    return {
+      spec: 'chara_card_v3',
+      spec_version: '3.0',
+      data: {
+        name: '',
+        nickname: '',
+        description: '',
+        personality: '',
+        mes_example: '',
+        scenario: '',
+        first_mes: '',
+        alternate_greetings: [],
+        tags: [],
+        creator: '',
+        character_version: '',
+        creator_notes: '',
+        creator_notes_multilingual: '',
+        source: '',
+        system_prompt: '',
+        post_history_instructions: '',
+        character_book: { entries: [] },
+        group_only_greetings: [],
+        creation_date: '',
+        modification_date: today,
+        extensions: {},
+        assets: [],
+      },
+    }
   })
 
   const [characterImage, setCharacterImage] = useState<string | null>(null)
@@ -76,13 +86,13 @@ const Index = () => {
         await configManager.loadConfig()
         const settings = configManager.getActiveAISettings()
         if (settings) {
-          setAISettings(settings)
+          setInfSettings(settings)
         } else {
-          setAISettings(DEFAULT_SETTINGS)
+          setInfSettings(DEFAULT_SETTINGS)
         }
       } catch (error) {
         console.error('Failed to load AI settings:', error)
-        setAISettings(DEFAULT_SETTINGS)
+        setInfSettings(DEFAULT_SETTINGS)
       }
     }
     loadSettings()
@@ -91,8 +101,8 @@ const Index = () => {
   /**
    * Updates AI settings and displays a toast notification.
    */
-  const handleAISettingsChange = (newSettings: AISettingsType) => {
-    setAISettings(newSettings)
+  const handleAISettingsChange = (newSettings: InferenceSettings) => {
+    setInfSettings(newSettings)
     toast({
       title: t('settingsUpdated') || 'Settings updated',
       description: t('settingsUpdatedDesc') || 'AI settings have been successfully updated and saved',
@@ -105,14 +115,14 @@ const Index = () => {
   const updateField = useCallback((field: string, value: GenericField) => {
     setCharacterData((prev) => ({
       ...prev,
-      data: { ...prev.data, [field]: value, modification_date: new Date().toISOString().split('T')[0] },
+      data: { ...prev.data, [field]: value, modification_date: Math.floor(Date.now() / 1000).toString() },
     }))
   }, [])
 
   const handleInsertField = (field: string, value: string | string[]) => {
     if (field === 'tags' && Array.isArray(value)) {
       // Merge existing tags and new tags to deduplicate
-      const existingTags = characterData.data.tags || []
+      const existingTags = charaData.data.tags || []
       const newTags = [...new Set([...existingTags, ...value])]
       updateField('tags', newTags)
     } else {
@@ -460,7 +470,12 @@ const Index = () => {
           <h1 className='text-4xl font-bold text-gradient mb-4'>{t('pageTitle')}</h1>
           <p className='text-lg text-muted-foreground max-w-2xl mx-auto mb-4'>{t('pageDescription')}</p>
           <div className='flex justify-center gap-4'>
-            <input type='file' ref={fileInputRef} onChange={handleFileImport} accept='.json,.png' className='hidden'
+            <input
+              type='file'
+              ref={fileInputRef}
+              onChange={handleFileImport}
+              accept='.json,.png'
+              className='hidden'
               title={t('importCard')}
             />
             <Button onClick={() => fileInputRef.current?.click()} className='mb-4 cta-button-gradient'>
@@ -522,7 +537,7 @@ const Index = () => {
             {/* AI Assistant Panel */}
             {activeTab === 'assistant' && (
               <div className='flex-1 p-6 min-h-0 overflow-auto'>
-                <AIAssistant aiSettings={aiSettings} onInsertField={handleInsertField} />
+                <AIAssistant infSettings={infSettings} onInsertField={handleInsertField} />
               </div>
             )}
 
@@ -536,46 +551,56 @@ const Index = () => {
                   <ScrollArea className='h-full'>
                     <div className='p-6 space-y-8'>
                       <BasicInfoSection
-                        data={characterData.data}
+                        data={charaData.data as unknown as UsedCharacterData}
                         updateField={updateField}
                         characterImage={characterImage}
                         setCharacterImage={setCharacterImage}
-                        aiSettings={aiSettings}
+                        infSettings={infSettings}
                       />
 
-                      <PersonalitySection data={characterData.data} updateField={updateField} aiSettings={aiSettings} />
+                      <PersonalitySection
+                        data={charaData.data as unknown as UsedCharacterData}
+                        updateField={updateField}
+                        infSettings={infSettings}
+                      />
 
-                      <PromptsSection data={characterData.data} updateField={updateField} aiSettings={aiSettings} />
+                      <PromptsSection
+                        data={charaData.data as unknown as UsedCharacterData}
+                        updateField={updateField}
+                        infSettings={infSettings}
+                      />
 
-                      <AlternateGreetings  greetings={ Array.isArray(characterData.data.alternate_greetings)
-                            ? (characterData.data.alternate_greetings)
-                            : typeof characterData.data.alternate_greetings === 'string'
-                              ? [characterData.data.alternate_greetings] : []
-                        }
-                        group_only_greetings={ Array.isArray(characterData.data.group_only_greetings)
-                            ? (characterData.data.group_only_greetings)
-                            : typeof characterData.data.group_only_greetings === 'string'
-                              ? [characterData.data.group_only_greetings] : []
+                      <AlternateGreetings
+                        greetings={
+                          Array.isArray(charaData.data.alternate_greetings)
+                            ? charaData.data.alternate_greetings
+                            : typeof charaData.data.alternate_greetings === 'string'
+                              ? [charaData.data.alternate_greetings]
+                              : []
                         }
                         updateField={updateField}
-                        aiSettings={aiSettings}
+                        infSettings={infSettings}
+                        charaData={charaData.data as unknown as UsedCharacterData}
                       />
 
                       <CharacterBook
-                        entries={characterData.data.character_book?.entries || []}
+                        entries={charaData.data.character_book?.entries || []}
                         updateField={updateField}
-                        aiSettings={aiSettings}
-                        characterData={characterData.data}
+                        infSettings={infSettings}
+                        charaData={charaData.data as unknown as UsedCharacterData}
                       />
 
                       <TagsSection
-                        tags={characterData.data.tags}
+                        tags={charaData.data.tags || []}
                         updateField={updateField}
-                        aiSettings={aiSettings}
-                        characterData={characterData.data}
+                        infSettings={infSettings}
+                        charaData={charaData.data as unknown as UsedCharacterData}
                       />
 
-                      <MetadataSection data={characterData.data} updateField={updateField} />
+                      <MetadataSection
+                        data={charaData.data as unknown as UsedCharacterData}
+                        updateField={updateField}
+                      />
                     </div>
                   </ScrollArea>
                 </div>
@@ -585,7 +610,7 @@ const Index = () => {
             {/* JSON Preview Panel */}
             {activeTab === 'preview' && (
               <div className='flex-1 p-6 min-h-0 overflow-auto'>
-                <CharacterPreview characterData={characterData} characterImage={characterImage} />
+                <CharacterPreview charaData={charaData} characterImage={characterImage} />
               </div>
             )}
           </div>

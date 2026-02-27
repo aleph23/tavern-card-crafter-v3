@@ -1,5 +1,5 @@
 /* eslint-disable prefer-const */
-import { Settings } from '@/types/settings'
+import { InferenceSettings } from '@/types/settings'
 import { buildApiUrl } from './buildApiUrl'
 import { promptManager } from './promptManager'
 import { UsedCharacterData } from '@/types/charactercard'
@@ -33,46 +33,47 @@ export const estimateTokens = (text: string): number => {
  * @returns A promise that resolves to the generated response content from the AI service.
  * @throws Error If the API key is missing for a non-local service, if the API URL is not configured, if the API request fails, or if the response is empty.
  */
-export const generateWithAI = async (settings: Settings, prompt: string): Promise<string> => {
+export const generateWithAI = async (settings: InferenceSettings, prompt: string): Promise<string> => {
   // Definition of local services that do not require a key
   const localServices = ['ollama', 'lmstudio']
-  const requiresKey = !localServices.includes(settings.provider.toLowerCase())
+  const provider = settings.endpoint?.provider || ''
+  const requiresKey = !localServices.includes(provider.toLowerCase())
 
   // Only non-local services check the key
-  if (requiresKey && !settings.apiKey) {
+  if (requiresKey && !settings.endpoint.apiKey) {
     throw new Error('Please configure the API key in the AI settings first')
   }
 
-  if (!settings.apiUrl) {
+  if (!settings.endpoint.apiUrl) {
     throw new Error('Please configure the API address in the AI settings first')
   }
 
   try {
     // Intelligently build API addresses
-    const apiUrl = buildApiUrl(settings.apiUrl, settings.provider)
+    const apiUrl = buildApiUrl(settings.endpoint.apiUrl, provider)
 
     console.log('Generating with AI using URL:', apiUrl)
-    console.log('Provider:', settings.provider)
-    console.log('Model:', settings.model)
+    console.log('Provider:', provider)
+    console.log('Model:', settings.endpoint.model)
 
     // Use a unified Open AI-compatible format
     let headers: Record<string, string> = { 'Content-Type': 'application/json' }
 
-    if (settings.provider === 'openrouter') {
+    if (provider === 'openrouter') {
       headers['Http-Referer'] = 'https://github.com/aleph23/tavern-card-creator-v3'
       headers['X-Title'] = 'CharaCardCreator'
     }
 
     // Always add Authorization header if API key is present
-    if (settings.apiKey) {
-      headers['Authorization'] = `Bearer ${settings.apiKey}`
+    if (settings.endpoint?.apiKey) {
+      headers['Authorization'] = `Bearer ${settings.endpoint.apiKey}`
     }
 
     const requestBody = {
-      model: settings.model,
+      model: settings.endpoint.model,
       messages: [{ role: 'user', content: prompt }],
-      max_tokens: settings.inferenceSettings?.maxTokens ?? 800,
-      temperature: settings.inferenceSettings?.temp ?? 0.7,
+      max_tokens: settings.maxTokens,
+      temperature: settings.temp,
     }
 
     console.log('Request body:', requestBody)
@@ -106,11 +107,8 @@ export const generateWithAI = async (settings: Settings, prompt: string): Promis
       }
 
       // Special error prompts for local services
-      if (
-        localServices.includes(settings.provider.toLowerCase()) &&
-        (response.status === 400 || errorText.includes('model'))
-      ) {
-        errorMessage = `Model "${settings.model}" not present or not loaded. Please fetch the list of available models in AI settings or make sure it has been downloaded/loaded.`
+      if (localServices.includes(provider.toLowerCase()) && (response.status === 400 || errorText.includes('model'))) {
+        errorMessage = `Model "${settings.endpoint?.model}" not present or not loaded. Please fetch the list of available models in AI settings or make sure it has been downloaded/loaded.`
       }
 
       throw new Error(errorMessage)
@@ -163,11 +161,11 @@ export const generateWithAI = async (settings: Settings, prompt: string): Promis
         throw new Error('Request timeout, please check the network connection or API service status')
       }
       if (error.message.includes('Failed to fetch')) {
-        if (settings.provider === 'ollama') {
+        if (provider === 'ollama') {
           throw new Error(
             'Unable to connect to the Ollama service, make sure Ollama is up and running on the correct port. Can try to execute: ollama serve'
           )
-        } else if (settings.provider === 'lmstudio') {
+        } else if (provider === 'lmstudio') {
           throw new Error(
             'Unable to connect to LM Studio service, please make sure LM Studio has started the local server'
           )
@@ -186,7 +184,7 @@ export const generateWithAI = async (settings: Settings, prompt: string): Promis
 /**
  * Generates a character description based on provided data.
  */
-export const generateDescription = (data: CharacterData): string => {
+export const generateDescription = (data: UsedCharacterData): string => {
   const existingDescription = data.description.trim()
 
   if (existingDescription) {
@@ -201,7 +199,7 @@ export const generateDescription = (data: CharacterData): string => {
 /**
  * Generates a personality description based on character data.
  */
-export const generatePersonality = (data: CharacterData): string => {
+export const generatePersonality = (data: UsedCharacterData): string => {
   const template = promptManager.getPrompt('personality')
   return promptManager.interpolatePrompt(template, data)
 }
@@ -209,12 +207,12 @@ export const generatePersonality = (data: CharacterData): string => {
 /**
  * Generates a meta-scenario based on character data.
  */
-export const generateScenario = (data: CharacterData): string => {
+export const generateScenario = (data: UsedCharacterData): string => {
   const template = promptManager.getPrompt('scenario')
   return promptManager.interpolatePrompt(template, data)
 }
 
-export const generateFirstMes = (data: CharacterData): string => {
+export const generateFirstMes = (data: UsedCharacterData): string => {
   const template = promptManager.getPrompt('firstMessage')
   return promptManager.interpolatePrompt(template, data)
 }
@@ -222,7 +220,7 @@ export const generateFirstMes = (data: CharacterData): string => {
 /**
  * Generates a conversational example based on character data.
  */
-export const generateMesExample = (data: CharacterData): string => {
+export const generateMesExample = (data: UsedCharacterData): string => {
   const template = promptManager.getPrompt('messageExample')
   // Pass {{user}} as user_placeholder if needed, but since we rely on unknown keys staying as placeholders,
   // and {{user}} is in the template as {{user}}, and data probably doesn't have "user" key, it should be fine.
@@ -233,7 +231,7 @@ export const generateMesExample = (data: CharacterData): string => {
 /**
  * Generates a system prompt based on character data.
  */
-export const generateSystemPrompt = (data: CharacterData): string => {
+export const generateSystemPrompt = (data: UsedCharacterData): string => {
   const template = promptManager.getPrompt('systemPrompt')
   return promptManager.interpolatePrompt(template, data)
 }
@@ -241,12 +239,12 @@ export const generateSystemPrompt = (data: CharacterData): string => {
 /**
  * Generates brief instructions for the AI based on character data.
  */
-export const generatePostHistoryInstructions = (data: CharacterData): string => {
+export const generatePostHistoryInstructions = (data: UsedCharacterData): string => {
   const template = promptManager.getPrompt('postHistoryInstructions')
   return promptManager.interpolatePrompt(template, data)
 }
 
-export const generateTags = (data: CharacterData): string => {
+export const generateTags = (data: UsedCharacterData): string => {
   const template = promptManager.getPrompt('tags')
   return promptManager.interpolatePrompt(template, data)
 }
@@ -254,7 +252,7 @@ export const generateTags = (data: CharacterData): string => {
 /**
  * Generates an alternate greeting based on character data.
  */
-export const generateAlternateGreeting = (data: string[]): string => {
+export const generateAlternateGreeting = (data: UsedCharacterData): string => {
   const template = promptManager.getPrompt('alternateGreeting')
   return promptManager.interpolatePrompt(template, data)
 }
@@ -262,7 +260,7 @@ export const generateAlternateGreeting = (data: string[]): string => {
 /**
  * Generates a character book entry based on character data and optional context.
  */
-export const generateCharacterBookEntry = (data: CharacterData): string => {
+export const generateCharacterBookEntry = (data: UsedCharacterData): string => {
   const template = promptManager.getPrompt('characterBookEntry')
   return promptManager.interpolatePrompt(template, data)
 }

@@ -1,16 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {useRef, useState} from 'react'
-import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/glass/card'
-import {Button} from '@/components/ui/glass/button'
-import {Textarea} from '@/components/ui/glass/textarea'
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/glass/select'
-import {useToast} from '@/hooks/use-toast'
-import {useLanguage} from '@/contexts/LanguageContext'
-import {Download, RefreshCcw, Wand, X} from 'lucide-react'
-import {CharacterDataV3} from '@/types/charactercard'
-import {generateWithAI} from '@/utils/aiGenerator'
-import {InferenceSettings} from '@/types/settings'
-
+import { useRef, useState } from 'react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/glass/card'
+import { Button } from '@/components/ui/glass/button'
+import { Textarea } from '@/components/ui/glass/textarea'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/glass/select'
+import { useToast } from '@/hooks/use-toast'
+import { useLanguage } from '@/contexts/LanguageContext'
+import { Download, RefreshCcw, Wand, X } from 'lucide-react'
+import { CharacterDataV3 } from '@/types/charactercard'
+import { generateWithAI } from '@/utils/aiGenerator'
+import { InferenceSettings } from '@/types/settings'
 
 interface AIAssistantProps {
   aiSettings: InferenceSettings | null
@@ -96,7 +95,8 @@ Output strictly in JSON format and do not add any other text:`
 "creator_notes": "Any notes you have about the character"
 }`
 
-    const typeSpecificPrompts = {general: `${baseInstructions}
+    const typeSpecificPrompts = {
+      general: `${baseInstructions}
 
 Intelligent analysis and extract role information based on the content.${jsonFormat}`,
 
@@ -129,7 +129,7 @@ This character stepped right out of a timeless classic, maybe Rabelais, maybe Jo
 
       historical: `${baseInstructions}
 
-This is a historic character (real or fictional), please generate: 
+This is a historic character (real or fictional), please generate:
 - description: List the appearance, clothing, and body characteristics in a detailed, non-prosaic list. Body, clothing, general appearance.
 - personality: Detailed personality traits, idiosyncrasies and back story in a non-prosaic list.
 - scenario: The back story.
@@ -347,11 +347,11 @@ This is a historic character (real or fictional), please generate:
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               placeholder='Paste the text content related to the role here:
-• Role Introduction Article 
-• Wikipedia page 
-• Character description of novels 
-• Game character information 
-• Introduction to cartoon characters 
+• Role Introduction Article
+• Wikipedia page
+• Character description of novels
+• Game character information
+• Introduction to cartoon characters
 etc...'
               className='min-h-[200px] text-sm'
               showCounter={true}
@@ -366,8 +366,7 @@ etc...'
             disabled={!isGenerating && !inputText.trim()}
             variant={isGenerating ? 'destructive' : 'default'}
             className='flex-1'
-          >
-          </Button>
+          ></Button>
 
           {parsedData && !isGenerating && (
             <Button onClick={generateCharacterData} variant='outline' title='Regenerate'>

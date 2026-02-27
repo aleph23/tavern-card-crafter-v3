@@ -2,6 +2,7 @@
  * Character Book Entry (used in both V2 and V3)
  *
  * CRITICAL RULES:
+ * 0. Read any. Output only v3. Promote at import.
  * 1. If content is empty/null, the entire entry is ignored
  * 2. If content exists, all boolean/structural fields become mandatory
  * 3. If constant === false (default), 'keys' is required
@@ -20,30 +21,30 @@
  */
 export interface CharacterBookEntry {
   // Content - determines if entry is valid
-  content: string  // If empty, entry is ignored regardless of other fields
+  content: string // If empty, entry is ignored regardless of other fields
 
   // Keys - required UNLESS constant === true
-  keys: string[]  // Can be empty array only if constant === true
+  keys: string[] // Can be empty array only if constant === true
 
   // Structural fields - mandatory when content exists
-  insertion_order: number  // Default: 10
-  enabled: boolean         // Default: true
-  use_regex: boolean       // Default: false (V3 requirement)
-  case_sensitive: boolean  // Default: false
-  constant: boolean        // Default: false (if true, keys can be empty)
-  priority: number         // Default: 100
-  position: 'before_char' | 'after_char'  // Default: 'after_char'
-  selective?: boolean      // Default: false. Second test? If true secondary_keys must have valid array.
+  insertion_order: number // Default: 10
+  enabled: boolean // Default: true
+  use_regex: boolean // Default: false (V3 requirement)
+  case_sensitive: boolean // Default: false
+  constant: boolean // Default: false (if true, keys can be empty)
+  priority: number // Default: 100
+  position: 'before_char' | 'after_char' // Default: 'after_char'
+  selective?: boolean // Default: false. Second test? If true secondary_keys must have valid array.
 
-  // Metadata - truly optional
+  // Metadata
   name?: string
   id?: number | string
   comment?: string
 
-  // Conditional matching - optional
+  // Second Conditional matching - optional
   secondary_keys?: string[]
 
-  // Extensions - optional - where diiferent systems put their special platform-specific additions.
+  // Extensions - optional - where different systems put their special, platform-specific additions.
   extensions?: Record<string, unknown>
 }
 
@@ -67,16 +68,16 @@ export interface Asset {
 }
 
 /**
- * Character Book structure (Lorebook in V3 spec)
+ * Character Book structure (Character book in V3 spec)
  */
 export interface CharacterBook {
-  entries: CharacterBookEntry[]
   name?: string
   description?: string
   scan_depth?: number
   token_budget?: number
   recursive_scanning?: boolean
   extensions?: Record<string, unknown>
+  entries: CharacterBookEntry[]
 }
 
 /**
@@ -95,21 +96,16 @@ export interface BaseCharacterData {
  * Character Card V2 Data
  */
 export interface CharacterDataV2 extends BaseCharacterData {
+  creator_notes: string
+  system_prompt: string
+  post_history_instructions: string
   alternate_greetings: string[]
+  character_book?: CharacterBook
+
   tags: string[]
   creator: string
   character_version: string
-  creator_notes: string
-  creator_notes_multilingual?: Record<string, string>
-  system_prompt: string
-  post_history_instructions: string
-  character_book?: CharacterBook
-  group_only_greetings: string[]
-  creation_date?: string                // This should be a string-representation of unix seconds.
-  modification_date?: string            // This should be a string-representation of unix seconds.
-  source?: string | string[]
   extensions: Record<string, unknown>
-  assets: Asset[]
 }
 
 /**
@@ -118,7 +114,13 @@ export interface CharacterDataV2 extends BaseCharacterData {
  */
 export interface CharacterDataV3 extends CharacterDataV2 {
   nickname?: string
-  source?: string[]  // V3 changes source to array
+  assets: Asset[]
+  creator_notes_multilingual: string
+
+  group_only_greetings: string[]
+  creation_date?: string // This should be a string-representation of unix seconds.
+  modification_date?: string // This should be a string-representation of unix seconds.
+  source?: string
 }
 
 /**
@@ -168,9 +170,9 @@ export interface UsedCharacterData {
   creator: string
   character_version: string
   creator_notes: string
-  creation_date?: string                // This should be a string-representation of unix seconds.
-  modification_date?: string            // This should be a string-representation of unix seconds.
-  source?: string  // 'Home' for this card. Typically a public URL.
+  creation_date?: string // This should be a string-representation of unix seconds.
+  modification_date?: string // This should be a string-representation of unix seconds.
+  source?: string // 'Home' for this card. Typically a public URL.
 
   // Future features (commented out until implemented)
   // group_only_greetings: string[]  // Not yet functional. Will be.
@@ -212,13 +214,13 @@ export function createCharacterBookEntry(params: {
     enabled: params.enabled ?? true,
     use_regex: params.use_regex ?? false,
     case_sensitive: params.case_sensitive ?? false,
-    constant: constant,
+    constant: constant ?? false,
     priority: params.priority ?? 100,
     position: params.position ?? 'after_char',
     name: params.name,
     id: params.id,
     comment: params.comment,
-    selective: params.selective,
+    selective: params.selective ?? false,
     secondary_keys: params.secondary_keys,
     extensions: params.extensions,
   }
