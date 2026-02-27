@@ -8,7 +8,7 @@ import { Plus, X, Edit2, Check, Sparkles, Loader2, RefreshCcw, Trash2 } from 'lu
 import { generateWithAI, generateAlternateGreeting } from '@/utils/aiGenerator'
 import { InferenceSettings } from '@/types/settings'
 import { useLanguage } from '@/contexts/LanguageContext'
-import { UsedCharacterData } from '@/types/charactercard.ts'
+import { UsedCharacterData, CharacterDataV3 } from '@/types/charactercard.ts'
 
 interface AlternateGreetingsProps {
   greetings: string[]
