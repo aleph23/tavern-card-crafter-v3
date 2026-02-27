@@ -81,7 +81,11 @@ const TagsSection = ({ tags, updateField, aiSettings, characterData }: TagsSecti
     setLoading(true)
 
     try {
-      const prompt = generateTags(characterData as unknown as UsedCharacterData)
+      const usedData: UsedCharacterData = {
+        ...characterData,
+        source: Array.isArray(characterData.source) ? characterData.source.join(',') : characterData.source
+      }
+      const prompt = generateTags(usedData)
       const result = await generateWithAI(aiSettings, prompt)
 
       // Parses tag strings returned by AI

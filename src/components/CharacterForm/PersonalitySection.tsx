@@ -14,9 +14,10 @@ import {
 } from '@/utils/aiGenerator'
 import { Settings } from '@/types/settings'
 import { useToast } from '@/hooks/use-toast'
+import { CharacterDataV3, UsedCharacterData } from '@/types/charactercard'
 
 interface PersonalitySectionProps {
-  data: any
+  data: CharacterDataV3
   updateField: (field: string, value: any) => void
   aiSettings: Settings | null
 }
@@ -36,7 +37,7 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
   const abortControllerRefs = useRef<{ [key: string]: AbortController | null }>({})
   const { toast } = useToast()
 
-  const handleAIGenerate = async (field: string, promptGenerator: (data: any) => string) => {
+  const handleAIGenerate = async (field: string, promptGenerator: (data: UsedCharacterData) => string) => {
     if (!aiSettings?.apiKey && !['ollama', 'lmstudio'].includes(aiSettings?.provider?.toLowerCase() || '')) {
       toast({
         title: 'Configuration error',
@@ -59,7 +60,11 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
     setLoading((prev) => ({ ...prev, [field]: true }))
 
     try {
-      const prompt = promptGenerator(data)
+      const usedData: UsedCharacterData = {
+        ...data,
+        source: Array.isArray(data.source) ? data.source.join(',') : data.source
+      }
+      const prompt = promptGenerator(usedData)
       const result = await generateWithAI(aiSettings, prompt)
       updateField(field, result)
       toast({ title: 'Generate successfully', description: `${field} Generated completed` })
@@ -109,7 +114,11 @@ const PersonalitySection = ({ data, updateField, aiSettings }: PersonalitySectio
    * @param promptGenerator - A function that generates a prompt based on the provided data.
    * @param dependencies - An optional array of dependencies that must be satisfied for button actions.
    */
-  const renderFieldButtons = (field: string, promptGenerator: (data: any) => string, dependencies?: string[]) => {
+  const renderFieldButtons = (
+    field: string,
+    promptGenerator: (data: UsedCharacterData) => string,
+    dependencies?: (keyof CharacterDataV3)[],
+  ) => {
     const isLoading = loading[field]
     const canGenerate = dependencies ? dependencies.every((dep) => data[dep]) : true
 

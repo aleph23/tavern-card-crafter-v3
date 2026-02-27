@@ -55,7 +55,7 @@ const MetadataSection = ({ data, updateField }: MetadataSectionProps) => {
           id='source'
           value={Array.isArray(data.source) ? data.source.join(', ') : (data.source || '')}
           onChange={(e) => {
-             updateField('source', e.target.value.split(',').map(s => s.trim()))
+             updateField('source', e.target.value)
           }}
           placeholder='Enter the source link...'
           className='mt-1 w-full max-w-none'

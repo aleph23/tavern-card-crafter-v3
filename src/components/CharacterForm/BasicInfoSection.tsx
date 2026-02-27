@@ -104,8 +104,11 @@ const BasicInfoSection = ({
     setLoading(true)
 
     try {
-      // Cast data to UsedCharacterData. Safe because CharacterDataV3 is compatible.
-      const prompt = generateDescription(data as unknown as UsedCharacterData)
+      const usedData: UsedCharacterData = {
+        ...data,
+        source: Array.isArray(data.source) ? data.source.join(',') : data.source
+      }
+      const prompt = generateDescription(usedData)
       const result = await generateWithAI(aiSettings, prompt)
       updateField('description', result)
       toast({ title: 'Generate successfully', description: 'Role description has been generated' })

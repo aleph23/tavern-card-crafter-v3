@@ -78,7 +78,11 @@ const CharacterBook = ({ entries, updateField, aiSettings, characterData }: Char
     setLoading(true)
 
     try {
-      const prompt = generateCharacterBookEntry(characterData as unknown as UsedCharacterData)
+      const usedData: UsedCharacterData = {
+        ...characterData,
+        source: Array.isArray(characterData.source) ? characterData.source.join(',') : characterData.source
+      }
+      const prompt = generateCharacterBookEntry(usedData)
       const result = await generateWithAI(aiSettings, prompt)
 
       // Analyze the content returned by AI and try to extract keywords and content

@@ -62,7 +62,11 @@ const PromptsSection = ({ data, updateField, aiSettings }: PromptsSectionProps) 
     setLoading((prev) => ({ ...prev, [field]: true }))
 
     try {
-      const prompt = promptGenerator(data as unknown as UsedCharacterData)
+      const usedData: UsedCharacterData = {
+        ...data,
+        source: Array.isArray(data.source) ? data.source.join(',') : data.source
+      }
+      const prompt = promptGenerator(usedData)
       const result = await generateWithAI(aiSettings, prompt)
       updateField(field, result)
       toast({ title: 'Generate successfully', description: `${field} Generated completed` })
