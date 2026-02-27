@@ -9,11 +9,11 @@ import {useLanguage} from '@/contexts/LanguageContext'
 import {Download, RefreshCcw, Wand, X} from 'lucide-react'
 import {CharacterDataV3} from '@/types/charactercard'
 import {generateWithAI} from '@/utils/aiGenerator'
-import {Settings} from '@/types/settings'
+import {InferenceSettings} from '@/types/settings'
 
 
 interface AIAssistantProps {
-  aiSettings: Settings | null
+  aiSettings: InferenceSettings | null
   onInsertField: (field: string, value: string | string[]) => void
 }
 
@@ -260,11 +260,8 @@ This is a historic character (real or fictional), please generate:
 
     // Insert all fields with values
     Object.entries(parsedData).forEach(([key, value]) => {
-      if (typeof value === 'string' && value.trim()) {
+      if (value && (Array.isArray(value) ? value.length > 0 : value.trim())) {
         onInsertField(key, value)
-        insertedCount++
-      } else if (Array.isArray(value) && value.length > 0 && value.every((item: any) => typeof item === 'string')) {
-        onInsertField(key, value as string[])
         insertedCount++
       }
     })
@@ -308,10 +305,7 @@ This is a historic character (real or fictional), please generate:
     if (Array.isArray(value)) {
       return value.join(', ')
     }
-    if (typeof value === 'object' && value !== null) {
-      return JSON.stringify(value)
-    }
-    const text = String(value)
+    const text = value.toString()
     return text.length > 150 ? `${text.substring(0, 150)}...` : text
   }
 
@@ -373,7 +367,6 @@ etc...'
             variant={isGenerating ? 'destructive' : 'default'}
             className='flex-1'
           >
-             {isGenerating ? 'Generating...' : 'Start generation'}
           </Button>
 
           {parsedData && !isGenerating && (
@@ -390,7 +383,7 @@ etc...'
               <Button
                 onClick={insertAllFields}
                 size='sm'
-                className='bg-green-600 hover:bg-green-700 text-white'
+                className='bg-success hover:bg-success/90 text-primary-foreground'
               >
                 <Download className='w-4 h-4 mr-2' />
                 Insert all with one click
