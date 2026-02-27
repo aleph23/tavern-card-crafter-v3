@@ -106,7 +106,7 @@ const BasicInfoSection = ({
     try {
       const usedData: UsedCharacterData = {
         ...data,
-        source: Array.isArray(data.source) ? data.source.join(',') : data.source
+        source: (data.source as any) || ''
       }
       const prompt = generateDescription(usedData)
       const result = await generateWithAI(aiSettings, prompt)
