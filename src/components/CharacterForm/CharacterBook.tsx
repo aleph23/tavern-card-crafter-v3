@@ -12,11 +12,11 @@ import { CharacterBookEntry, UsedCharacterData, createCharacterBookEntry } from 
 interface CharacterBookProps {
   entries: CharacterBookEntry[]
   updateField: (field: string, value: any) => void
-  aiSettings: InferenceSettings | null
-  characterData: UsedCharacterData
+  infSettings: InferenceSettings | null
+  charaData: UsedCharacterData
 }
 
-const CharacterBook = ({ entries, updateField, aiSettings, characterData }: CharacterBookProps) => {
+const CharacterBook = ({ entries, updateField, infSettings, charaData }: CharacterBookProps) => {
   const [newEntryKeys, setNewEntryKeys] = useState('')
   const [newEntryContent, setNewEntryContent] = useState('')
   const [loading, setLoading] = useState(false)
@@ -52,8 +52,8 @@ const CharacterBook = ({ entries, updateField, aiSettings, characterData }: Char
 
   const handleAIGenerateEntry = async () => {
     if (
-      !aiSettings?.endpoint?.apiKey &&
-      !['ollama', 'lmstudio'].includes(aiSettings?.endpoint?.provider?.toLowerCase() || '')
+      !infSettings?.endpoint?.apiKey &&
+      !['ollama', 'lmstudio'].includes(infSettings?.endpoint?.provider?.toLowerCase() || '')
     ) {
       toast({
         title: 'Configuration error',
@@ -63,7 +63,7 @@ const CharacterBook = ({ entries, updateField, aiSettings, characterData }: Char
       return
     }
 
-    if (!characterData.name || !characterData.description) {
+    if (!charaData.name || !charaData.description) {
       toast({
         title: 'Incomplete information',
         description: 'Please fill in the Card name and role description first',
@@ -76,8 +76,8 @@ const CharacterBook = ({ entries, updateField, aiSettings, characterData }: Char
     setLoading(true)
 
     try {
-      const prompt = generateCharacterBookEntry(characterData)
-      const result = await generateWithAI(aiSettings, prompt)
+      const prompt = generateCharacterBookEntry(charaData)
+      const result = await generateWithAI(infSettings, prompt)
 
       // Analyze the content returned by AI and try to extract keywords and content
       const lines = result.split('\n').filter((line) => line.trim())
@@ -108,7 +108,7 @@ const CharacterBook = ({ entries, updateField, aiSettings, characterData }: Char
 
       // If the keyword is not parsed, use the Card name as the keyword
       if (keys.length === 0) {
-        keys = [characterData.name]
+        keys = [charaData.name]
       }
 
       const entry = createCharacterBookEntry({ keys, content: content.trim(), insertion_order: 100, enabled: true })
@@ -164,7 +164,7 @@ const CharacterBook = ({ entries, updateField, aiSettings, characterData }: Char
             size='sm'
             variant={loading ? 'destructive' : 'outline'}
             onClick={loading ? cancelGeneration : handleAIGenerateEntry}
-            disabled={!loading && (!characterData.name || !characterData.description)}
+            disabled={!loading && (!charaData.name || !charaData.description)}
             className='h-8 px-2 text-xs'
           >
             {loading ? (

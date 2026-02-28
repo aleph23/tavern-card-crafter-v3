@@ -7,14 +7,8 @@ import { BotMessageSquareIcon as Bot } from '@/components/ui/bot-message-square'
 import { useToast } from '@/hooks/use-toast'
 import { ScrollArea } from '@/components/ui/glass/scroll-area'
 import { useLanguage } from '@/contexts/LanguageContext'
-import {
-  CharacterCardV3,
-  CharacterCardV2,
-  CharacterDataV3,
-  CharacterBookEntry,
-  Asset,
-  UsedCharacterData,
-} from '@/types/charactercard'
+import { CharacterCardV3, CharacterDataV3, CharacterBookEntry, Asset, UsedCharacterData } from '@/types/charactercard'
+import { extractPNGCharacterData, readJSONCharacterFile, upgradeToV3, UpgradeCallbacks } from '@/utils/importManager'
 import ConfigEditor from '@/components/ConfigEditor'
 import { InferenceSettings } from '@/types/settings'
 import { DEFAULT_SETTINGS } from '@/config/defaultSettings'
@@ -101,7 +95,7 @@ const Index = () => {
   /**
    * Updates AI settings and displays a toast notification.
    */
-  const handleAISettingsChange = (newSettings: InferenceSettings) => {
+  const handleInfSettingsChange = (newSettings: InferenceSettings) => {
     setInfSettings(newSettings)
     toast({
       title: t('settingsUpdated') || 'Settings updated',
@@ -130,234 +124,6 @@ const Index = () => {
     }
   }
 
-  /**
-   * Extract character data from a PNG file.
-   *
-   * This function reads a PNG file and searches for character data within it using multiple methods:
-   * first by locating the tEXt chunk, then by performing a string search for JSON patterns,
-   * and finally by searching for base64 encoded data. If character data is found, it resolves the promise
-   * with the parsed data; otherwise, it rejects with an error.
-   *
-   * @param file - The PNG file from which to extract character data.
-   * @returns A promise that resolves with the extracted character data.
-   * @throws Error If the file cannot be read or if no character data is found.
-   */
-  const extractPNGCharacterData = async (file: File): Promise<GenericField> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        try {
-          const arrayBuffer = e.target?.result as ArrayBuffer
-          const uint8Array = new Uint8Array(arrayBuffer)
-
-          console.log('PNG file size:', uint8Array.length)
-
-          // Method 1: Find PNG t EXt block
-          let foundData = null
-
-          // PNG t EXt block search
-          for (let i = 8; i < uint8Array.length - 8; i++) {
-            // Read block length
-            const chunkLength =
-              (uint8Array[i] << 24) | (uint8Array[i + 1] << 16) | (uint8Array[i + 2] << 8) | uint8Array[i + 3]
-
-            // Check if it is a t EXt block (0x74455874)
-            if (
-              uint8Array[i + 4] === 0x74 &&
-              uint8Array[i + 5] === 0x45 &&
-              uint8Array[i + 6] === 0x58 &&
-              uint8Array[i + 7] === 0x74
-            ) {
-              console.log('Found tEXt chunk at:', i, 'length:', chunkLength)
-
-              const textStart = i + 8
-              const textEnd = textStart + chunkLength
-
-              if (textEnd <= uint8Array.length) {
-                try {
-                  // Find keyword end position (null bytes)
-                  let keyEnd = textStart
-                  while (keyEnd < textEnd && uint8Array[keyEnd] !== 0) {
-                    keyEnd++
-                  }
-
-                  // Decode keywords using UTF-8
-                  const keyword = new TextDecoder('utf-8', { fatal: false }).decode(uint8Array.slice(textStart, keyEnd))
-                  console.log('tEXt keyword:', keyword)
-
-                  // Check whether it is a keyword related to a character card
-                  if (keyword === 'chara' || keyword === 'card_v3' || keyword === 'card_v2' || keyword === 'Comment') {
-                    const dataStart = keyEnd + 1
-                    const textDataBytes = uint8Array.slice(dataStart, textEnd)
-
-                    console.log('Found potential character data, length:', textDataBytes.length)
-
-                    // Try base64 decoding
-                    try {
-                      // First decode with UTF-8
-                      const textData = new TextDecoder('utf-8', { fatal: false }).decode(textDataBytes)
-                      const decoded = atob(textData)
-
-                      // Convert base64 decoded bytes to UTF-8 strings
-                      const decodedBytes = new Uint8Array(decoded.length)
-                      for (let j = 0; j < decoded.length; j++) {
-                        decodedBytes[j] = decoded.charCodeAt(j)
-                      }
-                      const decodedText = new TextDecoder('utf-8', { fatal: false }).decode(decodedBytes)
-                      const parsed = JSON.parse(decodedText)
-
-                      console.log('Successfully parsed base64 JSON with UTF-8 handling')
-                      foundData = parsed
-                      break
-                    } catch (e) {
-                      // Try to parse directly on JSON
-                      try {
-                        const textData = new TextDecoder('utf-8', { fatal: false }).decode(textDataBytes)
-                        const parsed = JSON.parse(textData)
-                        console.log('Successfully parsed direct JSON with UTF-8 handling')
-                        foundData = parsed
-                        break
-                      } catch (e2) {
-                        console.log('Failed to parse as JSON')
-                      }
-                    }
-                  }
-                } catch (e) {
-                  console.log('Error processing tEXt chunk:', e)
-                }
-              }
-
-              // Jump to the next block
-              i += 8 + chunkLength + 4 - 1 // -1 Because the for loop will+1
-            }
-          }
-
-          // Method 2: If the t EXt block method fails, try string search
-          if (!foundData) {
-            console.log('tEXt method failed, trying string search...')
-
-            // Using UTF-8 Decoder handles the entire file
-            const decoder = new TextDecoder('utf-8', { fatal: false })
-            const fullText = decoder.decode(uint8Array)
-
-            // Find possible JSON start locations
-            const jsonPatterns = [
-              /"spec"\s*:\s*"chara_card_v[123]"/g,
-              /"name"\s*:\s*"/g,
-              /\{\s*"name"\s*:/g,
-              /\{\s*"char_name"\s*:/g,
-            ]
-
-            for (const pattern of jsonPatterns) {
-              const matches = [...fullText.matchAll(pattern)]
-              console.log(`Pattern ${pattern.source} found ${matches.length} matches`)
-
-              for (const match of matches) {
-                if (!match.index) {
-                  continue
-                }
-                // Backwards looking for braces at the beginning of JSON
-                let jsonStart = match.index
-                while (jsonStart > 0 && fullText[jsonStart] !== '{') {
-                  jsonStart--
-                }
-
-                if (jsonStart >= 0) {
-                  // Looking forward to the end of JSON
-                  let braceCount = 0
-                  let jsonEnd = -1
-
-                  for (let i = jsonStart; i < fullText.length; i++) {
-                    if (fullText[i] === '{') {
-                      braceCount++
-                    }
-                    if (fullText[i] === '}') {
-                      braceCount--
-                    }
-                    if (braceCount === 0 && i > jsonStart) {
-                      jsonEnd = i + 1
-                      break
-                    }
-                  }
-
-                  if (jsonEnd > jsonStart) {
-                    try {
-                      const jsonStr = fullText.substring(jsonStart, jsonEnd)
-                      const parsed = JSON.parse(jsonStr)
-                      console.log('Successfully parsed JSON from string search with UTF-8')
-                      foundData = parsed
-                      break
-                    } catch (e) {
-                      console.log('Failed to parse extracted JSON')
-                    }
-                  }
-                }
-              }
-
-              if (foundData) {
-                break
-              }
-            }
-          }
-
-          // Method 3: Find base64 encoded data
-          if (!foundData) {
-            console.log('String search failed, trying base64 search...')
-
-            const decoder = new TextDecoder('utf-8', { fatal: false })
-            const fullText = decoder.decode(uint8Array)
-
-            // Find a long base64 string
-            const base64Pattern = /[A-Za-z0-9+/]{100,}={0,2}/g
-            const base64Matches = [...fullText.matchAll(base64Pattern)]
-
-            console.log(`Found ${base64Matches.length} potential base64 strings`)
-
-            for (const match of base64Matches) {
-              try {
-                const decoded = atob(match[0])
-
-                // Convert base64 decoded bytes to UTF-8 strings
-                const decodedBytes = new Uint8Array(decoded.length)
-                for (let j = 0; j < decoded.length; j++) {
-                  decodedBytes[j] = decoded.charCodeAt(j)
-                }
-                const decodedText = new TextDecoder('utf-8', { fatal: false }).decode(decodedBytes)
-
-                if (
-                  decodedText.includes('"name"') ||
-                  decodedText.includes('"char_name"') ||
-                  decodedText.includes('chara_card')
-                ) {
-                  const parsed = JSON.parse(decodedText)
-                  console.log('Successfully parsed base64 character data with UTF-8')
-                  foundData = parsed
-                  break
-                }
-              } catch (e) {
-                // Keep trying the next one
-              }
-            }
-          }
-
-          if (foundData) {
-            console.log('Character data found:', foundData)
-            resolve(foundData)
-          } else {
-            console.log('No character data found in PNG')
-            reject(new Error('No character data found in PNG'))
-          }
-        } catch (error) {
-          console.error('PNG parsing error:', error)
-          reject(error)
-        }
-      }
-
-      reader.onerror = () => reject(new Error('Failed to read file'))
-      reader.readAsArrayBuffer(file)
-    })
-  }
-
   const handleFileImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file) {
@@ -365,30 +131,19 @@ const Index = () => {
     }
 
     try {
-      let parsedData
+      let rawData: unknown
 
       if (file.name.endsWith('.json')) {
-        // Processing JSON files - Clear previous pictures
+        // JSON import — clear any previous avatar image
         setCharacterImage(null)
-
-        const content = await new Promise<string>((resolve, reject) => {
-          const reader = new FileReader()
-          reader.onload = (e) => resolve(e.target?.result as string)
-          reader.onerror = () => reject(new Error('Failed to read JSON file'))
-          reader.readAsText(file)
-        })
-
-        parsedData = JSON.parse(content)
+        rawData = await readJSONCharacterFile(file)
       } else if (file.name.endsWith('.png')) {
-        // Processing PNG files
-        parsedData = await extractPNGCharacterData(file)
+        // PNG import — extract embedded data and set avatar simultaneously
+        rawData = await extractPNGCharacterData(file)
 
         // If the data is successfully extracted from PNG, and the PNG image is set as the character avatar at the same time
         const reader = new FileReader()
-        reader.onload = (e) => {
-          const result = e.target?.result as string
-          setCharacterImage(result)
-        }
+        reader.onload = (e) => setCharacterImage(e.target?.result as string)
         reader.readAsDataURL(file)
       } else {
         toast({
@@ -399,52 +154,25 @@ const Index = () => {
         return
       }
 
-      // Helper to safely get array fields
-      const getArrayField = (source: GenericField, key: string) => {
-        const val = source?.[key]
-        if (Array.isArray(val)) return val
-        if (typeof val === 'string' && val.length > 0) return [val]
-        return []
-      }
-
-      // Normalize data source (V2/V3 uses .data, V1 uses root)
-      const src = parsedData.data || parsedData
-      const root = parsedData // Keep root for fallback access
-
-      const v3Data: CharacterCardV3 = {
-        spec: 'chara_card_v3',
-        spec_version: '3.0',
-        data: {
-          // Name mapping: prioritize char_name (often used for real name) over name
-          name: src.char_name || src.name || root.char_name || root.name || '',
-          nickname: src.nickname || root.nickname || '',
-          description: src.description || root.description || '',
-          personality: src.personality || root.personality || '',
-          scenario: src.scenario || root.scenario || '',
-          first_mes: src.first_mes || root.first_mes || '',
-          mes_example: src.mes_example || root.mes_example || '',
-          creator_notes: src.creator_notes || root.creator_notes || '',
-          system_prompt: src.system_prompt || root.system_prompt || '',
-          post_history_instructions: src.post_history_instructions || root.post_history_instructions || '',
-          alternate_greetings: getArrayField(src, 'alternate_greetings'),
-          character_book: src.character_book || root.character_book || { entries: [] },
-          tags: src.tags || root.tags || [],
-          creator: src.creator || root.creator || '',
-          character_version: src.character_version || root.character_version || '1.0',
-          group_only_greetings: getArrayField(src, 'group_only_greetings'),
-          // Date logic: Prioritize existing date in data, then root, then create_date (V1/V2), then fallback to today ONLY if missing
-          creation_date:
-            src.creation_date ??
-            root.creation_date ??
-            src.create_date ??
-            root.create_date ??
-            new Date().toISOString().split('T')[0],
-          modification_date: new Date().toISOString().split('T')[0],
-          extensions: src.extensions || root.extensions || {},
-          assets: getArrayField(src, 'assets'),
+      // Upgrade / normalise any payload version → CharacterCardV3.
+      // Number coercion failures are surfaced as toasts so the user knows which fields
+      // were defaulted or could not be resolved and need manual correction.
+      const importCallbacks: UpgradeCallbacks = {
+        onNumberDefaulted: (field, _rawValue, defaultUsed) => {
+          toast({
+            title: 'Field defaulted during import',
+            description: `"${field}" could not be parsed — defaulted to ${defaultUsed}. You can correct it in the editor.`,
+          })
+        },
+        onNumberMissing: (field, _rawValue) => {
+          toast({
+            title: 'Field requires your input',
+            description: `"${field}" could not be resolved. Please fill it in manually in the editor.`,
+            variant: 'destructive',
+          })
         },
       }
-
+      const v3Data = upgradeToV3(rawData, importCallbacks)
       setCharacterData(v3Data)
 
       toast({ title: t('importSuccess'), description: t('importSuccessDesc') })
@@ -482,7 +210,7 @@ const Index = () => {
               <Upload className='mr-2' />
               {t('importCard')}
             </Button>
-            <ConfigEditor onSettingsChange={handleAISettingsChange} />
+            <ConfigEditor onSettingsChange={handleInfSettingsChange} />
           </div>
         </div>
 
@@ -550,57 +278,57 @@ const Index = () => {
                 <div className='flex-1 min-h-0'>
                   <ScrollArea className='h-full'>
                     <div className='p-6 space-y-8'>
-                      <BasicInfoSection
-                        data={charaData.data as unknown as UsedCharacterData}
-                        updateField={updateField}
-                        characterImage={characterImage}
-                        setCharacterImage={setCharacterImage}
-                        infSettings={infSettings}
-                      />
+                      {(() => {
+                        const editableData: UsedCharacterData = charaData.data
+                        return (
+                          <>
+                            <BasicInfoSection
+                              data={editableData}
+                              updateField={updateField}
+                              characterImage={characterImage}
+                              setCharacterImage={setCharacterImage}
+                              infSettings={infSettings}
+                            />
 
-                      <PersonalitySection
-                        data={charaData.data as unknown as UsedCharacterData}
-                        updateField={updateField}
-                        infSettings={infSettings}
-                      />
+                            <PersonalitySection
+                              data={editableData}
+                              updateField={updateField}
+                              infSettings={infSettings}
+                            />
 
-                      <PromptsSection
-                        data={charaData.data as unknown as UsedCharacterData}
-                        updateField={updateField}
-                        infSettings={infSettings}
-                      />
+                            <PromptsSection data={editableData} updateField={updateField} infSettings={infSettings} />
 
-                      <AlternateGreetings
-                        greetings={
-                          Array.isArray(charaData.data.alternate_greetings)
-                            ? charaData.data.alternate_greetings
-                            : typeof charaData.data.alternate_greetings === 'string'
-                              ? [charaData.data.alternate_greetings]
-                              : []
-                        }
-                        updateField={updateField}
-                        infSettings={infSettings}
-                        charaData={charaData.data as unknown as UsedCharacterData}
-                      />
+                            <AlternateGreetings
+                              greetings={
+                                Array.isArray(editableData.alternate_greetings)
+                                  ? editableData.alternate_greetings
+                                  : typeof editableData.alternate_greetings === 'string'
+                                    ? [editableData.alternate_greetings]
+                                    : []
+                              }
+                              updateField={updateField}
+                              infSettings={infSettings}
+                              charaData={editableData}
+                            />
 
-                      <CharacterBook
-                        entries={charaData.data.character_book?.entries || []}
-                        updateField={updateField}
-                        infSettings={infSettings}
-                        charaData={charaData.data as unknown as UsedCharacterData}
-                      />
+                            <CharacterBook
+                              entries={editableData.character_book?.entries || []}
+                              updateField={updateField}
+                              infSettings={infSettings}
+                              charaData={editableData}
+                            />
 
-                      <TagsSection
-                        tags={charaData.data.tags || []}
-                        updateField={updateField}
-                        infSettings={infSettings}
-                        charaData={charaData.data as unknown as UsedCharacterData}
-                      />
+                            <TagsSection
+                              tags={editableData.tags || []}
+                              updateField={updateField}
+                              infSettings={infSettings}
+                              charaData={editableData}
+                            />
 
-                      <MetadataSection
-                        data={charaData.data as unknown as UsedCharacterData}
-                        updateField={updateField}
-                      />
+                            <MetadataSection data={editableData} updateField={updateField} />
+                          </>
+                        )
+                      })()}
                     </div>
                   </ScrollArea>
                 </div>

@@ -15,11 +15,11 @@ import { UsedCharacterData } from '@/types/charactercard'
 interface TagsSectionProps {
   tags: string[]
   updateField: (field: string, value: any) => void
-  aiSettings: InferenceSettings | null
-  characterData: UsedCharacterData
+  infSettings: InferenceSettings | null
+  charaData: UsedCharacterData
 }
 
-const TagsSection = ({ tags, updateField, aiSettings, characterData }: TagsSectionProps) => {
+const TagsSection = ({ tags, updateField, infSettings, charaData }: TagsSectionProps) => {
   const [newTag, setNewTag] = useState('')
   const [loading, setLoading] = useState(false)
   const abortControllerRef = useRef<AbortController | null>(null)
@@ -61,8 +61,8 @@ const TagsSection = ({ tags, updateField, aiSettings, characterData }: TagsSecti
    */
   const handleAIGenerate = async () => {
     if (
-      !aiSettings?.endpoint?.apiKey &&
-      !['ollama', 'lmstudio'].includes(aiSettings?.endpoint?.provider?.toLowerCase() || '')
+      !infSettings?.endpoint?.apiKey &&
+      !['ollama', 'lmstudio'].includes(infSettings?.endpoint?.provider?.toLowerCase() || '')
     ) {
       toast({
         title: t('configError') || 'Configuration error',
@@ -72,7 +72,7 @@ const TagsSection = ({ tags, updateField, aiSettings, characterData }: TagsSecti
       return
     }
 
-    if (!characterData.name || !characterData.description) {
+    if (!charaData.name || !charaData.description) {
       toast({
         title: t('incompleteInfo') || 'Incomplete information',
         description: t('fillNameDesc') || 'Please fill in the Card name and role description first',
@@ -85,8 +85,8 @@ const TagsSection = ({ tags, updateField, aiSettings, characterData }: TagsSecti
     setLoading(true)
 
     try {
-      const prompt = generateTags(characterData)
-      const result = await generateWithAI(aiSettings, prompt)
+      const prompt = generateTags(charaData)
+      const result = await generateWithAI(infSettings, prompt)
 
       // Parses tag strings returned by AI
       const newTags = result
@@ -151,7 +151,7 @@ const TagsSection = ({ tags, updateField, aiSettings, characterData }: TagsSecti
             size='sm'
             variant={loading ? 'destructive' : 'outline'}
             onClick={loading ? cancelGeneration : handleAIGenerate}
-            disabled={!loading && (!characterData.name || !characterData.description)}
+            disabled={!loading && (!charaData.name || !charaData.description)}
             className='h-8 px-2 text-xs'
           >
             {loading ? (

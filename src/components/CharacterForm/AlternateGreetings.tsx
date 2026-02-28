@@ -1,10 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useRef } from 'react'
 import { Label } from '@/components/ui/glass/label'
 import { Textarea } from '@/components/ui/glass/textarea'
 import { Button } from '@/components/ui/glass/button'
 import { useToast } from '@/hooks/use-toast'
-import { Plus, X, Edit2, Check, RefreshCcw, Trash2, Wand, Sparkles } from 'lucide-react'
+import { Plus, X, Edit2, Check, Sparkles, Loader2, RefreshCcw, Trash2 } from 'lucide-react'
 import { generateWithAI, generateAlternateGreeting } from '@/utils/aiGenerator'
 import { InferenceSettings } from '@/types/settings'
 import { useLanguage } from '@/contexts/LanguageContext'
@@ -12,12 +11,12 @@ import { UsedCharacterData } from '@/types/charactercard.ts'
 
 interface AlternateGreetingsProps {
   greetings: string[]
-  updateField: (field: string, value: any) => void
-  aiSettings: InferenceSettings | null
+  updateField: (field: string, value: string | string[]) => void
+  infSettings: InferenceSettings
   charaData: UsedCharacterData
 }
 
-const AlternateGreetings = ({ greetings, updateField, aiSettings, charaData }: AlternateGreetingsProps) => {
+const AlternateGreetings = ({ greetings, updateField, infSettings, charaData }: AlternateGreetingsProps) => {
   const [newGreeting, setNewGreeting] = useState('')
   const [editingIndex, setEditingIndex] = useState<number | null>(null)
   const [editingText, setEditingText] = useState('')
@@ -67,8 +66,8 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, charaData }: A
 
   const handleAIGenerateGreeting = async () => {
     if (
-      !aiSettings?.endpoint?.apiKey &&
-      !['ollama', 'lmstudio'].includes(aiSettings?.endpoint?.provider?.toLowerCase() || '')
+      !infSettings?.endpoint?.apiKey &&
+      !['ollama', 'lmstudio'].includes(infSettings?.endpoint?.provider?.toLowerCase() || '')
     ) {
       toast({
         title: t('configError') || 'Configuration error',
@@ -83,7 +82,7 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, charaData }: A
         title: t('incompleteInfo') || 'Incomplete information',
         description:
           t('fillNameDesc') ||
-          'In order to create an appropriate greeting, the character must first have' + ' a name and description.',
+          'In order to create an appropriate greeting, the character must first have a name and description.',
         variant: 'destructive',
       })
       return
@@ -94,7 +93,7 @@ const AlternateGreetings = ({ greetings, updateField, aiSettings, charaData }: A
 
     try {
       const prompt = generateAlternateGreeting(charaData)
-      const result = await generateWithAI(aiSettings, prompt)
+      const result = await generateWithAI(infSettings, prompt)
       updateField('alternate_greetings', [...greetings, result])
       toast({
         title: t('generateSuccess') || 'Generate successfully',

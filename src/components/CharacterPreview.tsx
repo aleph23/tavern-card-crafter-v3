@@ -9,7 +9,7 @@ import { useLanguage } from '@/contexts/LanguageContext'
 import { estimateTokens } from '@/utils/aiGenerator'
 
 interface CharacterPreviewProps {
-  characterData: any
+  charaData: any
   characterImage: string | null
 }
 
@@ -18,16 +18,16 @@ interface CharacterPreviewProps {
  *
  * The component utilizes hooks for toast notifications and language translation. It provides functionality to copy character data to the clipboard, download the character data as a JSON file, and export the character data embedded in a PNG image. It also calculates total characters and tokens from various fields in the character data and highlights JSON syntax for better readability.
  *
- * @param characterData - The data of the character to be previewed, including various attributes.
+ * @param charaData - The data of the character to be previewed, including various attributes.
  * @param characterImage - The URL of the character's image to be used for PNG export.
  * @returns A JSX element representing the character preview.
  */
-const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewProps) => {
+const CharacterPreview = ({ charaData, characterImage }: CharacterPreviewProps) => {
   const { toast } = useToast()
   const { t } = useLanguage()
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(JSON.stringify(characterData, null, 2))
+    navigator.clipboard.writeText(JSON.stringify(charaData, null, 2))
     toast({ title: t('copySuccess'), description: t('copySuccessDesc') })
   }
 
@@ -35,9 +35,9 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
    * Downloads character data as a JSON file.
    */
   const downloadJson = () => {
-    const dataStr = JSON.stringify(characterData, null, 2)
+    const dataStr = JSON.stringify(charaData, null, 2)
     const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr)
-    const exportFileDefaultName = `${characterData.data.name || 'character'}_card_v3.json`
+    const exportFileDefaultName = `${charaData.data.name || 'character'}_card_v3.json`
 
     const linkElement = document.createElement('a')
     linkElement.setAttribute('href', dataUri)
@@ -53,7 +53,7 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
    * In case of an error during the process, it logs the error and displays a failure notification.
    *
    * @param characterImage - The URL of the character image to be downloaded.
-   * @param characterData - The data associated with the character to be embedded in the PNG.
+   * @param charaData - The data associated with the character to be embedded in the PNG.
    * @returns void
    * @throws Error If an error occurs during the image fetching or embedding process.
    */
@@ -89,7 +89,7 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
             const uint8Array = new Uint8Array(arrayBuffer)
 
             // Prepare the character data as base64
-            const jsonData = JSON.stringify(characterData)
+            const jsonData = JSON.stringify(charaData)
             const base64Data = btoa(unescape(encodeURIComponent(jsonData)))
 
             // Create tEXt chunk
@@ -163,7 +163,7 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
             const url = URL.createObjectURL(newBlob)
             const link = document.createElement('a')
             link.href = url
-            link.download = `${characterData.data.name || 'character'}_card.png`
+            link.download = `${charaData.data.name || 'character'}_card.png`
             link.click()
             URL.revokeObjectURL(url)
 
@@ -229,7 +229,7 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
    * for totalTokens. The results are returned as an object containing both totals.
    */
   const calculateTotalStats = () => {
-    const { data } = characterData
+    const { data } = charaData
     let totalChars = 0
     let totalTokens = 0
 
@@ -312,7 +312,7 @@ const CharacterPreview = ({ characterData, characterImage }: CharacterPreviewPro
     )
   }
 
-  const highlightedJson = syntaxHighlight(JSON.stringify(characterData, null, 2))
+  const highlightedJson = syntaxHighlight(JSON.stringify(charaData, null, 2))
 
   return (
     <Card className='shadow-lg border-0 bg-card/80 backdrop-blur-sm'>

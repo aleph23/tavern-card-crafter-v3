@@ -11,7 +11,7 @@ import { UsedCharacterData } from '@/types/charactercard'
 interface PromptsSectionProps {
   data: UsedCharacterData
   updateField: (field: string, value: string) => void
-  aiSettings: InferenceSettings | null
+  infSettings: InferenceSettings | null
 }
 
 /**
@@ -21,10 +21,10 @@ interface PromptsSectionProps {
  *
  * @param data - An object containing the current prompt data.
  * @param updateField - A function to update the specific field in the prompt data.
- * @param aiSettings - An object containing the AI configuration settings, including the API key and provider.
+ * @param infSettings - An object containing the AI configuration settings, including the API key and provider.
  * @returns A JSX element representing the prompts section.
  */
-const PromptsSection = ({ data, updateField, aiSettings }: PromptsSectionProps) => {
+const PromptsSection = ({ data, updateField, infSettings }: PromptsSectionProps) => {
   const [loading, setLoading] = useState<{ [key: string]: boolean }>({})
   const abortControllerRefs = useRef<{ [key: string]: AbortController | null }>({})
   const { toast } = useToast()
@@ -41,8 +41,8 @@ const PromptsSection = ({ data, updateField, aiSettings }: PromptsSectionProps) 
    */
   const handleAIGenerate = async (field: string, promptGenerator: (data: UsedCharacterData) => string) => {
     if (
-      !aiSettings?.endpoint?.apiKey &&
-      !['ollama', 'lmstudio'].includes(aiSettings?.endpoint?.provider?.toLowerCase() || '')
+      !infSettings?.endpoint?.apiKey &&
+      !['ollama', 'lmstudio'].includes(infSettings?.endpoint?.provider?.toLowerCase() || '')
     ) {
       toast({
         title: 'Configuration error',
@@ -66,7 +66,7 @@ const PromptsSection = ({ data, updateField, aiSettings }: PromptsSectionProps) 
 
     try {
       const prompt = promptGenerator(data)
-      const result = await generateWithAI(aiSettings, prompt)
+      const result = await generateWithAI(infSettings, prompt)
       updateField(field, result)
       toast({ title: 'Generate successfully', description: `${field} Generated completed` })
     } catch (error) {

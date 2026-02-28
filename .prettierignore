@@ -1,0 +1,78 @@
+# ─────────────────────────────────────────────
+# Logs
+# ─────────────────────────────────────────────
+logs/
+*.log*
+
+# ─────────────────────────────────────────────
+# OS / Editor / Tooling
+# ─────────────────────────────────────────────
+.DS_Store
+.vscode/
+.idea/
+.qlty/
+.vs/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# JetBrains / VSCode AI tooling
+appmap.yml
+.continue/
+
+# ─────────────────────────────────────────────
+# Package managers
+# ─────────────────────────────────────────────
+node_modules/
+yarn.lock
+pnpm-lock.yaml
+pnpm-workspace.yaml
+package-lock.json
+
+# ─────────────────────────────────────────────
+# Build output (Electron + Vite)
+# ─────────────────────────────────────────────
+build-electron/
+dist-electron/
+portable-build/
+dist/
+dist-ssr/
+
+# Electron artifacts that sometimes escape
+*.asar
+*.pak
+*.bin
+
+# ─────────────────────────────────────────────
+# Temporary / local environment
+# ─────────────────────────────────────────────
+tmp/
+*.local
+*.txt
+
+# ─────────────────────────────────────────────
+# GitHub-specific
+# ─────────────────────────────────────────────
+.github/copilot-instructions.md
+prompts.json
+.claude/
+settings.json
+
+bun.lockb
+config.json
+.mcp.json
+
+# ─────────────────────────────────────────────
+# Binary / image assets (prettier can't format)
+# ─────────────────────────────────────────────
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico
+*.svg
+*.webp
+img/
+res/

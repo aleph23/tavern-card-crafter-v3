@@ -14,7 +14,7 @@ interface BasicInfoSectionProps {
   updateField: (field: string, value: string) => void
   characterImage: string | null
   setCharacterImage: (image: string | null) => void
-  aiSettings: InferenceSettings | null
+  infSettings: InferenceSettings | null
 }
 
 /**
@@ -27,7 +27,7 @@ interface BasicInfoSectionProps {
  * @param {Function} props.updateField - Function to update a specific field in the character data.
  * @param {string} props.characterImage - The URL of the character's avatar image.
  * @param {Function} props.setCharacterImage - Function to set the character's avatar image.
- * @param {Object} props.aiSettings - The settings for AI generation, including API key and provider.
+ * @param {Object} props.infSettings - The settings for AI generation, including API key and provider.
  * @returns {JSX.Element} The rendered Basic Information section.
  */
 const BasicInfoSection = ({
@@ -35,7 +35,7 @@ const BasicInfoSection = ({
   updateField,
   characterImage,
   setCharacterImage,
-  aiSettings,
+  infSettings,
 }: BasicInfoSectionProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [loading, setLoading] = useState(false)
@@ -70,7 +70,7 @@ const BasicInfoSection = ({
    * It then verifies that the card name is filled in before proceeding to generate a description using AI.
    * If successful, it updates the description field and displays a success message; otherwise, it handles errors appropriately.
    *
-   * @param {Object} aiSettings - The settings for the AI generation, including the API key and provider.
+   * @param {Object} infSettings - The settings for the AI generation, including the API key and provider.
    * @param {Object} data - The data object containing the card information, including the name.
    * @param {Function} setLoading - A function to set the loading state.
    * @param {Function} updateField - A function to update a specific field in the data.
@@ -81,8 +81,8 @@ const BasicInfoSection = ({
    */
   const handleAIGenerateDescription = async () => {
     if (
-      !aiSettings?.endpoint?.apiKey &&
-      !['ollama', 'lmstudio'].includes(aiSettings?.endpoint?.provider?.toLowerCase() || '')
+      !infSettings?.endpoint?.apiKey &&
+      !['ollama', 'lmstudio'].includes(infSettings?.endpoint?.provider?.toLowerCase() || '')
     ) {
       toast({
         title: 'Configuration error',
@@ -106,7 +106,7 @@ const BasicInfoSection = ({
 
     try {
       const prompt = generateDescription(data)
-      const result = await generateWithAI(aiSettings, prompt)
+      const result = await generateWithAI(infSettings, prompt)
       updateField('description', result)
       toast({ title: 'Generate successfully', description: 'Role description has been generated' })
     } catch (error) {
@@ -265,7 +265,7 @@ export default memo(BasicInfoSection, (prevProps, nextProps) => {
     prevProps.data.nickname === nextProps.data.nickname &&
     prevProps.data.description === nextProps.data.description &&
     prevProps.characterImage === nextProps.characterImage &&
-    prevProps.aiSettings === nextProps.aiSettings &&
+    prevProps.infSettings === nextProps.infSettings &&
     prevProps.updateField === nextProps.updateField &&
     prevProps.setCharacterImage === nextProps.setCharacterImage
   )

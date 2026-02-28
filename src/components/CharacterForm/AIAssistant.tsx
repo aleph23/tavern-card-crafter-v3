@@ -7,12 +7,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { Download, RefreshCcw, Wand, X } from 'lucide-react'
-import { CharacterDataV3 } from '@/types/charactercard'
+import { UsedCharacterData } from '@/types/charactercard'
 import { generateWithAI } from '@/utils/aiGenerator'
 import { InferenceSettings } from '@/types/settings'
 
 interface AIAssistantProps {
-  aiSettings: InferenceSettings | null
+  infSettings: InferenceSettings | null
   onInsertField: (field: string, value: string | string[]) => void
 }
 
@@ -56,16 +56,16 @@ const CHARACTER_TYPES = [
  * This component manages the state for input text, character type, and parsed data. It provides functionality to generate character data using AI, handle user interactions for inserting fields, and manage the cancellation of ongoing generation processes. The component also formats prompts based on the selected character type and ensures robust JSON parsing of the AI's response.
  *
  * @param {AIAssistantProps} props - The properties for the AIAssistant component.
- * @param {Object} props.aiSettings - The settings for the AI generation.
+ * @param {Object} props.infSettings - The settings for the AI generation.
  * @param {Function} props.onInsertField - Callback function to insert generated fields into a form.
  * @returns {JSX.Element} The rendered AIAssistant component.
  */
-const AIAssistant = ({ aiSettings, onInsertField }: AIAssistantProps) => {
+const AIAssistant = ({ infSettings, onInsertField }: AIAssistantProps) => {
   const { toast } = useToast()
   const { t } = useLanguage()
   const [inputText, setInputText] = useState('')
   const [characterType, setCharacterType] = useState('general')
-  const [parsedData, setParsedData] = useState<CharacterDataV3 | null>(null)
+  const [parsedData, setParsedData] = useState<Partial<UsedCharacterData> | null>(null)
   const [isGenerating, setIsGenerating] = useState(false)
   const abortControllerRef = useRef<AbortController | null>(null)
 
@@ -158,7 +158,7 @@ This is a historic character (real or fictional), please generate:
       return
     }
 
-    if (!aiSettings) {
+    if (!infSettings) {
       toast({ title: 'hint', description: 'Please configure API settings first', variant: 'destructive' })
       return
     }
@@ -172,7 +172,7 @@ This is a historic character (real or fictional), please generate:
       console.log('Generated prompt length:', prompt.length)
       console.log('Prompt preview:', prompt.substring(0, 200) + '...')
 
-      const result = await generateWithAI(aiSettings, prompt)
+      const result = await generateWithAI(infSettings, prompt)
       console.log('AI result:', result)
 
       // More robust JSON parsing
@@ -260,8 +260,15 @@ This is a historic character (real or fictional), please generate:
 
     // Insert all fields with values
     Object.entries(parsedData).forEach(([key, value]) => {
-      if (value && (Array.isArray(value) ? value.length > 0 : value.trim())) {
-        onInsertField(key, value)
+      // Check if value is string or array and not empty
+      const isValidValue = Array.isArray(value)
+        ? value.length > 0
+        : typeof value === 'string'
+          ? value.trim().length > 0
+          : value !== null && value !== undefined
+
+      if (isValidValue) {
+        onInsertField(key, value as string | string[])
         insertedCount++
       }
     })
