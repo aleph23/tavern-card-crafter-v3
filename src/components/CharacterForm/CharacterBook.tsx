@@ -11,7 +11,7 @@ import { CharacterBookEntry, UsedCharacterData, createCharacterBookEntry } from 
 
 interface CharacterBookProps {
   entries: CharacterBookEntry[]
-  updateField: (field: string, value: any) => void
+  updateField: (field: string, value: { entries: CharacterBookEntry[] }) => void
   infSettings: InferenceSettings | null
   charaData: UsedCharacterData
 }
@@ -50,7 +50,7 @@ const CharacterBook = ({ entries, updateField, infSettings, charaData }: Charact
     updateField('character_book', { entries: entries.filter((_, i) => i !== index) })
   }
 
-  const handleAIGenerateEntry = async () => {
+  const handleAIGenerateEntry = async (isRegenerate: boolean = false) => {
     if (
       !infSettings?.endpoint?.apiKey &&
       !['ollama', 'lmstudio'].includes(infSettings?.endpoint?.provider?.toLowerCase() || '')
@@ -76,31 +76,40 @@ const CharacterBook = ({ entries, updateField, infSettings, charaData }: Charact
     setLoading(true)
 
     try {
-      const prompt = generateCharacterBookEntry(charaData)
-      const result = await generateWithAI(infSettings, prompt)
+      const payload = {
+        ...charaData,
+        keys: newEntryKeys
+          .split(',')
+          .map((k) => k.trim())
+          .filter(Boolean),
+        content: newEntryContent,
+      }
+      const prompt = generateCharacterBookEntry(payload, isRegenerate)
+      const result = await generateWithAI(infSettings, prompt, abortControllerRef.current.signal)
 
       // Analyze the content returned by AI and try to extract keywords and content
-      const lines = result.split('\n').filter((line) => line.trim())
+      const splitLines = result.split('\n')
+      const lines = splitLines.filter((line) => line.trim())
       let keys: string[] = []
       let content = result
 
       // Try to parse formatted reply
       for (const line of lines) {
-        if (line.includes('Keywords:') || line.includes('Keywords:')) {
-          const keywordsMatch = line.match(/Keywords[:: ]\s*(.+)/)
+        const lowerLine = line.toLowerCase()
+        if (lowerLine.includes('keywords:')) {
+          const keywordsMatch = line.match(/keywords[: ]+\s*(.+)/i)
           if (keywordsMatch) {
-            keys = keywordsMatch[1]
-              .split(/[,, ]/)
-              .map((k) => k.trim())
-              .filter((k) => k)
+            const rawKeywords = keywordsMatch[1].split(/[,\s]+/)
+            keys = rawKeywords.map((k) => k.trim().replace(/^["']|["']$/g, '')).filter(Boolean)
           }
-        } else if (line.includes('content:') || line.includes('content:')) {
-          const contentMatch = line.match(/content[:: ]\s*(.+)/)
+        } else if (lowerLine.includes('content:')) {
+          const contentMatch = line.match(/content[: ]+\s*(.+)/i)
           if (contentMatch) {
+            const lineIndex = lines.indexOf(line)
             content = lines
-              .slice(lines.indexOf(line))
+              .slice(lineIndex)
               .join('\n')
-              .replace(/^content[:: ]\s*/, '')
+              .replace(/^content[: ]+\s*/i, '')
             break
           }
         }
@@ -120,16 +129,16 @@ const CharacterBook = ({ entries, updateField, infSettings, charaData }: Charact
       if (error instanceof Error && error.name === 'AbortError') {
         toast({ title: 'Canceled', description: 'AI generation has been canceled by the user' })
       } else {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error'
         toast({
           title: 'Generation failed',
-          description: error instanceof Error ? error.message : 'Unknown error',
+          description: errorMessage,
           variant: 'destructive',
         })
       }
-    } finally {
-      setLoading(false)
-      abortControllerRef.current = null
     }
+    setLoading(false)
+    abortControllerRef.current = null
   }
 
   /**
@@ -138,9 +147,6 @@ const CharacterBook = ({ entries, updateField, infSettings, charaData }: Charact
   const cancelGeneration = () => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort()
-      setLoading(false)
-      abortControllerRef.current = null
-      toast({ title: 'Canceled', description: 'AI generation has been canceled' })
     }
   }
 
@@ -155,7 +161,12 @@ const CharacterBook = ({ entries, updateField, infSettings, charaData }: Charact
         <h3 className='text-lg font-semibold text-foreground mb-4'>Character Book</h3>
         <div className='flex gap-1'>
           {!loading && (
-            <Button size='sm' variant='outline' onClick={handleAIGenerateEntry} className='h-8 px-2 text-xs'>
+            <Button
+              size='sm'
+              variant='outline'
+              onClick={() => handleAIGenerateEntry(true)}
+              className='h-8 px-2 text-xs'
+            >
               <RefreshCcw className='w-3 h-3 mr-1' />
               Regenerate
             </Button>
@@ -163,7 +174,7 @@ const CharacterBook = ({ entries, updateField, infSettings, charaData }: Charact
           <Button
             size='sm'
             variant={loading ? 'destructive' : 'outline'}
-            onClick={loading ? cancelGeneration : handleAIGenerateEntry}
+            onClick={loading ? cancelGeneration : () => handleAIGenerateEntry(false)}
             disabled={!loading && (!charaData.name || !charaData.description)}
             className='h-8 px-2 text-xs'
           >

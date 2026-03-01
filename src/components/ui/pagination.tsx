@@ -2,7 +2,8 @@ import * as React from 'react'
 import { ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
-import { ButtonProps, buttonVariants } from '@/components/ui/glass/button'
+import { buttonVariants } from '@/components/ui/button'
+import type { ButtonProps } from '@/components/ui/glass/button'
 
 const Pagination = ({ className, ...props }: React.ComponentProps<'nav'>) => (
   <nav
@@ -17,7 +18,7 @@ Pagination.displayName = 'Pagination'
 const PaginationContent = React.forwardRef<HTMLUListElement, React.ComponentProps<'ul'>>(
   ({ className, ...props }, ref) => (
     <ul ref={ref} className={cn('flex flex-row items-center gap-1', className)} {...props} />
-  )
+  ),
 )
 PaginationContent.displayName = 'PaginationContent'
 

@@ -3,7 +3,8 @@ import { Alert as BaseAlert, AlertDescription, AlertTitle } from '@/components/u
 import { cn } from '@/lib/utils'
 import { hoverEffects, type HoverEffect } from '@/lib/hover-effects'
 
-export interface AlertProps extends React.ComponentProps<typeof BaseAlert> {
+export interface AlertProps extends Omit<React.ComponentProps<typeof BaseAlert>, 'variant'> {
+  variant?: string
   glow?: boolean
   hover?: HoverEffect
 }
@@ -20,22 +21,21 @@ export interface AlertProps extends React.ComponentProps<typeof BaseAlert> {
  * ```
  */
 export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
-  ({ className, variant = 'glass', glow = false, hover = 'none', ...props }, ref) => {
+  ({ className, variant: _variant = 'glass', glow = false, hover = 'none', ...props }, ref) => {
     return (
       <BaseAlert
         ref={ref}
-        variant={variant}
         className={cn(
           'relative overflow-hidden',
           glow && 'shadow-lg shadow-purple-500/20',
           'transition-all duration-200',
           hoverEffects({ hover }),
-          className
+          className,
         )}
         {...props}
       />
     )
-  }
+  },
 )
 Alert.displayName = 'Alert'
 

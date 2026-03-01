@@ -1,5 +1,5 @@
 /* eslint-disable prefer-const */
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { Button } from '@/components/ui/glass/button'
 import { Input } from '@/components/ui/glass/input'
 import { Label } from '@/components/ui/glass/label'
@@ -15,12 +15,12 @@ import AppearanceSettings from './AppearanceSettings'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/glass/accordion'
 import { buildApiUrl } from '@/utils/buildApiUrl'
 import { configManager } from '@/utils/configManager'
-import { AppConfig, Endpoint, Settings } from '@/types/settings'
+import { AppConfig, Endpoint, InferenceSettings } from '@/types/settings'
 import { DEFAULT_SETTINGS, DEFAULT_APP_CONFIG } from '@/config/defaultSettings'
 import { apiProviders } from '@/config/providers'
 
 interface ConfigEditorProps {
-  onSettingsChange: (settings: Settings) => void
+  onSettingsChange: (settings: InferenceSettings) => void
 }
 
 const createDefaultConfig = (): AppConfig => DEFAULT_APP_CONFIG()
@@ -47,17 +47,31 @@ export const ConfigEditor = ({ onSettingsChange }: ConfigEditorProps) => {
   const [connectionStatus, setConnectionStatus] = useState<Record<string, 'idle' | 'success' | 'error'>>({})
   const [lastError, setLastError] = useState<Record<string, string>>({})
 
-  const loadConfig = async () => {
+  const loadConfig = useCallback(async () => {
     const loadedConfig = await configManager.loadConfig()
     if (loadedConfig) {
       setConfig(loadedConfig)
     } else {
       setConfig(createDefaultConfig())
     }
-  }
+  }, [])
 
   useEffect(() => {
-    loadConfig()
+    let isMounted = true
+    const initiateLoad = async () => {
+      const loadedConfig = await configManager.loadConfig()
+      if (isMounted) {
+        if (loadedConfig) {
+          setConfig(loadedConfig)
+        } else {
+          setConfig(createDefaultConfig())
+        }
+      }
+    }
+    initiateLoad()
+    return () => {
+      isMounted = false
+    }
   }, [isOpen]) // Reload when opened, but also load initially
 
   /**
@@ -97,12 +111,12 @@ export const ConfigEditor = ({ onSettingsChange }: ConfigEditorProps) => {
     const newEndpoint: Endpoint = {
       id: crypto.randomUUID(),
       name: `New Endpoint ${config.endpoints.length + 1}`,
-      provider: DEFAULT_SETTINGS.provider,
-      apiKey: DEFAULT_SETTINGS.apiKey,
-      apiUrl: DEFAULT_SETTINGS.apiUrl,
-      model: DEFAULT_SETTINGS.model,
+      provider: DEFAULT_SETTINGS.endpoint?.provider || '',
+      apiKey: DEFAULT_SETTINGS.endpoint?.apiKey || '',
+      apiUrl: DEFAULT_SETTINGS.endpoint?.apiUrl || '',
+      model: DEFAULT_SETTINGS.endpoint?.model || '',
       type: 'text',
-      availableModels: [DEFAULT_SETTINGS.model],
+      availableModels: [DEFAULT_SETTINGS.endpoint?.model || ''],
     }
 
     setConfig({ ...config, endpoints: [...config.endpoints, newEndpoint] })
@@ -248,8 +262,9 @@ export const ConfigEditor = ({ onSettingsChange }: ConfigEditorProps) => {
         headers['X-Title'] = 'CardCreator'
       }
 
-      // If the user provides an API key, we should send it, even if the provider doesn't strictly require it (e.g. some local providers).
-      if (endpoint.apiKey && (currentProvider?.requiresKey || endpoint.apiKey)) {
+      // Validated at the top of the function: block if required but missing.
+      // Now we just send it if it's there (even if not strictly required).
+      if (endpoint.apiKey) {
         headers['Authorization'] = `Bearer ${endpoint.apiKey}`
       }
 
@@ -282,9 +297,8 @@ export const ConfigEditor = ({ onSettingsChange }: ConfigEditorProps) => {
       setConnectionStatus((prev) => ({ ...prev, [endpoint.id]: 'error' }))
       setLastError((prev) => ({ ...prev, [endpoint.id]: errorMessage }))
       toast({ title: 'Connection Failed', description: errorMessage, variant: 'destructive' })
-    } finally {
-      setTestingEndpointId(null)
     }
+    setTestingEndpointId(null)
   }
 
   /**
@@ -299,6 +313,15 @@ export const ConfigEditor = ({ onSettingsChange }: ConfigEditorProps) => {
     const endpoint = config.endpoints[index]
     const currentProvider = apiProviders.find((p) => p.value === endpoint.provider)
 
+    if (currentProvider && currentProvider.modelsUrl === null) {
+      toast({
+        title: 'Not Supported',
+        description: 'This provider does not support fetching models.',
+        variant: 'default',
+      })
+      return
+    }
+
     if (currentProvider?.requiresKey && !endpoint.apiKey) {
       toast({ title: 'Missing API Key', description: 'Please enter an API key.', variant: 'destructive' })
       return
@@ -310,9 +333,9 @@ export const ConfigEditor = ({ onSettingsChange }: ConfigEditorProps) => {
 
     setLoadingModelsEndpointId(endpoint.id)
 
-    try {
-      const modelsUrl = currentProvider?.modelsUrl || buildModelsUrl(endpoint.apiUrl, endpoint.provider)
+    const modelsUrl = currentProvider?.modelsUrl || buildModelsUrl(endpoint.apiUrl, endpoint.provider)
 
+    try {
       console.log('Fetching models from:', modelsUrl)
       console.log('Provider:', endpoint.provider)
 
@@ -322,7 +345,7 @@ export const ConfigEditor = ({ onSettingsChange }: ConfigEditorProps) => {
         headers['HTTP-Referer'] = 'https://github.com/aleph23/tavern-card-creator-v3'
         headers['X-Title'] = 'CharaCardCreator'
       }
-      if (endpoint.apiKey && (currentProvider?.requiresKey || endpoint.apiKey)) {
+      if (endpoint.apiKey) {
         headers['Authorization'] = `Bearer ${endpoint.apiKey}`
       }
 
@@ -356,9 +379,8 @@ export const ConfigEditor = ({ onSettingsChange }: ConfigEditorProps) => {
     } catch (error) {
       console.error(error)
       toast({ title: 'Fetch Failed', description: 'Network error while fetching models.', variant: 'destructive' })
-    } finally {
-      setLoadingModelsEndpointId(null)
     }
+    setLoadingModelsEndpointId(null)
   }
 
   const handleSave = async () => {
@@ -396,7 +418,10 @@ export const ConfigEditor = ({ onSettingsChange }: ConfigEditorProps) => {
           Settings
         </Button>
       </DrawerTrigger>
-      <DrawerContent className='sm:max-w-[1200px] max-h-[100vh] flex flex-col' overflow-y-auto>
+      <DrawerContent
+        className='sm:max-w-[1200px] max-h-screen flex flex-col bg-transparent border-none p-0 overflow-hidden outline-none'
+        overflow-y-auto
+      >
         {!config ? (
           <div className='flex justify-center items-center p-4'>
             <Loader2 className='h-6 w-6 animate-spin text-primary' />
@@ -407,7 +432,7 @@ export const ConfigEditor = ({ onSettingsChange }: ConfigEditorProps) => {
               <DrawerTitle>Settings</DrawerTitle>
             </DrawerHeader>
             <Tabs defaultValue='connection' className='flex-1 flex flex-col min-h-0'>
-              <TabsList className='grid w-full grid-cols-3 flex-shrink-0'>
+              <TabsList className='grid w-full grid-cols-3 shrink-0'>
                 <TabsTrigger value='connection'>API & Inference Parameters</TabsTrigger>
                 <TabsTrigger value='prompts'>Prompt Templates</TabsTrigger>
                 <TabsTrigger value='appearance'>UI Appearance</TabsTrigger>
@@ -540,8 +565,12 @@ export const ConfigEditor = ({ onSettingsChange }: ConfigEditorProps) => {
                                   variant='outline'
                                   size='icon'
                                   onClick={() => fetchModels(index)}
-                                  disabled={loadingModelsEndpointId === endpoint.id}
-                                  title='Get Model List'
+                                  disabled={loadingModelsEndpointId === endpoint.id || provider?.modelsUrl === null}
+                                  title={
+                                    provider?.modelsUrl === null
+                                      ? 'Fetching models is not supported for this provider'
+                                      : 'Get Model List'
+                                  }
                                 >
                                   {loadingModelsEndpointId === endpoint.id ? (
                                     <Loader2 className='h-4 w-4 animate-spin' />

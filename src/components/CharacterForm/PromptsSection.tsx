@@ -66,7 +66,7 @@ const PromptsSection = ({ data, updateField, infSettings }: PromptsSectionProps)
 
     try {
       const prompt = promptGenerator(data)
-      const result = await generateWithAI(infSettings, prompt)
+      const result = await generateWithAI(infSettings, prompt, abortControllerRefs.current[field]!.signal)
       updateField(field, result)
       toast({ title: 'Generate successfully', description: `${field} Generated completed` })
     } catch (error) {
@@ -79,10 +79,9 @@ const PromptsSection = ({ data, updateField, infSettings }: PromptsSectionProps)
           variant: 'destructive',
         })
       }
-    } finally {
-      setLoading((prev) => ({ ...prev, [field]: false }))
-      abortControllerRefs.current[field] = null
     }
+    setLoading((prev) => ({ ...prev, [field]: false }))
+    abortControllerRefs.current[field] = null
   }
 
   /**
@@ -91,9 +90,6 @@ const PromptsSection = ({ data, updateField, infSettings }: PromptsSectionProps)
   const cancelGeneration = (field: string) => {
     if (abortControllerRefs.current[field]) {
       abortControllerRefs.current[field]!.abort()
-      setLoading((prev) => ({ ...prev, [field]: false }))
-      abortControllerRefs.current[field] = null
-      toast({ title: 'Canceled', description: 'AI generation has been canceled' })
     }
   }
 
@@ -113,7 +109,7 @@ const PromptsSection = ({ data, updateField, infSettings }: PromptsSectionProps)
    * @param {string} field - The identifier for the field being rendered.
    * @param {(data: any) => string} promptGenerator - A function that generates a prompt based on the provided data.
    */
-  const renderFieldButtons = (field: string, promptGenerator: (data: any) => string) => {
+  const renderFieldButtons = (field: string, promptGenerator: (data: UsedCharacterData['data']) => string) => {
     const isLoading = loading[field]
     const canGenerate = data.name && data.description && data.personality
 

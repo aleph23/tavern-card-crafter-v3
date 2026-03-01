@@ -185,14 +185,24 @@ export const PromptEditor: React.FC = () => {
             <CardTitle className='text-foreground'>{prompts[activeTab]?.name}</CardTitle>
             <CardDescription className='text-muted-foreground'>{prompts[activeTab]?.description}</CardDescription>
           </CardHeader>
-          <CardContent className='flex-1 p-4 pt-0'>
-            <Textarea
-              className='h-full min-h-[400px] font-mono text-sm resize-none'
-              value={prompts[activeTab]?.template || ''}
-              onChange={(e) => handlePromptChange(activeTab, e.target.value)}
-            />
-            <div className='mt-2 text-xs text-muted-foreground text-right'>
-              Length: {prompts[activeTab]?.template?.length || 0} chars
+          <CardContent className='flex-1 p-4 pt-0 flex flex-col gap-4'>
+            <div className='flex-1 min-h-[400px]'>
+              <Textarea
+                className='h-full w-full font-mono text-sm resize-none'
+                value={prompts[activeTab]?.template || ''}
+                onChange={(e) => handlePromptChange(activeTab, e.target.value)}
+              />
+            </div>
+            <div className='flex justify-between items-center text-xs text-muted-foreground'>
+              <div>
+                <span className='font-semibold'>Cheatsheet:</span> Use these placeholders to inject card data:
+                <code className='ml-2 text-primary/80'>
+                  {'{{name}}'}, {'{{nickname}}'}, {'{{description}}'}, {'{{personality}}'}, {'{{scenario}}'},{' '}
+                  {'{{first_mes}}'}, {'{{mes_example}}'}, {'{{system_prompt}}'}, {'{{alternate_greetings}}'},{' '}
+                  {'{{tags}}'}, {'{{creator_notes}}'}
+                </code>
+              </div>
+              <div>Length: {prompts[activeTab]?.template?.length || 0} chars</div>
             </div>
           </CardContent>
         </Card>

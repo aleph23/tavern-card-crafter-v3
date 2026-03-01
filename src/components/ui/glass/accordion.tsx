@@ -8,24 +8,25 @@ import {
 import { cn } from '@/lib/utils'
 
 export interface AccordionTriggerProps extends React.ComponentProps<typeof BaseAccordionTrigger> {
+  variant?: string
   glow?: boolean
 }
 
 /**
  * Glass UI Accordion - Enhanced accordion with glassy effects
  */
-export const AccordionTrigger = React.forwardRef<React.ElementRef<typeof BaseAccordionTrigger>, AccordionTriggerProps>(
-  ({ className, variant = 'glass', glow = false, ...props }, ref) => {
-    return (
-      <BaseAccordionTrigger
-        ref={ref}
-        variant={variant}
-        className={cn(glow && 'data-[state=open]:shadow-md data-[state=open]:shadow-purple-500/20', className)}
-        {...props}
-      />
-    )
-  }
-)
+export const AccordionTrigger = React.forwardRef<
+  React.ComponentRef<typeof BaseAccordionTrigger>,
+  AccordionTriggerProps
+>(({ className, variant = 'glass', glow = false, ...props }, ref) => {
+  return (
+    <BaseAccordionTrigger
+      ref={ref}
+      className={cn(glow && 'data-[state=open]:shadow-md data-[state=open]:shadow-purple-500/20', className)}
+      {...props}
+    />
+  )
+})
 AccordionTrigger.displayName = 'AccordionTrigger'
 
 export { BaseAccordion as Accordion, AccordionItem, AccordionContent }

@@ -39,6 +39,7 @@ const Index = () => {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [activeTab, setActiveTab] = useState('assistant')
   const [infSettings, setInfSettings] = useState<InferenceSettings | null>(null)
+  const [isConfigLoaded, setIsConfigLoaded] = useState(false)
 
   const [charaData, setCharacterData] = useState<CharacterCardV3>(() => {
     const today = Math.floor(Date.now() / 1000).toString()
@@ -87,6 +88,8 @@ const Index = () => {
       } catch (error) {
         console.error('Failed to load AI settings:', error)
         setInfSettings(DEFAULT_SETTINGS)
+      } finally {
+        setIsConfigLoaded(true)
       }
     }
     loadSettings()
@@ -130,6 +133,7 @@ const Index = () => {
       return
     }
 
+    const hintTitle = t('hint') || 'hint'
     try {
       let rawData: unknown
 
@@ -147,7 +151,7 @@ const Index = () => {
         reader.readAsDataURL(file)
       } else {
         toast({
-          title: t('hint') || 'hint',
+          title: hintTitle,
           description: 'Please select JSON or PNG Format role card file',
           variant: 'destructive',
         })
@@ -178,14 +182,22 @@ const Index = () => {
       toast({ title: t('importSuccess'), description: t('importSuccessDesc') })
     } catch (error) {
       console.error('Import error:', error)
+      const importErrorTitle = t('importError') || 'Import failed'
+      const isPng = file.name.endsWith('.png')
+      const importErrorDesc = isPng
+        ? 'The role card data is not found in this PNG file. Please make sure to use the PNG file containing the role card information.'
+        : t('importErrorDesc')
+
       toast({
-        title: t('importError') || 'Import failed',
-        description: file.name.endsWith('.png')
-          ? 'The role card data is not found in this PNG file. Please make sure to use the PNG file containing the role card information.'
-          : t('importErrorDesc'),
+        title: importErrorTitle,
+        description: importErrorDesc,
         variant: 'destructive',
       })
     }
+  }
+
+  if (!isConfigLoaded) {
+    return null
   }
 
   return (

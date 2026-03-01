@@ -17,32 +17,5 @@ export const buildApiUrl = (baseUrl: string, provider: string): string => {
 
   // Remove the end slash
   const cleanUrl = baseUrl.replace(/\/+$/, '')
-
-  // Ollama special treatment
-  if (provider === 'ollama') {
-    if (baseUrl.includes('/v1/chat/completions')) {
-      return cleanUrl
-    }
-    return `${cleanUrl}/v1/chat/completions`
-  }
-
-  // Special processing of Zhipu GLM
-  if (provider === 'zhipu') {
-    if (baseUrl.includes('/chat/completions')) {
-      return cleanUrl
-    }
-    return `${cleanUrl}/chat/completions`
-  }
-
-  // Standard processing from other providers
-  if (baseUrl.includes('/chat/completions')) {
-    return cleanUrl
-  }
-
-  // Smartly add endpoints
-  if (cleanUrl.includes('/v1')) {
-    return `${cleanUrl}/chat/completions`
-  } else {
-    return `${cleanUrl}/v1/chat/completions`
-  }
+  return cleanUrl
 }

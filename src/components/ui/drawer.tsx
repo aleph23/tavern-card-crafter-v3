@@ -7,18 +7,19 @@ const Drawer = ({ shouldScaleBackground = true, ...props }: React.ComponentProps
   <DrawerPrimitive.Root shouldScaleBackground={shouldScaleBackground} {...props} />
 )
 Drawer.displayName = 'Drawer'
+
 const DrawerTrigger = DrawerPrimitive.Trigger
+
 const DrawerPortal = DrawerPrimitive.Portal
+
 const DrawerClose = DrawerPrimitive.Close
+
 const DrawerOverlay = React.forwardRef<
   React.ComponentRef<typeof DrawerPrimitive.Overlay>,
   React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Overlay>
->( // do not combine this with next line because I said so. Really I mean it, don't even think about it
-  // DrawerOverlay is a component that is used to render the overlay, and it is a component that is used to render the overlay, and it is a component that is used to render the overlay, and it is a component that is used to render the
-  ({ className, ...props }, ref) => (
-    <DrawerPrimitive.Overlay ref={ref} className={cn('fixed inset-0 z-50 bg-background', className)} {...props} />
-  )
-)
+>(({ className, ...props }, ref) => (
+  <DrawerPrimitive.Overlay ref={ref} className={cn('fixed inset-0 z-50 bg-black/80', className)} {...props} />
+))
 DrawerOverlay.displayName = DrawerPrimitive.Overlay.displayName
 
 const DrawerContent = React.forwardRef<
@@ -30,12 +31,12 @@ const DrawerContent = React.forwardRef<
     <DrawerPrimitive.Content
       ref={ref}
       className={cn(
-        'fixed inset-x-0 top-0 z-50 mt-6 flex h-auto flex-col rounded-t-[10px] border bg-background',
-        className
+        'fixed inset-x-0 bottom-0 z-50 mt-24 flex h-auto flex-col rounded-t-[10px] border bg-background',
+        className,
       )}
       {...props}
     >
-      <div className='mx-auto mt-4 h-2 w-[80%] rounded-full bg-muted' />
+      <div className='mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted' />
       {children}
     </DrawerPrimitive.Content>
   </DrawerPortal>

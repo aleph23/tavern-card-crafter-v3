@@ -3,8 +3,11 @@ import { Textarea as BaseTextarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
 
 export interface TextareaProps extends React.ComponentProps<typeof BaseTextarea> {
+  variant?: string
   icon?: React.ReactNode
   error?: boolean
+  showCounter?: boolean
+  showTokens?: boolean
 }
 
 /**
@@ -12,23 +15,33 @@ export interface TextareaProps extends React.ComponentProps<typeof BaseTextarea>
  * Built on top of the base Textarea component with enhanced visual styling
  */
 export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ className, variant = 'glass', icon, error, ...props }, ref) => {
+  (
+    {
+      className,
+      variant: _variant = 'glass',
+      icon,
+      error,
+      showCounter: _showCounter,
+      showTokens: _showTokens,
+      ...props
+    },
+    ref,
+  ) => {
     return (
       <div className='relative'>
         {icon && <div className='absolute left-3 top-3 text-muted-foreground'>{icon}</div>}
         <BaseTextarea
           ref={ref}
-          variant={variant}
           className={cn(
             icon && 'pl-10',
             error && 'border-destructive focus-visible:ring-destructive',
             'transition-all duration-200 focus-visible:scale-[1.01]',
-            className
+            className,
           )}
           {...props}
         />
       </div>
     )
-  }
+  },
 )
 Textarea.displayName = 'Textarea'

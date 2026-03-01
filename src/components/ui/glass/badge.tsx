@@ -3,7 +3,8 @@ import { Badge as BaseBadge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { hoverEffects, type HoverEffect } from '@/lib/hover-effects'
 
-export interface BadgeProps extends React.ComponentProps<typeof BaseBadge> {
+export interface BadgeProps extends Omit<React.ComponentProps<typeof BaseBadge>, 'variant'> {
+  variant?: string
   glow?: boolean
   hover?: HoverEffect
 }
@@ -11,16 +12,15 @@ export interface BadgeProps extends React.ComponentProps<typeof BaseBadge> {
 /**
  * Glass UI Badge - Enhanced badge with glassy effects and glow option
  */
-export function Badge({ className, variant = 'glass', glow = false, hover = 'none', ...props }: BadgeProps) {
+export function Badge({ className, variant: _variant = 'glass', glow = false, hover = 'none', ...props }: BadgeProps) {
   return (
     <BaseBadge
-      variant={variant}
       className={cn(
         'relative overflow-hidden',
         glow && 'shadow-lg shadow-purple-500/30',
         'transition-all duration-200',
         hoverEffects({ hover }),
-        className
+        className,
       )}
       {...props}
     />

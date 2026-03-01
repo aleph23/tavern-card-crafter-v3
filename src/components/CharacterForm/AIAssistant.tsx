@@ -1,15 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/glass/card'
 import { Button } from '@/components/ui/glass/button'
 import { Textarea } from '@/components/ui/glass/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/glass/select'
 import { useToast } from '@/hooks/use-toast'
 import { useLanguage } from '@/contexts/LanguageContext'
-import { Download, RefreshCcw, Wand, X } from 'lucide-react'
+import { Download, RefreshCcw, X } from 'lucide-react'
 import { UsedCharacterData } from '@/types/charactercard'
 import { generateWithAI } from '@/utils/aiGenerator'
 import { InferenceSettings } from '@/types/settings'
+import { RouteIcon, RouteIconHandle } from '@/components/ui/route'
+import { promptManager } from '@/utils/promptManager'
+import defaultPrompts from '@/config/defaultPrompts.json'
 
 interface AIAssistantProps {
   infSettings: InferenceSettings | null
@@ -68,6 +71,16 @@ const AIAssistant = ({ infSettings, onInsertField }: AIAssistantProps) => {
   const [parsedData, setParsedData] = useState<Partial<UsedCharacterData> | null>(null)
   const [isGenerating, setIsGenerating] = useState(false)
   const abortControllerRef = useRef<AbortController | null>(null)
+  const iconRef = useRef<RouteIconHandle>(null)
+
+  // Manage icon animation state based on generation process
+  useEffect(() => {
+    if (isGenerating) {
+      iconRef.current?.startAnimation()
+    } else {
+      iconRef.current?.stopAnimation()
+    }
+  }, [isGenerating])
 
   /**
    * Generates a prompt based on the specified type and content.
@@ -76,68 +89,12 @@ const AIAssistant = ({ infSettings, onInsertField }: AIAssistantProps) => {
     // Limit the length of input content to avoid too long prompt words
     const truncatedContent = content.length > 2000 ? content.substring(0, 2000) + '...' : content
 
-    const baseInstructions = `Please generate role card information based on the following content.
+    const promptKey = `assistant_${type}` as keyof typeof defaultPrompts
+    const template = promptManager.getPrompt(promptKey) || promptManager.getPrompt('assistant_general')
 
-Enter content:
-${truncatedContent}
-
-Output strictly in JSON format and do not add any other text:`
-
-    const jsonFormat = `
-{
-"name": "Character and scene name",
-"nickname": "Primary Character's First Name",
-"description": "Detailed character appearance description",
-"personality": "Detailed description of personality traits. Lists are okay, but should be a single string response per key",
-"scenario": "Detailed scene setting description",
-"first_mes": "The first events that start game play. Must include both the character and the user, referenced as {{user}}.",
-"mes_example": "<START>\\n{{user}}: User Discourse\\n{{char}}: The Character's example answer",
-"creator_notes": "Any notes you have about the character"
-}`
-
-    const typeSpecificPrompts = {
-      general: `${baseInstructions}
-
-Intelligent analysis and extract role information based on the content.${jsonFormat}`,
-
-      anime: `${baseInstructions}
-
-This is an anime character, please generate:
-- description: List the appearance, clothing, and body characteristics in a detailed, non-prosaic list. Body, clothing, general appearance.
-- personality: Detailed personality traits, idiosyncrasies and mannerisms in a non-prosaic list.
-- scenario: The back story.
-- first_mes: How character and player/user meet. This is a public part of the card and should read like a superb piece of professional fiction.
-- mes_example: A dialogue example that reflects the character's speaking style and personality ${jsonFormat}`,
-
-      game: `${baseInstructions}
-
-This is a personified game character, please generate:
-- description: Character appearance, equipment, special ability description in a detailed, non-prosaic list. Body, clothing, general appearance.
-- personality: personality traits, combat style, values, back story in a non-prosaic list.
-- scenario: The over-arching mythos.
-- first_mes: How character and player/user meet. This is a public part of the card and should read like a superb piece of professional fiction.
-- mes_example: A dialogue example that reflects the character's speaking style and personality ${jsonFormat} `,
-
-      novel: `${baseInstructions}
-
-This character stepped right out of a timeless classic, maybe Rabelais, maybe Joyce. Please generate:
-- description: The character's appearance in a detailed, non-prosaic list. Body, clothing, general appearance.
-- personality: Deep psychological characteristics and personality complexity
-- scenario: The background and environment setting of novel era
-- first mes: This is the first outward facing component and should be written in the style of a great literary master. It is a long paragraph portraying how this character first meets the user/player in this game.
-- mes example: Monologue or dialogue that captures the character's quintessence. ${jsonFormat}`,
-
-      historical: `${baseInstructions}
-
-This is a historic character (real or fictional), please generate:
-- description: List the appearance, clothing, and body characteristics in a detailed, non-prosaic list. Body, clothing, general appearance.
-- personality: Detailed personality traits, idiosyncrasies and back story in a non-prosaic list.
-- scenario: The back story.
-- first_mes: How character and player/user meet. This is a public part of the card and should read like a superb piece of professional fiction.
-- mes example: Monologue or dialogue that captures the character's quintessence. ${jsonFormat}`,
-    }
-
-    return typeSpecificPrompts[type as keyof typeof typeSpecificPrompts] || typeSpecificPrompts.general
+    return promptManager.interpolatePrompt(template, {
+      content: truncatedContent,
+    })
   }
 
   /**
@@ -163,8 +120,9 @@ This is a historic character (real or fictional), please generate:
       return
     }
 
-    // Create a new AbortController
-    abortControllerRef.current = new AbortController()
+    // Create a new AbortController and update state at the same time
+    const abortController = new AbortController()
+    abortControllerRef.current = abortController
     setIsGenerating(true)
 
     try {
@@ -172,62 +130,71 @@ This is a historic character (real or fictional), please generate:
       console.log('Generated prompt length:', prompt.length)
       console.log('Prompt preview:', prompt.substring(0, 200) + '...')
 
-      const result = await generateWithAI(infSettings, prompt)
+      const result = await generateWithAI(infSettings, prompt, abortController.signal)
       console.log('AI result:', result)
 
-      // More robust JSON parsing
+      // Extract and parse JSON content from the AI response
+      let jsonData: any = null
       try {
-        // First try to parse the entire result directly
-        let jsonData
-        try {
-          jsonData = JSON.parse(result)
-        } catch {
-          // If it fails, try to extract the JSON part
-          const jsonMatch = result.match(/\{[\s\S]*\}/)
-          if (jsonMatch) {
+        // First try direct parse
+        jsonData = JSON.parse(result)
+      } catch {
+        // Fallback to regex extraction
+        const jsonMatch = result.match(/\{[\s\S]*\}/)
+        if (jsonMatch) {
+          try {
             jsonData = JSON.parse(jsonMatch[0])
-          } else {
-            throw new Error('No valid JSON format found')
+          } catch (e) {
+            console.error('Regex match extraction parse failed:', e)
           }
         }
+      }
 
-        // Verify that the parsing results contain basic fields
-        if (typeof jsonData === 'object' && jsonData !== null) {
-          setParsedData(jsonData)
-          toast({
-            title: 'Generate successfully',
-            description:
-              'The role information has been successfully parsed and can be inserted into the form with one click.',
-          })
-        } else {
-          throw new Error('The API response did not parse correctly.')
+      const errorMsg =
+        result === 'null'
+          ? 'The AI returned a null result. Please try again with more detailed input.'
+          : 'No valid character data could be extracted from the AI response.'
+
+      // Final validation and normalization of result
+      if (jsonData && typeof jsonData === 'object' && Object.keys(jsonData).length > 0) {
+        // Normalize tags (split by delimiters)
+        if (typeof jsonData.tags === 'string') {
+          jsonData.tags = jsonData.tags
+            .split(/[,\s，]+/)
+            .map((s: string) => s.trim().replace(/^["']|["']$/g, ''))
+            .filter(Boolean)
         }
-      } catch (parseError) {
-        console.error('JSON parsing failed:', parseError)
-        console.error('Original results:', result)
+
+        // Normalize alternate_greetings (NO SPLITTING - just wrap in array)
+        if (typeof jsonData.alternate_greetings === 'string') {
+          jsonData.alternate_greetings = [jsonData.alternate_greetings.trim().replace(/^["']|["']$/g, '')]
+        }
+
+        setParsedData(jsonData)
         toast({
-          title: 'Analysis failed',
-          description: 'The generated content format is incorrect. Please try again or check the AI settings.',
-          variant: 'destructive',
+          title: 'Generate successfully',
+          description:
+            'The character information has been successfully parsed and can be inserted into the form with one click.',
         })
+      } else {
+        throw new Error(errorMsg)
       }
     } catch (error) {
       // Check whether the user actively cancels it
-      if (error instanceof Error && error.name === 'AbortError') {
-        toast({ title: 'Canceled', description: 'AI generation was canceled by the user' })
-      } else {
+      const isAbortError = error instanceof Error && (error.name === 'AbortError' || error.message.includes('abort'))
+      if (!isAbortError) {
         console.error('Generation failed:', error)
+        const errorMessage =
+          error instanceof Error ? error.message : 'The generated content format is incorrect. Please try again.'
         toast({
-          title: 'Generation failed',
-          description:
-            error instanceof Error ? error.message : 'Unknown error, please check AI settings or network connection',
+          title: 'Analysis failed',
+          description: errorMessage,
           variant: 'destructive',
         })
       }
-    } finally {
-      setIsGenerating(false)
-      abortControllerRef.current = null
     }
+    setIsGenerating(false)
+    abortControllerRef.current = null
   }
 
   /**
@@ -236,14 +203,17 @@ This is a historic character (real or fictional), please generate:
   const cancelGeneration = () => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort()
-      setIsGenerating(false)
-      abortControllerRef.current = null
-      toast({ title: 'Canceled', description: 'AI generation has been canceled' })
+      // Note: State reset will be handled by finally block in generateCharacterData
+      toast({
+        title: 'Canceled',
+        description:
+          'User canceled generation. Depending on the API, you may or may not still be debited for the call.',
+      })
     }
   }
 
   /**
-   * Inserts all fields from parsedData into the role card form.
+   * Inserts all fields from parsedData into the character card form.
    *
    * The function checks if parsedData is available and iterates over its entries.
    * For each entry, it verifies if the value is valid (non-empty or non-whitespace)
@@ -276,7 +246,7 @@ This is a historic character (real or fictional), please generate:
     if (insertedCount > 0) {
       toast({
         title: 'Insert successfully',
-        description: `Successfully inserted ${insertedCount} Fields into the role card form`,
+        description: `Successfully inserted ${insertedCount} Fields into the character card form`,
       })
     } else {
       toast({
@@ -323,8 +293,8 @@ This is a historic character (real or fictional), please generate:
       <CardHeader>
         <CardTitle className='text-lg font-semibold text-foreground'>AI character card assistant</CardTitle>
         <p className='text-sm text-muted-foreground'>
-          Paste any text content, select the role type, and the AI will intelligently extract and generate detailed role
-          information
+          Paste any text content, select the character type, and the AI will intelligently extract and generate detailed
+          character information
         </p>
       </CardHeader>
       <CardContent className='space-y-4'>
@@ -353,12 +323,12 @@ This is a historic character (real or fictional), please generate:
             <Textarea
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              placeholder='Paste the text content related to the role here:
-• Role Introduction Article
+              placeholder='Paste the text content related to the character here:
+• Character Introduction Article
 • Wikipedia page
-• Character description of novels
+• Character description from novels
 • Game character information
-• Introduction to cartoon characters
+• Introduction for a cartoon character
 etc...'
               className='min-h-[200px] text-sm'
               showCounter={true}
@@ -373,7 +343,19 @@ etc...'
             disabled={!isGenerating && !inputText.trim()}
             variant={isGenerating ? 'destructive' : 'default'}
             className='flex-1'
-          ></Button>
+          >
+            {isGenerating ? (
+              <>
+                <X className='w-4 h-4 mr-2' />
+                Cancel Generation
+              </>
+            ) : (
+              <>
+                <RouteIcon ref={iconRef} className='w-4 h-4 mr-2' />
+                Extract character info
+              </>
+            )}
+          </Button>
 
           {parsedData && !isGenerating && (
             <Button onClick={generateCharacterData} variant='outline' title='Regenerate'>

@@ -39,7 +39,7 @@ const AlternateGreetings = ({ greetings, updateField, infSettings, charaData }: 
   const removeGreeting = (index: number) => {
     updateField(
       'alternate_greetings',
-      greetings.filter((_, i) => i !== index)
+      greetings.filter((_, i) => i !== index),
     )
   }
 
@@ -64,7 +64,7 @@ const AlternateGreetings = ({ greetings, updateField, infSettings, charaData }: 
     setEditingText('')
   }
 
-  const handleAIGenerateGreeting = async () => {
+  const handleAIGenerateGreeting = async (isRegenerate: boolean = false) => {
     if (
       !infSettings?.endpoint?.apiKey &&
       !['ollama', 'lmstudio'].includes(infSettings?.endpoint?.provider?.toLowerCase() || '')
@@ -88,39 +88,41 @@ const AlternateGreetings = ({ greetings, updateField, infSettings, charaData }: 
       return
     }
 
+    const successTitle = t('generateSuccess') || 'Generate successfully'
+    const successDesc = t('alternateGreetingGenerated') || 'Alternative greetings have been generated'
+    const errorTitle = t('generateError') || 'Generation failed'
+    const unknownError = t('unknownError') || 'Unknown error'
+
     abortControllerRef.current = new AbortController()
     setLoading(true)
 
     try {
-      const prompt = generateAlternateGreeting(charaData)
-      const result = await generateWithAI(infSettings, prompt)
+      const prompt = generateAlternateGreeting(charaData, isRegenerate)
+      const result = await generateWithAI(infSettings, prompt, abortControllerRef.current.signal)
       updateField('alternate_greetings', [...greetings, result])
       toast({
-        title: t('generateSuccess') || 'Generate successfully',
-        description: t('alternateGreetingGenerated') || 'Alternative greetings have been generated',
+        title: successTitle,
+        description: successDesc,
       })
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
         toast({ title: 'Canceled', description: 'AI generation has been canceled by the user' })
       } else {
+        const errorMessage = error instanceof Error ? error.message : unknownError
         toast({
-          title: t('generateError') || 'Generation failed',
-          description: error instanceof Error ? error.message : t('unknownError') || 'Unknown error',
+          title: errorTitle,
+          description: errorMessage,
           variant: 'destructive',
         })
       }
-    } finally {
-      setLoading(false)
-      abortControllerRef.current = null
     }
+    setLoading(false)
+    abortControllerRef.current = null
   }
 
   const cancelGeneration = () => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort()
-      setLoading(false)
-      abortControllerRef.current = null
-      toast({ title: 'Canceled', description: 'AI generation has been canceled' })
     }
   }
 
@@ -138,7 +140,12 @@ const AlternateGreetings = ({ greetings, updateField, infSettings, charaData }: 
         <h3 className='text-lg font-semibold text-foreground mb-4'>{t('alternateGreetings')}</h3>
         <div className='flex gap-1'>
           {!loading && (
-            <Button size='sm' variant='outline' onClick={handleAIGenerateGreeting} className='h-8 px-2 text-xs'>
+            <Button
+              size='sm'
+              variant='outline'
+              onClick={() => handleAIGenerateGreeting(true)}
+              className='h-8 px-2 text-xs'
+            >
               <RefreshCcw className='w-3 h-3 mr-1' />
               Regenerate
             </Button>
@@ -146,7 +153,7 @@ const AlternateGreetings = ({ greetings, updateField, infSettings, charaData }: 
           <Button
             size='sm'
             variant={loading ? 'destructive' : 'outline'}
-            onClick={loading ? cancelGeneration : handleAIGenerateGreeting}
+            onClick={loading ? cancelGeneration : () => handleAIGenerateGreeting(false)}
             disabled={!loading && (!charaData.name || !charaData.description)}
             className='h-8 px-2 text-xs'
           >

@@ -207,14 +207,10 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
  * @param {React.ReactNode} children - The child components that will have access to the language context.
  */
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [language, setLanguageState] = useState<'zh' | 'en'>('en')
-
-  useEffect(() => {
-    const savedLanguage = localStorage.getItem('language') as 'zh' | 'en'
-    if (savedLanguage) {
-      setLanguageState(savedLanguage)
-    }
-  }, [])
+  const [language, setLanguageState] = useState<'zh' | 'en'>(() => {
+    const savedLanguage = typeof window !== 'undefined' ? localStorage.getItem('language') : null
+    return savedLanguage === 'zh' || savedLanguage === 'en' ? savedLanguage : 'en'
+  })
 
   /**
    * Sets the application language and stores it in local storage.

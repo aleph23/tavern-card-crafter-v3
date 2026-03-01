@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils'
 import { hoverEffects, type HoverEffect } from '@/lib/hover-effects'
 
 export interface TabsListProps extends React.ComponentProps<typeof BaseTabsList> {
+  variant?: string
   glow?: boolean
   hover?: HoverEffect
 }
@@ -11,22 +12,21 @@ export interface TabsListProps extends React.ComponentProps<typeof BaseTabsList>
 /**
  * Glass UI Tabs - Enhanced tabs with glassy effects
  */
-export const TabsList = React.forwardRef<React.ElementRef<typeof BaseTabsList>, TabsListProps>(
-  ({ className, variant = 'glass', glow = false, hover = 'none', ...props }, ref) => {
+export const TabsList = React.forwardRef<React.ComponentRef<typeof BaseTabsList>, TabsListProps>(
+  ({ className, variant: _variant = 'glass', glow = false, hover = 'none', ...props }, ref) => {
     return (
       <BaseTabsList
         ref={ref}
-        variant={variant}
         className={cn(
           'relative overflow-hidden',
           glow && 'shadow-lg shadow-purple-500/20',
           hoverEffects({ hover }),
-          className
+          className,
         )}
         {...props}
       />
     )
-  }
+  },
 )
 TabsList.displayName = 'TabsList'
 

@@ -79,7 +79,7 @@ const BasicInfoSection = ({
    * @returns {Promise<void>} A promise that resolves when the description generation process is complete.
    * @throws {Error} If the generation fails or is canceled.
    */
-  const handleAIGenerateDescription = async () => {
+  const handleAIGenerateDescription = async (isRegenerate: boolean = false) => {
     if (
       !infSettings?.endpoint?.apiKey &&
       !['ollama', 'lmstudio'].includes(infSettings?.endpoint?.provider?.toLowerCase() || '')
@@ -105,8 +105,8 @@ const BasicInfoSection = ({
     setLoading(true)
 
     try {
-      const prompt = generateDescription(data)
-      const result = await generateWithAI(infSettings, prompt)
+      const prompt = generateDescription(data, isRegenerate)
+      const result = await generateWithAI(infSettings, prompt, abortControllerRef.current.signal)
       updateField('description', result)
       toast({ title: 'Generate successfully', description: 'Role description has been generated' })
     } catch (error) {
@@ -119,10 +119,9 @@ const BasicInfoSection = ({
           variant: 'destructive',
         })
       }
-    } finally {
-      setLoading(false)
-      abortControllerRef.current = null
     }
+    setLoading(false)
+    abortControllerRef.current = null
   }
 
   /**
@@ -131,9 +130,6 @@ const BasicInfoSection = ({
   const cancelGeneration = () => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort()
-      setLoading(false)
-      abortControllerRef.current = null
-      toast({ title: 'Canceled', description: 'AI generation has been canceled' })
     }
   }
 
@@ -216,7 +212,12 @@ const BasicInfoSection = ({
           </Label>
           <div className='flex gap-1'>
             {!loading && (
-              <Button size='sm' variant='outline' onClick={handleAIGenerateDescription} className='h-8 px-2 text-xs'>
+              <Button
+                size='sm'
+                variant='outline'
+                onClick={() => handleAIGenerateDescription(true)}
+                className='h-8 px-2 text-xs'
+              >
                 <RefreshCcw className='w-3 h-3 mr-1' />
                 Regenerate
               </Button>
@@ -224,7 +225,7 @@ const BasicInfoSection = ({
             <Button
               size='sm'
               variant={loading ? 'destructive' : 'outline'}
-              onClick={loading ? cancelGeneration : handleAIGenerateDescription}
+              onClick={loading ? cancelGeneration : () => handleAIGenerateDescription(false)}
               disabled={!loading && !data.name}
               className='h-8 px-2 text-xs'
             >

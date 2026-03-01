@@ -130,13 +130,15 @@ const CharacterPreview = ({ charaData, characterImage }: CharacterPreviewProps) 
             // Find IEND chunk position (last 12 bytes of PNG)
             let iendPosition = uint8Array.length - 12
 
-            // Verify it's actually IEND
-            if (
-              uint8Array[iendPosition + 4] !== 0x49 || // 'I'
-              uint8Array[iendPosition + 5] !== 0x45 || // 'E'
-              uint8Array[iendPosition + 6] !== 0x4e || // 'N'
-              uint8Array[iendPosition + 7] !== 0x44
-            ) {
+            // Verify it's actually IEND - checking for 'IEND' at the end of the chunk
+            const b4 = uint8Array[iendPosition + 4]
+            const b5 = uint8Array[iendPosition + 5]
+            const b6 = uint8Array[iendPosition + 6]
+            const b7 = uint8Array[iendPosition + 7]
+
+            const isIend = b4 === 0x49 && b5 === 0x45 && b6 === 0x4e && b7 === 0x44
+
+            if (!isIend) {
               // 'D'
               // Search for IEND if not at expected position
               for (let i = uint8Array.length - 12; i >= 0; i--) {
@@ -308,7 +310,7 @@ const CharacterPreview = ({ charaData, characterImage }: CharacterPreviewProps) 
         // This neutralizes <script> tags into harmless text,
         // preventing them from executing while still displaying them.
         return `<span class="${cls}">${escapeHtml(match)}</span>`
-      }
+      },
     )
   }
 

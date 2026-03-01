@@ -39,7 +39,7 @@ const TagsSection = ({ tags, updateField, infSettings, charaData }: TagsSectionP
   const removeTag = (tagToRemove: string) => {
     updateField(
       'tags',
-      tags.filter((tag) => tag !== tagToRemove)
+      tags.filter((tag) => tag !== tagToRemove),
     )
   }
 
@@ -59,7 +59,7 @@ const TagsSection = ({ tags, updateField, infSettings, charaData }: TagsSectionP
    *
    * @returns {Promise<void>} A promise that resolves when the tag generation process is complete.
    */
-  const handleAIGenerate = async () => {
+  const handleAIGenerate = async (isRegenerate: boolean = false) => {
     if (
       !infSettings?.endpoint?.apiKey &&
       !['ollama', 'lmstudio'].includes(infSettings?.endpoint?.provider?.toLowerCase() || '')
@@ -81,39 +81,42 @@ const TagsSection = ({ tags, updateField, infSettings, charaData }: TagsSectionP
       return
     }
 
+    const successTitle = t('generateSuccess') || 'Generate successfully'
+    const successDesc = t('tagsGenerated') || 'Tag generation completed'
+    const errorTitle = t('generateError') || 'Generation failed'
+    const unknownError = t('unknownError') || 'Unknown error'
+
     abortControllerRef.current = new AbortController()
     setLoading(true)
 
     try {
-      const prompt = generateTags(charaData)
-      const result = await generateWithAI(infSettings, prompt)
+      const prompt = generateTags(charaData, isRegenerate)
+      const result = await generateWithAI(infSettings, prompt, abortControllerRef.current.signal)
 
       // Parses tag strings returned by AI
-      const newTags = result
-        .split(/[,，]/)
-        .map((tag) => tag.trim())
-        .filter((tag) => tag)
+      const rawTags = result.split(/[,，]/)
+      const newTags = rawTags.map((tag) => tag.trim()).filter((tag) => tag)
       const uniqueTags = [...new Set([...tags, ...newTags])]
 
       updateField('tags', uniqueTags)
       toast({
-        title: t('generateSuccess') || 'Generate successfully',
-        description: t('tagsGenerated') || 'Tag generation completed',
+        title: successTitle,
+        description: successDesc,
       })
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
         toast({ title: 'Canceled', description: 'AI generation has been canceled by the user' })
       } else {
+        const errorMessage = error instanceof Error ? error.message : unknownError
         toast({
-          title: t('generateError') || 'Generation failed',
-          description: error instanceof Error ? error.message : t('unknownError') || 'Unknown error',
+          title: errorTitle,
+          description: errorMessage,
           variant: 'destructive',
         })
       }
-    } finally {
-      setLoading(false)
-      abortControllerRef.current = null
     }
+    setLoading(false)
+    abortControllerRef.current = null
   }
 
   /**
@@ -122,9 +125,6 @@ const TagsSection = ({ tags, updateField, infSettings, charaData }: TagsSectionP
   const cancelGeneration = () => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort()
-      setLoading(false)
-      abortControllerRef.current = null
-      toast({ title: 'Canceled', description: 'AI generation has been canceled' })
     }
   }
 
@@ -142,7 +142,7 @@ const TagsSection = ({ tags, updateField, infSettings, charaData }: TagsSectionP
         <h3 className='text-lg font-semibold text-foreground'>{t('tags')}</h3>
         <div className='flex gap-1'>
           {!loading && (
-            <Button size='sm' variant='outline' onClick={handleAIGenerate} className='h-8 px-2 text-xs'>
+            <Button size='sm' variant='outline' onClick={() => handleAIGenerate(true)} className='h-8 px-2 text-xs'>
               <RefreshCcw className='w-3 h-3 mr-1' />
               Regenerate
             </Button>
@@ -150,7 +150,7 @@ const TagsSection = ({ tags, updateField, infSettings, charaData }: TagsSectionP
           <Button
             size='sm'
             variant={loading ? 'destructive' : 'outline'}
-            onClick={loading ? cancelGeneration : handleAIGenerate}
+            onClick={loading ? cancelGeneration : () => handleAIGenerate(false)}
             disabled={!loading && (!charaData.name || !charaData.description)}
             className='h-8 px-2 text-xs'
           >

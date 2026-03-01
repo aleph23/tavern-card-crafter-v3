@@ -82,6 +82,10 @@ class ConfigManager {
     return { ...this.config }
   }
 
+  isConfigLoaded(): boolean {
+    return this.isLoaded
+  }
+
   getActiveChatEndpoint(): Endpoint | undefined {
     return this.config.endpoints.find((e) => e.id === this.config.activeChatEndpointId)
   }

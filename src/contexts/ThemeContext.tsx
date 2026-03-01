@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react'
 import { ThemeColors } from '@/types/settings'
 import { DEFAULT_THEME_COLORS } from '@/config/defaultSettings'
 import { configManager } from '@/utils/configManager'
@@ -17,21 +17,39 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
  * Persists colors to localStorage and applies them to document root CSS variables.
  */
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [colors, setColors] = useState<ThemeColors>(() => {
-    // Attempt to load from configManager first, then fallback to DEFAULT
-    const config = configManager.getConfig()
-    return config.themeColors || DEFAULT_THEME_COLORS
-  })
+  const [colors, setColors] = useState<ThemeColors>(DEFAULT_THEME_COLORS)
+  const [isHydrated, setIsHydrated] = useState(false)
+  const isFirstRender = useRef(true)
+
+  useEffect(() => {
+    let active = true
+    const hydrate = async () => {
+      await configManager.loadConfig()
+      if (active) {
+        const config = configManager.getConfig()
+        if (config.themeColors) {
+          setColors(config.themeColors)
+        }
+        setIsHydrated(true)
+      }
+    }
+    hydrate()
+    return () => {
+      active = false
+    }
+  }, [])
 
   // Apply colors and derivations to CSS variables
   useEffect(() => {
+    if (!isHydrated) return
+
     const root = document.documentElement
 
     // Base 5 colors
     root.style.setProperty('--primary', colors.primary)
     root.style.setProperty('--secondary', colors.secondary)
     root.style.setProperty('--primary-foreground', colors.primaryForeground)
-    root.style.setProperty('--secondary-foreground', colors.secondaryForeground)  // second-fore and accent are the same
+    root.style.setProperty('--secondary-foreground', colors.secondaryForeground) // second-fore and accent are the same
     root.style.setProperty('--border', colors.border)
 
     // Derived colors
@@ -60,11 +78,17 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     root.style.setProperty('--muted-accent', mutedAccent)
     root.style.setProperty('--muted-border', mutedBorder)
 
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      return
+    }
 
     // Save to configManager (which also handles persistence)
-    const currentConfig = configManager.getConfig()
-    configManager.saveConfig({ ...currentConfig, themeColors: colors })
-  }, [colors])
+    if (configManager.isConfigLoaded()) {
+      const currentConfig = configManager.getConfig()
+      configManager.saveConfig({ ...currentConfig, themeColors: colors })
+    }
+  }, [colors, isHydrated])
 
   const updateColor = useCallback((key: keyof ThemeColors, value: string) => {
     setColors((prev) => ({ ...prev, [key]: value }))

@@ -37,7 +37,11 @@ const PersonalitySection = ({ data, updateField, infSettings }: PersonalitySecti
   const abortControllerRefs = useRef<{ [key: string]: AbortController | null }>({})
   const { toast } = useToast()
 
-  const handleAIGenerate = async (field: string, promptGenerator: (data: any) => string) => {
+  const handleAIGenerate = async (
+    field: string,
+    promptGenerator: (data: any, isRegenerate?: boolean) => string,
+    isRegenerate: boolean = false,
+  ) => {
     if (
       !infSettings?.endpoint?.apiKey &&
       !['ollama', 'lmstudio'].includes(infSettings?.endpoint?.provider?.toLowerCase() || '')
@@ -63,8 +67,8 @@ const PersonalitySection = ({ data, updateField, infSettings }: PersonalitySecti
     setLoading((prev) => ({ ...prev, [field]: true }))
 
     try {
-      const prompt = promptGenerator(data)
-      const result = await generateWithAI(infSettings, prompt)
+      const prompt = promptGenerator(data, isRegenerate)
+      const result = await generateWithAI(infSettings, prompt, abortControllerRefs.current[field]!.signal)
       updateField(field, result)
       toast({ title: 'Generate successfully', description: `${field} Generated completed` })
     } catch (error) {
@@ -77,10 +81,9 @@ const PersonalitySection = ({ data, updateField, infSettings }: PersonalitySecti
           variant: 'destructive',
         })
       }
-    } finally {
-      setLoading((prev) => ({ ...prev, [field]: false }))
-      abortControllerRefs.current[field] = null
     }
+    setLoading((prev) => ({ ...prev, [field]: false }))
+    abortControllerRefs.current[field] = null
   }
 
   /**
@@ -89,9 +92,6 @@ const PersonalitySection = ({ data, updateField, infSettings }: PersonalitySecti
   const cancelGeneration = (field: string) => {
     if (abortControllerRefs.current[field]) {
       abortControllerRefs.current[field]!.abort()
-      setLoading((prev) => ({ ...prev, [field]: false }))
-      abortControllerRefs.current[field] = null
-      toast({ title: 'Canceled', description: 'AI generation has been canceled' })
     }
   }
 
@@ -113,7 +113,11 @@ const PersonalitySection = ({ data, updateField, infSettings }: PersonalitySecti
    * @param promptGenerator - A function that generates a prompt based on the provided data.
    * @param dependencies - An optional array of dependencies that must be satisfied for button actions.
    */
-  const renderFieldButtons = (field: string, promptGenerator: (data: any) => string, dependencies?: string[]) => {
+  const renderFieldButtons = (
+    field: string,
+    promptGenerator: (data: any, isRegenerate?: boolean) => string,
+    dependencies?: string[],
+  ) => {
     const isLoading = loading[field]
     const canGenerate = dependencies ? dependencies.every((dep) => data[dep]) : true
 
@@ -123,7 +127,7 @@ const PersonalitySection = ({ data, updateField, infSettings }: PersonalitySecti
           <Button
             size='sm'
             variant='outline'
-            onClick={() => handleAIGenerate(field, promptGenerator)}
+            onClick={() => handleAIGenerate(field, promptGenerator, true)}
             disabled={!canGenerate}
             className='h-8 px-2 text-xs'
           >
@@ -134,7 +138,7 @@ const PersonalitySection = ({ data, updateField, infSettings }: PersonalitySecti
         <Button
           size='sm'
           variant={isLoading ? 'destructive' : 'outline'}
-          onClick={isLoading ? () => cancelGeneration(field) : () => handleAIGenerate(field, promptGenerator)}
+          onClick={isLoading ? () => cancelGeneration(field) : () => handleAIGenerate(field, promptGenerator, false)}
           disabled={!isLoading && !canGenerate}
           className='px-2 text-xs'
         >

@@ -6,11 +6,17 @@
     "buildResources": "res/**/*",
     "output": "build-electron"
   },
-  "files": ["package.json"
+  "files": [
+    "package.json",
     {
-      "from": ["dist", "electron"],
-      "to": "build-electron",
-      "filter": "**/*"
+      "from": "dist",
+      "to": "dist",
+      "filter": ["**/*"]
+    },
+    {
+      "from": "electron",
+      "to": "electron",
+      "filter": ["**/*"]
     }
   ],
   "extraResources": [

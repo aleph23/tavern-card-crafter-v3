@@ -13,6 +13,7 @@ import {
 import { cn } from '@/lib/utils'
 
 export interface AlertDialogContentProps extends React.ComponentProps<typeof BaseAlertDialogContent> {
+  variant?: string
   animated?: boolean
 }
 
@@ -20,13 +21,12 @@ export interface AlertDialogContentProps extends React.ComponentProps<typeof Bas
  * Glass UI Alert Dialog - Enhanced alert dialog with glassy effects
  */
 export const AlertDialogContent = React.forwardRef<
-  React.ElementRef<typeof BaseAlertDialogContent>,
+  React.ComponentRef<typeof BaseAlertDialogContent>,
   AlertDialogContentProps
->(({ className, variant = 'glass', animated = true, ...props }, ref) => {
+>(({ className, variant: _variant = 'glass', animated = true, ...props }, ref) => {
   return (
     <BaseAlertDialogContent
       ref={ref}
-      variant={variant}
       className={cn(animated && 'backdrop-blur-[var(--blur-lg)]', className)}
       {...props}
     />
