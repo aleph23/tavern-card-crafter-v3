@@ -42,7 +42,7 @@ const RouteIcon = forwardRef<RouteIconHandle, RouteIconProps>(
           controls.start('animate')
         }
       },
-      [controls, onMouseEnter]
+      [controls, onMouseEnter],
     )
 
     const handleMouseLeave = useCallback(
@@ -53,7 +53,7 @@ const RouteIcon = forwardRef<RouteIconHandle, RouteIconProps>(
           controls.start('normal')
         }
       },
-      [controls, onMouseLeave]
+      [controls, onMouseLeave],
     )
 
     return (
@@ -64,26 +64,45 @@ const RouteIcon = forwardRef<RouteIconHandle, RouteIconProps>(
           viewBox='0 0 24 24'
           xmlns='http://www.w3.org/2000/svg'
         >
-          <motion.circle cx='6' cy='19' r='3'
-            variants={{ normal: { stroke: 'var(--ring)' },
-              animate: { stroke: ['var(--ring)', 'var(--success)'],
-                transition: { repeat: Infinity, duration: 1.5, ease: steps(1, 'end') }, }, }}
+          <motion.circle
+            cx='6'
+            cy='19'
+            r='3'
+            variants={{
+              normal: { stroke: 'var(--ring)' },
+              animate: {
+                stroke: ['var(--ring)', 'var(--success)'],
+                transition: { repeat: Infinity, duration: 1.5, ease: steps(1, 'end') },
+              },
+            }}
           />
-          <motion.path d='M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15'
+          <motion.path
+            d='M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15'
             style={{ stroke: 'var(--border)' }}
-            variants={{ normal: { pathLength: 1, opacity: 1 },
-              animate: { pathLength: [0, 1],
-                transition: { repeat: Infinity, repeatType: 'reverse', duration: 1.5, ease: 'easeInOut' }, }, }}
+            variants={{
+              normal: { pathLength: 1, opacity: 1 },
+              animate: {
+                pathLength: [0, 1],
+                transition: { repeat: Infinity, repeatType: 'reverse', duration: 1.5, ease: 'easeInOut' },
+              },
+            }}
           />
-          <motion.circle cx='6' cy='19' r='3'
-            variants={{ normal: { stroke: 'var(--success)' },
-              animate: { stroke: ['var(--success)', 'var(--ring)'],
-                transition: { repeat: Infinity, duration: 1.5, ease: steps(1, 'end') }, }, }}
+          <motion.circle
+            cx='6'
+            cy='19'
+            r='3'
+            variants={{
+              normal: { stroke: 'var(--success)' },
+              animate: {
+                stroke: ['var(--success)', 'var(--ring)'],
+                transition: { repeat: Infinity, duration: 1.5, ease: steps(1, 'end') },
+              },
+            }}
           />
         </motion.svg>
       </div>
     )
-  }
+  },
 )
 
 RouteIcon.displayName = 'RouteIcon'

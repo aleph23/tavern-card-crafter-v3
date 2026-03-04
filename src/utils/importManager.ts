@@ -322,7 +322,7 @@ export function upgradeToV3(raw: unknown, callbacks?: UpgradeCallbacks): Charact
   // creation_date: src → root, with V1 "create_date" alias as final fallback.
   const creation_date = coerceToString(
     src.creation_date ?? root.creation_date ?? src.create_date ?? root.create_date,
-    ''
+    '',
   )
   const modification_date = Math.floor(Date.now() / 1000).toString()
 

@@ -63,15 +63,10 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     // For now, let's stick to the prompt's rule: "subtracting 10 percent intensity from whatever is being muted"
     // We'll apply this to --muted (from primary) and --muted-foreground (from foreground)
 
-    const primary = 'var(--primary)'
-    const foreground = 'var(--foreground)' // Current index.css value
-    const accent = 'var(--secondary-foreground)'
-    const border = 'var(--border)'
-
-    const muted = deriveMutedColor(primary)
-    const mutedForeground = deriveMutedColor(foreground)
-    const mutedAccent: string = deriveMutedColor(accent)
-    const mutedBorder: string = deriveMutedColor(border)
+    const muted = deriveMutedColor(colors.primary)
+    const mutedForeground = deriveMutedColor(colors.primaryForeground)
+    const mutedAccent: string = deriveMutedColor(colors.secondaryForeground)
+    const mutedBorder: string = deriveMutedColor(colors.border)
 
     root.style.setProperty('--muted', muted)
     root.style.setProperty('--muted-foreground', mutedForeground)

@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
 import type { GlassCustomization } from '@/lib/glass-utils'
-import { getGlassStyles } from '@/lib/glass-utils'
+import { getGlassStyles, glassVariants, type GlassVariantProps } from '@/lib/glass-utils'
 import { hoverEffects, type HoverEffect } from '@/lib/hover-effects'
 
 export interface DialogContentProps extends React.ComponentProps<typeof BaseDialogContent> {
@@ -42,8 +42,9 @@ export const DialogContent = React.forwardRef<React.ComponentRef<typeof BaseDial
       <BaseDialogContent
         ref={ref}
         className={cn(
+          glassVariants({ variant: _variant as GlassVariantProps['variant'] }),
           'relative overflow-hidden',
-          animated && 'backdrop-blur-[var(--blur-lg)]',
+          animated && 'backdrop-blur-lg',
           hoverEffects({ hover }),
           className,
         )}

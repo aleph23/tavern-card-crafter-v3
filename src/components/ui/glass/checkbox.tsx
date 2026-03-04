@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Checkbox as BaseCheckbox } from '@/components/ui/checkbox'
 import { cn } from '@/lib/utils'
+import { glassVariants, type GlassVariantProps } from '@/lib/glass-utils'
 
 export interface CheckboxProps extends React.ComponentProps<typeof BaseCheckbox> {
   variant?: string
@@ -16,7 +17,8 @@ export const Checkbox = React.forwardRef<React.ComponentRef<typeof BaseCheckbox>
       <BaseCheckbox
         ref={ref}
         className={cn(
-          glow && 'data-[state=checked]:shadow-lg data-[state=checked]:shadow-purple-500/30',
+          glassVariants({ variant: _variant as GlassVariantProps['variant'] }),
+          glow && 'data-[state=checked]:shadow-lg data-[state=checked]:shadow-secondary/30',
           'transition-all duration-200',
           className,
         )}

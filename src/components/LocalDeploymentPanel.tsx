@@ -244,7 +244,9 @@ pause`
                             : '启动开发服务器:'}
                       </p>
                       <div className='flex items-center gap-2'>
-                        <code className='flex-1 bg-muted px-3 py-2 rounded text-sm font-mono'>{command}</code>
+                        <code className='flex-1 bg-muted px-3 py-2 rounded text-sm font-mono text-foreground'>
+                          {command}
+                        </code>
                         <Button size='sm' variant='outline' onClick={() => copyToClipboard(command)}>
                           {language === 'en' ? 'Copy' : '复制'}
                         </Button>

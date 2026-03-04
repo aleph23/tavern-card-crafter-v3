@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/glass/label'
 import { Drawer, DrawerContent, DrawerTitle, DrawerTrigger, DrawerHeader } from '@/components/ui/glass/drawer'
 import { Loader2, Check, X, RefreshCw, Info, Plus, Trash2, Power } from 'lucide-react'
 import { SettingsIcon, SettingsIconHandle } from '@/components/ui/settings'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/glass/select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useToast } from '@/hooks/use-toast'
 import { Alert, AlertDescription } from '@/components/ui/glass/alert'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/glass/tabs'
@@ -399,7 +399,7 @@ export const ConfigEditor = ({ onSettingsChange }: ConfigEditorProps) => {
   const settingsRef = useRef<SettingsIconHandle>(null)
 
   return (
-    <Drawer open={isOpen} onOpenChange={setIsOpen}>
+    <Drawer open={isOpen} onOpenChange={setIsOpen} direction='top'>
       <DrawerTrigger asChild>
         <Button
           variant='outline'
@@ -419,7 +419,8 @@ export const ConfigEditor = ({ onSettingsChange }: ConfigEditorProps) => {
         </Button>
       </DrawerTrigger>
       <DrawerContent
-        className='sm:max-w-[1200px] max-h-screen flex flex-col bg-transparent border-none p-0 overflow-hidden outline-none'
+        direction='top'
+        className='sm:max-w-[1200px] max-h-screen flex flex-col glass-panel-lg p-0 overflow-hidden outline-none mx-auto left-0 right-0'
         overflow-y-auto
       >
         {!config ? (
@@ -457,33 +458,35 @@ export const ConfigEditor = ({ onSettingsChange }: ConfigEditorProps) => {
                         <AccordionItem key={endpoint.id} value={endpoint.id}>
                           <AccordionTrigger className='hover:no-underline'>
                             <div className='flex items-center gap-2 w-full pr-4'>
-                              <Button
-                                variant={isActive ? 'default' : 'ghost'}
-                                size='icon'
-                                className={`h-4 w-4 rounded-full text-foreground/50 ${isActive ? 'bg-success text-primary-foreground hover:bg-success/90' : 'hover:bg-muted'}`}
+                              <div
+                                role='button'
+                                tabIndex={0}
+                                className={`flex items-center justify-center p-1 h-6 w-6 rounded-full text-foreground/50 transition-colors ${isActive ? 'bg-success text-primary-foreground hover:bg-success/90' : 'hover:bg-muted'}`}
                                 onClick={(e) => {
+                                  e.preventDefault()
                                   e.stopPropagation()
                                   handleSetActive(endpoint.id)
                                 }}
                                 title={isActive ? 'Active Chat Endpoint' : 'Set as Active Chat Endpoint'}
                               >
                                 <Power className='h-3 w-3' />
-                              </Button>
+                              </div>
                               <span className={`flex-1 text-left ${isActive ? 'font-bold text-success' : ''}`}>
                                 {endpoint.name || 'Unnamed Endpoint'}
                               </span>
                               {config.endpoints.length > 1 && (
-                                <Button
-                                  variant='ghost'
-                                  size='icon'
-                                  className='h-8 w-8 text-destructive hover:text-destructive/90 hover:bg-destructive/10'
+                                <div
+                                  role='button'
+                                  tabIndex={0}
+                                  className='flex items-center justify-center p-1 h-8 w-8 rounded-md text-destructive hover:text-destructive/90 hover:bg-destructive/10 transition-colors'
                                   onClick={(e) => {
+                                    e.preventDefault()
                                     e.stopPropagation()
                                     handleDeleteEndpoint(index)
                                   }}
                                 >
                                   <Trash2 className='h-4 w-4' />
-                                </Button>
+                                </div>
                               )}
                             </div>
                           </AccordionTrigger>

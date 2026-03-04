@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Input as BaseInput } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 import type { GlassCustomization } from '@/lib/glass-utils'
-import { getGlassStyles } from '@/lib/glass-utils'
+import { getGlassStyles, glassVariants, type GlassVariantProps } from '@/lib/glass-utils'
 import { hoverEffects, type HoverEffect } from '@/lib/hover-effects'
 
 export interface InputProps extends React.ComponentProps<typeof BaseInput> {
@@ -41,6 +41,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         <BaseInput
           ref={ref}
           className={cn(
+            glassVariants({ variant: _variant as GlassVariantProps['variant'] }),
             'relative overflow-hidden',
             icon && 'pl-10',
             error && 'border-destructive focus-visible:ring-destructive',

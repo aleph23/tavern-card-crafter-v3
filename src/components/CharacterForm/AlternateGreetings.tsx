@@ -3,7 +3,7 @@ import { Label } from '@/components/ui/glass/label'
 import { Textarea } from '@/components/ui/glass/textarea'
 import { Button } from '@/components/ui/glass/button'
 import { useToast } from '@/hooks/use-toast'
-import { Plus, X, Edit2, Check, Sparkles, Loader2, RefreshCcw, Trash2 } from 'lucide-react'
+import { Plus, X, Edit2, Check, Sparkles, RefreshCcw, Trash2 } from 'lucide-react'
 import { generateWithAI, generateAlternateGreeting } from '@/utils/aiGenerator'
 import { InferenceSettings } from '@/types/settings'
 import { useLanguage } from '@/contexts/LanguageContext'
@@ -198,7 +198,7 @@ const AlternateGreetings = ({ greetings, updateField, infSettings, charaData }: 
       <div className='space-y-3'>
         {greetings.map((greeting, index) => (
           <div key={index} className='p-4 bg-muted/50 rounded-lg relative'>
-            <div className='absolute top-2 left-2 bg-primary/20 text-primary text-xs font-medium px-2 py-1 rounded-full'>
+            <div className='absolute top-2 left-2 bg-primary/30 text-primary-foreground text-xs font-medium px-2 py-1 rounded-full'>
               {t('greeting') || 'Greetings'} {index + 1}
             </div>
             {editingIndex === index ? (

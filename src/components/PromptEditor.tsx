@@ -130,7 +130,7 @@ export const PromptEditor: React.FC = () => {
                 </div>
                 <div>
                   <Label className='font-bold'>Result:</Label>
-                  <div className='bg-muted p-4 rounded-md whitespace-pre-wrap text-sm mt-2'>
+                  <div className='bg-muted p-4 rounded-md whitespace-pre-wrap text-sm mt-2 text-foreground'>
                     {getInterpolatedPreview(activeTab)}
                   </div>
                 </div>
@@ -193,10 +193,11 @@ export const PromptEditor: React.FC = () => {
                 onChange={(e) => handlePromptChange(activeTab, e.target.value)}
               />
             </div>
-            <div className='flex justify-between items-center text-xs text-muted-foreground'>
-              <div>
-                <span className='font-semibold'>Cheatsheet:</span> Use these placeholders to inject card data:
-                <code className='ml-2 text-primary/80'>
+            <div className='flex justify-between items-center text-xs text-foreground/80 mt-2'>
+              <div className='leading-relaxed'>
+                <span className='font-semibold text-foreground'>Cheatsheet:</span> Use these placeholders to inject card
+                data:
+                <code className='ml-2 text-foreground font-mono bg-muted/50 border border-border/50 px-1.5 py-0.5 rounded-md'>
                   {'{{name}}'}, {'{{nickname}}'}, {'{{description}}'}, {'{{personality}}'}, {'{{scenario}}'},{' '}
                   {'{{first_mes}}'}, {'{{mes_example}}'}, {'{{system_prompt}}'}, {'{{alternate_greetings}}'},{' '}
                   {'{{tags}}'}, {'{{creator_notes}}'}

@@ -109,7 +109,7 @@ const PromptsSection = ({ data, updateField, infSettings }: PromptsSectionProps)
    * @param {string} field - The identifier for the field being rendered.
    * @param {(data: any) => string} promptGenerator - A function that generates a prompt based on the provided data.
    */
-  const renderFieldButtons = (field: string, promptGenerator: (data: UsedCharacterData['data']) => string) => {
+  const renderFieldButtons = (field: string, promptGenerator: (data: UsedCharacterData) => string) => {
     const isLoading = loading[field]
     const canGenerate = data.name && data.description && data.personality
 

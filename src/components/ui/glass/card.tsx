@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Card as BaseCard, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import type { GlassCustomization } from '@/lib/glass-utils'
-import { getGlassStyles } from '@/lib/glass-utils'
+import { getGlassStyles, glassVariants, type GlassVariantProps } from '@/lib/glass-utils'
 import { hoverEffects, type HoverEffect } from '@/lib/hover-effects'
 
 export interface CardProps extends React.ComponentProps<typeof BaseCard> {
@@ -75,9 +75,10 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
       <BaseCard
         ref={ref}
         className={cn(
-          'relative overflow-hidden',
-          gradient && 'bg-gradient-to-br from-purple-500/10 via-blue-500/10 to-pink-500/10',
-          animated && 'transition-all duration-300 hover:scale-[1.02] hover:shadow-[var(--glass-shadow-lg)]',
+          glassVariants({ variant: _variant as GlassVariantProps['variant'] }),
+          'relative overflow-hidden backdrop-blur-(--blur)',
+          gradient && 'bg-linear-to-br from-primary/10 via-secondary/10 to-accent/10',
+          animated && 'transition-all duration-300 hover:scale-[1.02] hover:shadow-(--glass-shadow-lg)',
           hoverEffects({ hover }),
           className,
         )}

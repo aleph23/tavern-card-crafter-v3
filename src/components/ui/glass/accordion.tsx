@@ -6,6 +6,7 @@ import {
   AccordionTrigger as BaseAccordionTrigger,
 } from '@/components/ui/accordion'
 import { cn } from '@/lib/utils'
+import { glassVariants, type GlassVariantProps } from '@/lib/glass-utils'
 
 export interface AccordionTriggerProps extends React.ComponentProps<typeof BaseAccordionTrigger> {
   variant?: string
@@ -18,11 +19,15 @@ export interface AccordionTriggerProps extends React.ComponentProps<typeof BaseA
 export const AccordionTrigger = React.forwardRef<
   React.ComponentRef<typeof BaseAccordionTrigger>,
   AccordionTriggerProps
->(({ className, variant = 'glass', glow = false, ...props }, ref) => {
+>(({ className, variant: _variant = 'glass', glow = false, ...props }, ref) => {
   return (
     <BaseAccordionTrigger
       ref={ref}
-      className={cn(glow && 'data-[state=open]:shadow-md data-[state=open]:shadow-purple-500/20', className)}
+      className={cn(
+        glassVariants({ variant: _variant as GlassVariantProps['variant'] }),
+        glow && 'data-[state=open]:shadow-md data-[state=open]:shadow-secondary/20',
+        className,
+      )}
       {...props}
     />
   )

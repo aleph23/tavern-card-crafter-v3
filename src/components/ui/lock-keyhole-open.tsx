@@ -34,7 +34,7 @@ const LockKeyholeOpenIcon = forwardRef<LockKeyholeOpenIconHandle, LockKeyholeOpe
           controls.start('animate')
         }
       },
-      [controls, onMouseEnter]
+      [controls, onMouseEnter],
     )
 
     const handleMouseLeave = useCallback(
@@ -45,7 +45,7 @@ const LockKeyholeOpenIcon = forwardRef<LockKeyholeOpenIconHandle, LockKeyholeOpe
           controls.start('normal')
         }
       },
-      [controls, onMouseLeave]
+      [controls, onMouseLeave],
     )
 
     return (
@@ -80,7 +80,7 @@ const LockKeyholeOpenIcon = forwardRef<LockKeyholeOpenIconHandle, LockKeyholeOpe
         </motion.svg>
       </div>
     )
-  }
+  },
 )
 
 LockKeyholeOpenIcon.displayName = 'LockKeyholeOpenIcon'

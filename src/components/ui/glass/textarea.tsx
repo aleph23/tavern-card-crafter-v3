@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Textarea as BaseTextarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
+import { glassVariants, type GlassVariantProps } from '@/lib/glass-utils'
 
 export interface TextareaProps extends React.ComponentProps<typeof BaseTextarea> {
   variant?: string
@@ -33,6 +34,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         <BaseTextarea
           ref={ref}
           className={cn(
+            glassVariants({ variant: _variant as GlassVariantProps['variant'] }),
             icon && 'pl-10',
             error && 'border-destructive focus-visible:ring-destructive',
             'transition-all duration-200 focus-visible:scale-[1.01]',

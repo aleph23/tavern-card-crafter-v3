@@ -2,7 +2,7 @@ import * as React from 'react'
 import { ButtonGroup as BaseButtonGroup } from '@/components/ui/button-group'
 import { cn } from '@/lib/utils'
 import type { GlassCustomization } from '@/lib/glass-utils'
-import { getGlassStyles } from '@/lib/glass-utils'
+import { getGlassStyles, glassVariants, type GlassVariantProps } from '@/lib/glass-utils'
 import { hoverEffects, type HoverEffect } from '@/lib/hover-effects'
 
 export interface ButtonGroupProps extends React.ComponentProps<typeof BaseButtonGroup> {
@@ -20,7 +20,11 @@ export const ButtonGroup = React.forwardRef<HTMLDivElement, ButtonGroupProps>(
     return (
       <BaseButtonGroup
         ref={ref}
-        className={cn(hoverEffects({ hover: effect }), className)}
+        className={cn(
+          glassVariants({ variant: _variant as GlassVariantProps['variant'] }),
+          hoverEffects({ hover: effect }),
+          className,
+        )}
         style={{ ...getGlassStyles(glass), ...props.style }}
         {...props}
       />

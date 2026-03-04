@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Switch as BaseSwitch } from '@/components/ui/switch'
 import { cn } from '@/lib/utils'
+import { glassVariants, type GlassVariantProps } from '@/lib/glass-utils'
 
 export interface SwitchProps extends React.ComponentProps<typeof BaseSwitch> {
   variant?: string
@@ -16,7 +17,8 @@ export const Switch = React.forwardRef<React.ComponentRef<typeof BaseSwitch>, Sw
       <BaseSwitch
         ref={ref}
         className={cn(
-          glow && 'data-[state=checked]:shadow-lg data-[state=checked]:shadow-purple-500/30',
+          glassVariants({ variant: _variant as GlassVariantProps['variant'] }),
+          glow && 'data-[state=checked]:shadow-lg data-[state=checked]:shadow-secondary/30',
           'transition-all duration-200',
           className,
         )}

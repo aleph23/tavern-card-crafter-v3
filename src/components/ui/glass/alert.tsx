@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Alert as BaseAlert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { cn } from '@/lib/utils'
+import { glassVariants, type GlassVariantProps } from '@/lib/glass-utils'
 import { hoverEffects, type HoverEffect } from '@/lib/hover-effects'
 
 export interface AlertProps extends Omit<React.ComponentProps<typeof BaseAlert>, 'variant'> {
@@ -26,8 +27,9 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
       <BaseAlert
         ref={ref}
         className={cn(
+          glassVariants({ variant: _variant as GlassVariantProps['variant'] }),
           'relative overflow-hidden',
-          glow && 'shadow-lg shadow-purple-500/20',
+          glow && 'shadow-lg shadow-secondary/20',
           'transition-all duration-200',
           hoverEffects({ hover }),
           className,

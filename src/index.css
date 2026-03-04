@@ -1,9 +1,9 @@
 @import 'tailwindcss';
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
-@custom-variant dark (&:is(.dark *));
+/**** @custom-variant dark (&:is(.dark *));
 
-/* ============================================================
+ ============================================================
    DESIGN TOKENS — edit here to change the entire app's colors
    ============================================================ */
 :root {
@@ -267,7 +267,7 @@ textarea:focus-visible {
   LUCIDE ICON STYLING
   ====================================*/
 .lucide {
-  stroke: var(--border);
+  stroke: var(--accent);
   width: 1.1em;
   height: 1.1em;
   /* - 0.5px: The absolute floor (never invisible).

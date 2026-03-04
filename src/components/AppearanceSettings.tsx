@@ -61,29 +61,29 @@ const AppearanceSettings = () => {
         {renderColorPicker(
           'primary',
           'Primary Color',
-          'Main theme color. Used for large buttons, active sidebar items, and major UI accents.'
+          'Main theme color. Used for large buttons, active sidebar items, and major UI accents.',
         )}
         {renderColorPicker(
           'secondary',
           'Secondary Color',
-          'Supporting dark color. Used for sidebar backgrounds and secondary text for text on lighter colors.'
+          'Supporting dark color. Used for sidebar backgrounds and secondary text for text on lighter colors.',
         )}
         {renderColorPicker(
           'primaryForeground',
           'Primary Text',
-          'Optimized text color for display on top of the Primary background.'
+          'Optimized text color for display on top of the Primary background.',
         )}
         {renderColorPicker(
           'secondaryForeground',
           'Accent & Emphasis',
           'Controls highlights, tag backgrounds, and the primary Accent color.  Usually contrasting the primary. The' +
-          ' Ring color is a split-complimentary of this.'
+            ' Ring color is a split-complimentary of this.',
         )}
         <div className='md:col-span-2'>
           {renderColorPicker(
             'border',
             'Borders & Details',
-            'Structural color for dividers, input borders, and gradient finishing touches across panels.'
+            'Structural color for dividers, input borders, and gradient finishing touches across panels.',
           )}
         </div>
       </div>

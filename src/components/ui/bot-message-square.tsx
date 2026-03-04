@@ -30,7 +30,7 @@ export const BotMessageSquareIcon = forwardRef<BotMessageSquareHandle, BotMessag
         if (isControlledRef.current) onMouseEnter?.(e)
         else controls.start('animate')
       },
-      [controls, onMouseEnter]
+      [controls, onMouseEnter],
     )
 
     const handleMouseLeave = useCallback(
@@ -38,7 +38,7 @@ export const BotMessageSquareIcon = forwardRef<BotMessageSquareHandle, BotMessag
         if (isControlledRef.current) onMouseLeave?.(e)
         else controls.start('normal')
       },
-      [controls, onMouseLeave]
+      [controls, onMouseLeave],
     )
 
     return (
@@ -123,7 +123,7 @@ export const BotMessageSquareIcon = forwardRef<BotMessageSquareHandle, BotMessag
         </motion.svg>
       </div>
     )
-  }
+  },
 )
 
 BotMessageSquareIcon.displayName = 'BotMessageSquareIcon'

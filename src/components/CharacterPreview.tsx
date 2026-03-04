@@ -296,12 +296,12 @@ const CharacterPreview = ({ charaData, characterImage }: CharacterPreviewProps) 
         let cls = 'text-accent'
         if (/^"/.test(match)) {
           if (/:$/.test(match)) {
-            cls = 'text-primary font-semibold' // Key
+            cls = 'text-ring font-semibold' // Key
           } else {
             cls = 'text-success' // String
           }
         } else if (/true|false/.test(match)) {
-          cls = 'text-primary/70' // Boolean (or a variant)
+          cls = 'text-ring/70' // Boolean (or a variant)
         } else if (/null/.test(match)) {
           cls = 'text-destructive' // Null
         }
@@ -348,7 +348,7 @@ const CharacterPreview = ({ charaData, characterImage }: CharacterPreviewProps) 
       </CardHeader>
       <CardContent>
         <ScrollArea className='h-[600px] custom-scrollbar'>
-          <div className='bg-muted p-4 rounded-lg text-sm font-mono whitespace-pre-wrap break-all border border-border/10'>
+          <div className='bg-muted p-4 rounded-lg text-sm font-mono whitespace-pre-wrap break-all border border-border/10 text-foreground'>
             <div className='text-foreground/90 leading-relaxed' dangerouslySetInnerHTML={{ __html: highlightedJson }} />
           </div>
         </ScrollArea>

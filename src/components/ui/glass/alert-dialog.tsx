@@ -11,6 +11,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { cn } from '@/lib/utils'
+import { glassVariants, type GlassVariantProps } from '@/lib/glass-utils'
 
 export interface AlertDialogContentProps extends React.ComponentProps<typeof BaseAlertDialogContent> {
   variant?: string
@@ -27,7 +28,11 @@ export const AlertDialogContent = React.forwardRef<
   return (
     <BaseAlertDialogContent
       ref={ref}
-      className={cn(animated && 'backdrop-blur-[var(--blur-lg)]', className)}
+      className={cn(
+        glassVariants({ variant: _variant as GlassVariantProps['variant'] }),
+        animated && 'backdrop-blur-lg',
+        className,
+      )}
       {...props}
     />
   )

@@ -10,6 +10,7 @@ import {
   NavigationMenuViewport as BaseNavigationMenuViewport,
 } from '@/components/ui/navigation-menu'
 import { cn } from '@/lib/utils'
+import { glassVariants, type GlassVariantProps } from '@/lib/glass-utils'
 
 export interface NavigationMenuListProps extends React.ComponentProps<typeof BaseNavigationMenuList> {
   variant?: string
@@ -34,7 +35,15 @@ export const NavigationMenuList = React.forwardRef<
   NavigationMenuListProps
 >(({ className, variant: _variant = 'glass', glow = false, ...props }, ref) => {
   return (
-    <BaseNavigationMenuList ref={ref} className={cn(glow && 'shadow-md shadow-purple-500/20', className)} {...props} />
+    <BaseNavigationMenuList
+      ref={ref}
+      className={cn(
+        glassVariants({ variant: _variant as GlassVariantProps['variant'] }),
+        glow && 'shadow-md shadow-secondary/20',
+        className,
+      )}
+      {...props}
+    />
   )
 })
 NavigationMenuList.displayName = 'NavigationMenuList'
@@ -46,7 +55,11 @@ export const NavigationMenuContent = React.forwardRef<
   return (
     <BaseNavigationMenuContent
       ref={ref}
-      className={cn(glow && 'shadow-lg shadow-purple-500/30', className)}
+      className={cn(
+        glassVariants({ variant: _variant as GlassVariantProps['variant'] }),
+        glow && 'shadow-lg shadow-secondary/30',
+        className,
+      )}
       {...props}
     />
   )
@@ -60,7 +73,11 @@ export const NavigationMenuViewport = React.forwardRef<
   return (
     <BaseNavigationMenuViewport
       ref={ref}
-      className={cn(glow && 'shadow-lg shadow-purple-500/30', className)}
+      className={cn(
+        glassVariants({ variant: _variant as GlassVariantProps['variant'] }),
+        glow && 'shadow-lg shadow-secondary/30',
+        className,
+      )}
       {...props}
     />
   )
