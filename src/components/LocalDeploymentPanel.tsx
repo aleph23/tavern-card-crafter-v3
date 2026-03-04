@@ -1,14 +1,13 @@
-
-import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Download, Terminal, Play, FolderOpen, Code, Server } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { useLanguage } from "@/contexts/LanguageContext";
+import { useState } from 'react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/glass/dialog'
+import { Button } from '@/components/ui/glass/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/glass/card'
+import { Badge } from '@/components/ui/glass/badge'
+import { Separator } from '@/components/ui/separator'
+import { ScrollArea } from '@/components/ui/glass/scroll-area'
+import { Download, Terminal, Play, FolderOpen, Code, Server } from 'lucide-react'
+import { useToast } from '@/hooks/use-toast'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 /**
  * Component for managing the local deployment panel of the application.
@@ -20,28 +19,28 @@ import { useLanguage } from "@/contexts/LanguageContext";
  * @returns A JSX element representing the local deployment panel.
  */
 const LocalDeploymentPanel = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const { toast } = useToast();
-  const { t, language } = useLanguage();
+  const [isOpen, setIsOpen] = useState(false)
+  const { toast } = useToast()
+  const { t, language } = useLanguage()
 
-  const deploymentSteps = language === 'en' ? [
-    "Download the project files",
-    "Install Node.js (version 18 or higher)",
-    "Install dependencies using npm",
-    "Start the development server",
-    "Open browser to view the application"
-  ] : [
-    "Download project files",
-    "Install Node.js (version 18 or higher)",
-    "use npm Installation dependencies",
-    "Start the development server",
-    "Open a browser to view the application"
-  ];
+  const deploymentSteps =
+    language === 'en'
+      ? [
+          'Download the project files',
+          'Install Node.js (version 18 or higher)',
+          'Install dependencies using npm',
+          'Start the development server',
+          'Open browser to view the application',
+        ]
+      : [
+          'Download project files',
+          'Install Node.js (version 18 or higher)',
+          'use npm Installation dependencies',
+          'Start the development server',
+          'Open a browser to view the application',
+        ]
 
-  const commands = [
-    "npm install",
-    "npm run dev"
-  ];
+  const commands = ['npm install', 'npm run dev']
 
   const batFileContent = `@echo off
 chcp 65001 >nul
@@ -71,7 +70,7 @@ echo The application will be available at http://localhost:8080
 echo Press Ctrl+C to stop the server
 echo.
 call npm run dev
-pause`;
+pause`
 
   const packageJsonContent = `{
   "name": "character-card-creator",
@@ -86,33 +85,6 @@ pause`;
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
-    "@radix-ui/react-accordion": "^1.2.0",
-    "@radix-ui/react-alert-dialog": "^1.1.1",
-    "@radix-ui/react-aspect-ratio": "^1.1.0",
-    "@radix-ui/react-avatar": "^1.1.0",
-    "@radix-ui/react-checkbox": "^1.1.1",
-    "@radix-ui/react-collapsible": "^1.1.0",
-    "@radix-ui/react-context-menu": "^2.2.1",
-    "@radix-ui/react-dialog": "^1.1.2",
-    "@radix-ui/react-dropdown-menu": "^2.1.1",
-    "@radix-ui/react-hover-card": "^1.1.1",
-    "@radix-ui/react-label": "^2.1.0",
-    "@radix-ui/react-menubar": "^1.1.1",
-    "@radix-ui/react-navigation-menu": "^1.2.0",
-    "@radix-ui/react-popover": "^1.1.1",
-    "@radix-ui/react-progress": "^1.1.0",
-    "@radix-ui/react-radio-group": "^1.2.0",
-    "@radix-ui/react-scroll-area": "^1.1.0",
-    "@radix-ui/react-select": "^2.2.5",
-    "@radix-ui/react-separator": "^1.1.0",
-    "@radix-ui/react-slider": "^1.2.0",
-    "@radix-ui/react-slot": "^1.1.0",
-    "@radix-ui/react-switch": "^1.1.0",
-    "@radix-ui/react-tabs": "^1.1.0",
-    "@radix-ui/react-toast": "^1.2.1",
-    "@radix-ui/react-toggle": "^1.1.0",
-    "@radix-ui/react-toggle-group": "^1.1.0",
-    "@radix-ui/react-tooltip": "^1.1.4",
     "@tanstack/react-query": "^5.56.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -150,90 +122,73 @@ pause`;
     "typescript": "^5.2.2",
     "vite": "^5.2.0"
   }
-}`;
-
-  /**
-   * Initiates the download of a .bat file and displays a toast notification.
-   */
-  const downloadBatFile = () => {
-    const blob = new Blob([batFileContent], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'start-server.bat';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-
-    toast({
-      title: language === 'en' ? "Downloaded" : "Download completed",
-      description: language === 'en' ? "start-server.bat has been downloaded" : "start-server.bat File downloaded",
-    });
-  };
+}`
 
   /**
    * Downloads the package.json file and shows a toast notification upon completion.
    */
   const downloadPackageJson = () => {
-    const blob = new Blob([packageJsonContent], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'package.json';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    const blob = new Blob([packageJsonContent], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'package.json'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
 
     toast({
-      title: language === 'en' ? "Downloaded" : "下载完成",
-      description: language === 'en' ? "package.json has been downloaded" : "package.json File downloaded",
-    });
-  };
+      title: language === 'en' ? 'Downloaded' : '下载完成',
+      description: language === 'en' ? 'package.json has been downloaded' : 'package.json File downloaded',
+    })
+  }
 
   const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
+    navigator.clipboard.writeText(text)
     toast({
-      title: language === 'en' ? "Copied" : "已复制",
-      description: language === 'en' ? "Command copied to clipboard" : "The command has been copied to the clipboard",
-    });
-  };
+      title: language === 'en' ? 'Copied' : '已复制',
+      description: language === 'en' ? 'Command copied to clipboard' : 'The command has been copied to the clipboard',
+    })
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="gap-2">
-          <Server className="w-4 h-4" />
+        <Button variant='outline' className='gap-2'>
+          <Server className='w-4 h-4' />
           {language === 'en' ? 'Local Deployment' : '本地部署'}
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl max-h-[80vh]">
+      <DialogContent className='max-w-4xl max-h-[80vh]'>
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-xl">
-            <Terminal className="w-5 h-5" />
+          <DialogTitle className='flex items-center gap-2 text-xl'>
+            <Terminal className='w-5 h-5' />
             {language === 'en' ? 'Local Deployment Guide' : '本地部署指南'}
           </DialogTitle>
         </DialogHeader>
 
-        <ScrollArea className="h-[60vh] pr-4">
-          <div className="space-y-6">
+        <ScrollArea className='h-[60vh] pr-4'>
+          <div className='space-y-6'>
             {/* Deployment steps */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FolderOpen className="w-4 h-4" />
+                <CardTitle className='flex items-center gap-2'>
+                  <FolderOpen className='w-4 h-4' />
                   {language === 'en' ? 'Deployment Steps' : '部署步骤'}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
+                <div className='space-y-3'>
                   {deploymentSteps.map((step, index) => (
-                    <div key={index} className="flex items-center gap-3">
-                      <Badge variant="outline" className="w-6 h-6 rounded-full p-0 flex items-center justify-center text-xs">
+                    <div key={index} className='flex items-center gap-3'>
+                      <Badge
+                        variant='outline'
+                        className='w-6 h-6 rounded-full p-0 flex items-center justify-center text-xs'
+                      >
                         {index + 1}
                       </Badge>
-                      <span className="text-sm">{step}</span>
+                      <span className='text-sm'>{step}</span>
                     </div>
                   ))}
                 </div>
@@ -246,18 +201,18 @@ pause`;
                 <CardTitle>{language === 'en' ? 'System Requirements' : '系统要求'}</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <h4 className="font-medium">{language === 'en' ? 'Required Software' : '必需软件'}</h4>
-                    <ul className="text-sm space-y-1 text-muted-foreground">
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                  <div className='space-y-2'>
+                    <h4 className='font-medium'>{language === 'en' ? 'Required Software' : '必需软件'}</h4>
+                    <ul className='text-sm space-y-1 text-muted-foreground'>
                       <li>• Node.js 18+</li>
                       <li>• npm (comes with Node.js)</li>
                       <li>• {language === 'en' ? 'Modern web browser' : '现代网络浏览器'}</li>
                     </ul>
                   </div>
-                  <div className="space-y-2">
-                    <h4 className="font-medium">{language === 'en' ? 'System Support' : '系统支持'}</h4>
-                    <ul className="text-sm space-y-1 text-muted-foreground">
+                  <div className='space-y-2'>
+                    <h4 className='font-medium'>{language === 'en' ? 'System Support' : '系统支持'}</h4>
+                    <ul className='text-sm space-y-1 text-muted-foreground'>
                       <li>• Windows 10/11</li>
                       <li>• macOS 10.15+</li>
                       <li>• Linux (Ubuntu/Debian)</li>
@@ -270,30 +225,29 @@ pause`;
             {/* Command line command */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Code className="w-4 h-4" />
+                <CardTitle className='flex items-center gap-2'>
+                  <Code className='w-4 h-4' />
                   {language === 'en' ? 'Command Line Instructions' : '命令行指令'}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <div className='space-y-4'>
                   {commands.map((command, index) => (
-                    <div key={index} className="space-y-2">
-                      <p className="text-sm text-muted-foreground">
+                    <div key={index} className='space-y-2'>
+                      <p className='text-sm text-muted-foreground'>
                         {index === 0
-                          ? (language === 'en' ? 'Install dependencies:' : '安装依赖:')
-                          : (language === 'en' ? 'Start development server:' : '启动开发服务器:')
-                        }
+                          ? language === 'en'
+                            ? 'Install dependencies:'
+                            : '安装依赖:'
+                          : language === 'en'
+                            ? 'Start development server:'
+                            : '启动开发服务器:'}
                       </p>
-                      <div className="flex items-center gap-2">
-                        <code className="flex-1 bg-muted px-3 py-2 rounded text-sm font-mono">
+                      <div className='flex items-center gap-2'>
+                        <code className='flex-1 bg-muted px-3 py-2 rounded text-sm font-mono text-foreground'>
                           {command}
                         </code>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => copyToClipboard(command)}
-                        >
+                        <Button size='sm' variant='outline' onClick={() => copyToClipboard(command)}>
                           {language === 'en' ? 'Copy' : '复制'}
                         </Button>
                       </div>
@@ -306,41 +260,33 @@ pause`;
             {/* Download the file */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Download className="w-4 h-4" />
+                <CardTitle className='flex items-center gap-2'>
+                  <Download className='w-4 h-4' />
                   {language === 'en' ? 'Download Files' : '下载文件'}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-3">
-                    <div className="p-4 border rounded-lg">
-                      <h4 className="font-medium mb-2">start-server.bat</h4>
-                      <p className="text-sm text-muted-foreground mb-3">
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                  <div className='space-y-3'>
+                    <div className='p-4 border rounded-lg'>
+                      <h4 className='font-medium mb-2'>start-server.bat</h4>
+                      <p className='text-sm text-muted-foreground mb-3'>
                         {language === 'en'
                           ? 'Automated startup script for Windows. Double-click to run after downloading project files.'
-                          : 'Windows Automatically start the script. After downloading the project file, double-click to run.'
-                        }
+                          : 'This should be maandarin.'}
                       </p>
-                      <Button onClick={downloadBatFile} className="w-full">
-                        <Download className="w-4 h-4 mr-2" />
-                        {language === 'en' ? 'Download .bat File' : '下载 .bat 文件'}
-                      </Button>
+                      <Download className='w-4 h-4 mr-2' />
+                      {language === 'en' ? 'Download .bat File' : '下载 .bat 文件'}
                     </div>
                   </div>
-                  <div className="space-y-3">
-                    <div className="p-4 border rounded-lg">
-                      <h4 className="font-medium mb-2">package.json</h4>
-                      <p className="text-sm text-muted-foreground mb-3">
+                  <div className='space-y-3'>
+                    <div className='p-4 border rounded-lg'>
+                      <h4 className='font-medium mb-2'>package.json</h4>
+                      <p className='text-sm text-muted-foreground mb-3'>
                         {language === 'en'
                           ? 'Project configuration file containing all dependencies and scripts.'
-                          : '项目配置文件，包含所有依赖和脚本。'
-                        }
+                          : '项目配置文件，包含所有依赖和脚本。'}
                       </p>
-                      <Button onClick={downloadPackageJson} className="w-full" variant="outline">
-                        <Download className="w-4 h-4 mr-2" />
-                        {language === 'en' ? 'Download package.json' : '下载 package.json'}
-                      </Button>
                     </div>
                   </div>
                 </div>
@@ -350,35 +296,38 @@ pause`;
             {/* Instructions for use */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Play className="w-4 h-4" />
+                <CardTitle className='flex items-center gap-2'>
+                  <Play className='w-4 h-4' />
                   {language === 'en' ? 'Usage Instructions' : '使用说明'}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="p-4 bg-blue-50 dark:bg-blue-950 rounded-lg">
-                    <h4 className="font-medium mb-2 text-blue-900 dark:text-blue-100">
-                      {language === 'en' ? 'Quick Start (Windows)' : '快速启动 (Windows)'}
-                    </h4>
-                    <ol className="text-sm space-y-1 text-blue-800 dark:text-blue-200">
-                      <li>1. {language === 'en' ? 'Download all project files from Lovable' : '从 Lovable 下载所有项目文件'}</li>
-                      <li>2. {language === 'en' ? 'Download the start-server.bat file above' : '下载上面的 start-server.bat 文件'} </li>
-                      <li>3. {language === 'en' ? 'Place the .bat file in the project root directory' : '将 .bat 文件放在项目根目录'}</li>
-                      <li>4. {language === 'en' ? 'Double-click start-server.bat to run' : '双击 start-server.bat 运行'}</li>
-                    </ol>
-                  </div>
+                <div className='space-y-4'>
+                  <div className='p-4 bg-primary/5 rounded-lg'></div>
 
-                  <div className="p-4 bg-green-50 dark:bg-green-950 rounded-lg">
-                    <h4 className="font-medium mb-2 text-green-900 dark:text-green-100">
-                      {language === 'en' ? 'Manual Setup' : '手动设置'}
-                    </h4>
-                    <ol className="text-sm space-y-1 text-green-800 dark:text-green-200">
-                      <li>1. {language === 'en' ? 'Install Node.js from https://nodejs.org' : '从 https://nodejs.org 安装 Node.js'}</li>
-                      <li>2. {language === 'en' ? 'Open terminal/command prompt in project directory' : '在项目目录打开终端/命令提示符'}</li>
+                  <div className='p-4 bg-success/10 rounded-lg'>
+                    <h4 className='font-medium mb-2 success'>{language === 'en' ? 'Manual Setup' : '手动设置'}</h4>
+                    <ol className='text-sm space-y-1 success'>
+                      <li>
+                        1.{' '}
+                        {language === 'en'
+                          ? 'Install Node.js from https://nodejs.org'
+                          : '从 https://nodejs.org 安装 Node.js'}
+                      </li>
+                      <li>
+                        2.{' '}
+                        {language === 'en'
+                          ? 'Open terminal/command prompt in project directory'
+                          : '在项目目录打开终端/命令提示符'}
+                      </li>
                       <li>3. {language === 'en' ? 'Run: npm install' : '运行: npm install'}</li>
                       <li>4. {language === 'en' ? 'Run: npm run dev' : '运行: npm run dev'}</li>
-                      <li>5. {language === 'en' ? 'Open http://localhost:6090 in browser' : '在浏览器打开 http://localhost:6090'}</li>
+                      <li>
+                        5.{' '}
+                        {language === 'en'
+                          ? 'Open http://localhost:6090 in browser'
+                          : '在浏览器打开 http://localhost:6090'}
+                      </li>
                     </ol>
                   </div>
                 </div>
@@ -388,7 +337,7 @@ pause`;
         </ScrollArea>
       </DialogContent>
     </Dialog>
-  );
-};
+  )
+}
 
-export default LocalDeploymentPanel;
+export default LocalDeploymentPanel

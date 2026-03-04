@@ -1,211 +1,304 @@
-/* stylelint-disable at-rule-no-unknown */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-/* stylelint-enable at-rule-no-unknown */
+@import 'tailwindcss';
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. */
+/**** @custom-variant dark (&:is(.dark *));
 
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+ ============================================================
+   DESIGN TOKENS — edit here to change the entire app's colors
+   ============================================================ */
+:root {
+  --radius: 0.375rem;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+  /* --- 5 User-Controlled Base Colors (Appearance Settings page) --- */
+  --primary: oklch(0.1235 0.0698 267.48); /* Deep indigo */
+  --secondary: oklch(0.1649 0.0758 328.36); /* Very dark magenta */
+  --primary-foreground: oklch(90% 0.1 360); /* Light lavender on primary */
+  --secondary-foreground: oklch(0.7245 0.189 50.94); /* Amber on dark magenta */
+  --border: oklch(0.7017 0.3225 328.36); /* Bright magenta */
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+  /* --- Derived / Fixed Tokens --- */
+  --background: oklch(0 0 0 / 0.8);
+  --foreground: var(--primary-foreground); /* Near-white lavender (base text) */
+  --accent: var(--secondary-foreground);
+  --accent-foreground: var(--primary);
+  --ring: oklch(0.8025 0.1111 240.15); /* Initial fallback, overridden by JS */
+  --destructive: oklch(0.6 0.22 20); /* Red-orange */
+  --destructive-foreground: oklch(96.896% 0.13236 113.67);
+  --success: oklch(0.7216 0.2455 142.5);
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+  --card: var(--glass-bg);
+  --card-foreground: var(--foreground);
+  --popover: var(--glass-bg);
+  --popover-foreground: var(--foreground);
+  --muted: oklch(0 0 0);
+  --muted-foreground: oklch(0.569 0 89.876);
+  --muted-accent: oklch(from var(--accent) l calc(c - 0.2) h);
+  --muted-border: oklch(from var(--border) l calc(c - 0.2) h);
+  --input: oklch(0.2 0.06 280);
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+  /* Shadows */
+  --shadow: 0 8px 32px var(--secondary), 0 0 0 1px var(--primary) inset;
+  --shadow-lg: 0 16px 48px var(--secondary), 0 0 0 1px var(--primary) inset;
+  --shadow-sm: 0 4px 16px var(--secondary), 0 0 0 1px var(--primary) inset;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+  /* Glass effect variables */
+  --glass-bg: rgba(0 0 0 0.8); /* Semi-transparent black for glass panels */
+  --glass-border: var(--border);
+  --glass-shadow: 0 8px 32px var(--secondary) / 0.4, 0 0 0 1px var(--primary) / 0.1 inset;
+  --glass-shadow-lg: 0 16px 48px var(--secondary) / 0.4, 0 0 0 1px var(--primary) / 0.1 inset;
+  --glass-shadow-sm: 0 4px 16px var(--secondary) / 0.4, 0 0 0 1px var(--primary) / 0.1 inset;
+  --blur: 18px;
+  --blur-sm: 10px;
+  --blur-lg: 26px;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+  /* Page gradient background */
+  --page-bg-from: var(--primary);
+  --page-bg-to: var(--secondary);
+  --page-bg-via: black;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+  /* CTA button gradient (derived from primary + border) */
+  --cta-gradient-from: var(--primary);
+  --cta-gradient-to: var(--secondary);
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+  /* Sidebar tokens */
+  --sidebar-background: var(--secondary);
+  --sidebar-foreground: var(--secondary-foreground);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: var(--secondary-foreground);
+  --sidebar-accent-foreground: var(--primary);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--ring);
 
-    --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
+  /* Scrollbar */
+  --scrollbar-thumb: oklch(0.42 0.08 280 / 0.5);
+  --scrollbar-thumb-hover: oklch(0.35 0.08 280 / 0.7);
+  --sidebar: hsl(0 0% 98%);
 }
 
+/* ============================================================
+   TOKEN → TAILWIND BRIDGE (v4 @theme block)
+   This is what generates bg-primary, text-foreground etc.
+   ============================================================ */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar-background);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 10px);
+  --radius-lg: calc(var(--radius) - 18px);
+}
+
+/* ============================================================
+   BASE LAYER
+   ============================================================ */
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border outline-ring/50;
   }
-
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(
+      135deg,
+      var(--page-bg-from),
+      var(--page-bg-via),
+      var(--page-bg-to),
+      var(--page-bg-via),
+      var(--page-bg-from)
+    );
+    min-height: 100vh;
+  }
+  .font-mono {
+    font-family: 'JetBrains Mono', 'Cascadia', monospace;
   }
 }
 
-/* Custom scroll bar style - Apply to all scroll elements */
-.custom-scrollbar,
-input[type="text"],
-input[type="email"],
-input[type="password"],
-input[type="url"],
-textarea {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+/* ============================================================
+   COMPONENT UTILITIES
+   ============================================================ */
+@layer components {
+  .glass-panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--blur));
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+  }
+
+  .glass-panel-lg {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--blur-lg));
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow-lg);
+  }
+
+  .cta-button-gradient {
+    background: linear-gradient(to right, var(--cta-gradient-from), black, var(--cta-gradient-to));
+  }
+  .cta-button-gradient:hover {
+    background: linear-gradient(
+      to right,
+      oklch(from var(--cta-gradient-from) calc(l - 0.05) c h),
+      oklch(from var(--cta-gradient-to) calc(l - 0.05) c h)
+    );
+  }
+
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 3px;
+    transition: background 0.2s ease;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover);
+  }
+
+  .text-gradient {
+    @apply bg-linear-to-r from-ring to-accent bg-clip-text text-transparent;
+  }
+
+  /* Color picker swatch styling */
+  input[type='color'] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 1px;
+    border-radius: var(--radius);
+    cursor: crosshair;
+    padding: 1px;
+    background: var(--glass-bg);
+  }
+  input[type='color']::-webkit-color-swatch-wrapper {
+    padding: 0;
+  }
+  input[type='color']::-webkit-color-swatch {
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+  }
 }
 
-.custom-scrollbar::-webkit-scrollbar,
-input[type="text"]::-webkit-scrollbar,
-input[type="email"]::-webkit-scrollbar,
-input[type="password"]::-webkit-scrollbar,
-input[type="url"]::-webkit-scrollbar,
-textarea::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track,
-input[type="text"]::-webkit-scrollbar-track,
-input[type="email"]::-webkit-scrollbar-track,
-input[type="password"]::-webkit-scrollbar-track,
-input[type="url"]::-webkit-scrollbar-track,
-textarea::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb,
-input[type="text"]::-webkit-scrollbar-thumb,
-input[type="email"]::-webkit-scrollbar-thumb,
-input[type="password"]::-webkit-scrollbar-thumb,
-input[type="url"]::-webkit-scrollbar-thumb,
-textarea::-webkit-scrollbar-thumb {
-  background-color: rgba(156, 163, 175, 0.5);
-  border-radius: 3px;
-  transition: background-color 0.2s ease;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover,
-input[type="text"]::-webkit-scrollbar-thumb:hover,
-input[type="email"]::-webkit-scrollbar-thumb:hover,
-input[type="password"]::-webkit-scrollbar-thumb:hover,
-input[type="url"]::-webkit-scrollbar-thumb:hover,
-textarea::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(107, 114, 128, 0.7);
-}
-
-/* Add custom scrollbars to the entire page */
+/* ============================================================
+   PAGE-LEVEL SCROLLBAR
+   ============================================================ */
 html {
   scrollbar-width: thin;
-  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
 }
-
 html::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
-
 html::-webkit-scrollbar-track {
   background: transparent;
 }
-
 html::-webkit-scrollbar-thumb {
-  background-color: rgba(156, 163, 175, 0.5);
+  background: var(--scrollbar-thumb);
   border-radius: 4px;
-  transition: background-color 0.2s ease;
+  transition: background 0.2s ease;
 }
-
 html::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(107, 114, 128, 0.7);
+  background: var(--scrollbar-thumb-hover);
 }
 
-/* Fixed the input frame focus border problem */
+/* ============================================================
+   FOCUS RING NORMALIZATION
+   ============================================================ */
+input:focus-visible,
+textarea:focus-visible {
+  outline: none;
+  border-color: var(--ring) !important;
+  box-shadow: 0 0 0 2px var(--ring) !important;
+  z-index: 10;
+  position: relative;
+}
 .form-group {
   position: relative;
   z-index: 1;
 }
-
 .form-group:focus-within {
   z-index: 10;
 }
-
-/* Make sure all input boxes have the correct focus ring style */
-input:focus-visible,
-textarea:focus-visible {
-  outline: none !important;
-  border-color: hsl(var(--ring)) !important;
-  box-shadow: 0 0 0 2px hsl(var(--ring)) !important;
-  z-index: 10;
-  position: relative;
-}
-
-/* To ensure that the focus ring is not obstructed, add appropriate margins to all form controls */
 .form-group input,
 .form-group textarea {
   position: relative;
   z-index: 1;
 }
-
 .form-group input:focus,
 .form-group textarea:focus {
   z-index: 10;
+}
+
+/*====================================
+  LUCIDE ICON STYLING
+  ====================================*/
+.lucide {
+  stroke: var(--accent);
+  width: 1.1em;
+  height: 1.1em;
+  /* - 0.5px: The absolute floor (never invisible).
+  - 1.5%: The growth rate relative to the icon size (the 'log' feel).
+  - 1.5px: The absolute ceiling (never looks like a marker).
+  */
+  --icon-stroke: clamp(0.5px, 0.5px + 1.3%, 3px);
+  stroke-width: var(--icon-stroke);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+
+  /* Rendering Strategy for High-DPI & Interp Displays */
+  /* This prevents the 0.6px line from 'shimmering' on your HD+ resolution */
+  shape-rendering: geometricPrecision;
+}
+
+.app {
+  display: grid;
+  grid-template-columns: 1fr minmax(auto, 1200px) 1fr;
+  grid-template-rows: auto;
+  gap: 2px;
+}
+
+.dark {
+  --sidebar: hsl(240 5.9% 10%);
+  --sidebar-foreground: hsl(240 4.8% 95.9%);
+  --sidebar-primary: hsl(224.3 76.3% 48%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(240 3.7% 15.9%);
+  --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
+  --sidebar-border: hsl(240 3.7% 15.9%);
+  --sidebar-ring: hsl(217.2 91.2% 59.8%);
 }

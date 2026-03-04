@@ -1,67 +1,105 @@
-
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react'
+import { ThemeColors } from '@/types/settings'
+import { DEFAULT_THEME_COLORS } from '@/config/defaultSettings'
+import { configManager } from '@/utils/configManager'
+import { deriveRingColor, deriveMutedColor } from '@/utils/themeUtils'
 
 interface ThemeContextType {
-  theme: 'light' | 'dark';
-  setTheme: (theme: 'light' | 'dark') => void;
-  toggleTheme: () => void;
+  colors: ThemeColors
+  updateColor: (key: keyof ThemeColors, value: string) => void
+  resetColors: () => void
 }
 
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
 /**
- * Provides a theme context for the application.
- *
- * The ThemeProvider component manages the current theme state ('light' or 'dark') and synchronizes it with local storage.
- * It checks for a saved theme in local storage upon mounting and defaults to the system preference if none is found.
- * The component also updates the document's class list based on the current theme and provides functions to set or toggle the theme.
- *
- * @param {React.ReactNode} children - The child components that will have access to the theme context.
+ * Provides a theme context for the application, managing user-configurable OKLCH color tokens.
+ * Persists colors to localStorage and applies them to document root CSS variables.
  */
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [theme, setThemeState] = useState<'light' | 'dark'>('light');
+  const [colors, setColors] = useState<ThemeColors>(DEFAULT_THEME_COLORS)
+  const [isHydrated, setIsHydrated] = useState(false)
+  const isFirstRender = useRef(true)
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark';
-    if (savedTheme) {
-      setThemeState(savedTheme);
-    } else {
-      // Check system preferences
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      setThemeState(prefersDark ? 'dark' : 'light');
+    let active = true
+    const hydrate = async () => {
+      await configManager.loadConfig()
+      if (active) {
+        const config = configManager.getConfig()
+        if (config.themeColors) {
+          setColors(config.themeColors)
+        }
+        setIsHydrated(true)
+      }
     }
-  }, []);
+    hydrate()
+    return () => {
+      active = false
+    }
+  }, [])
 
+  // Apply colors and derivations to CSS variables
   useEffect(() => {
-    document.documentElement.classList.toggle('dark', theme === 'dark');
-  }, [theme]);
+    if (!isHydrated) return
 
-  /**
-   * Sets the application theme and stores it in local storage.
-   */
-  const setTheme = (newTheme: 'light' | 'dark') => {
-    setThemeState(newTheme);
-    localStorage.setItem('theme', newTheme);
-  };
+    const root = document.documentElement
 
-  /**
-   * Toggles the theme between 'light' and 'dark'.
-   */
-  const toggleTheme = () => {
-    setTheme(theme === 'light' ? 'dark' : 'light');
-  };
+    // Base 5 colors
+    root.style.setProperty('--primary', colors.primary)
+    root.style.setProperty('--secondary', colors.secondary)
+    root.style.setProperty('--primary-foreground', colors.primaryForeground)
+    root.style.setProperty('--secondary-foreground', colors.secondaryForeground) // second-fore and accent are the same
+    root.style.setProperty('--border', colors.border)
 
-  return (
-    <ThemeContext.Provider value={{ theme, setTheme, toggleTheme }}>
-      {children}
-    </ThemeContext.Provider>
-  );
-};
+    // Derived colors
+    // Ring is derived from Accent (secondary-foreground)
+    const ring = deriveRingColor(colors.secondaryForeground)
+    root.style.setProperty('--ring', ring)
+
+    // Muted is derived from Background (which is currently fixed or based on secondary/primary in CSS,
+    // but the request implies "whatever is being muted".
+    // Usually --muted and --muted-foreground. Let's derive them from background and foreground.)
+    // For now, let's stick to the prompt's rule: "subtracting 10 percent intensity from whatever is being muted"
+    // We'll apply this to --muted (from primary) and --muted-foreground (from foreground)
+
+    const muted = deriveMutedColor(colors.primary)
+    const mutedForeground = deriveMutedColor(colors.primaryForeground)
+    const mutedAccent: string = deriveMutedColor(colors.secondaryForeground)
+    const mutedBorder: string = deriveMutedColor(colors.border)
+
+    root.style.setProperty('--muted', muted)
+    root.style.setProperty('--muted-foreground', mutedForeground)
+    root.style.setProperty('--muted-accent', mutedAccent)
+    root.style.setProperty('--muted-border', mutedBorder)
+
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      return
+    }
+
+    // Save to configManager (which also handles persistence)
+    if (configManager.isConfigLoaded()) {
+      const currentConfig = configManager.getConfig()
+      configManager.saveConfig({ ...currentConfig, themeColors: colors })
+    }
+  }, [colors, isHydrated])
+
+  const updateColor = useCallback((key: keyof ThemeColors, value: string) => {
+    setColors((prev) => ({ ...prev, [key]: value }))
+  }, [])
+
+  const resetColors = useCallback(() => {
+    setColors(DEFAULT_THEME_COLORS)
+  }, [])
+
+  return <ThemeContext.Provider value={{ colors, updateColor, resetColors }}>{children}</ThemeContext.Provider>
+}
 
 export const useTheme = () => {
-  const context = useContext(ThemeContext);
+  const context = useContext(ThemeContext)
   if (context === undefined) {
-    throw new Error('useTheme must be used within a ThemeProvider');
+    throw new Error('useTheme must be used within a ThemeProvider')
   }
-  return context;
-};
+  return context
+}

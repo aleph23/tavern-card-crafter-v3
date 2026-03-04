@@ -1,10 +1,9 @@
-
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react'
 
 interface LanguageContextType {
-  language: 'zh' | 'en';
-  setLanguage: (lang: 'zh' | 'en') => void;
-  t: (key: string) => string;
+  language: 'zh' | 'en'
+  setLanguage: (lang: 'zh' | 'en') => void
+  t: (key: string) => string
 }
 
 const translations = {
@@ -102,8 +101,8 @@ const translations = {
   },
   en: {
     // Page titles
-    pageTitle: 'SillyTavern Character Card V3 Generator',
-    pageDescription: 'Create professional SillyTavern V3 format character cards with V1/V2/V3 import/export support',
+    pageTitle: 'CharaCard Creator',
+    pageDescription: 'Create SillyTavern V3 format character cards with V1/V2/V3 import support',
 
     // Buttons
     importCard: 'Import Card',
@@ -115,7 +114,7 @@ const translations = {
     cancel: 'Cancel',
 
     // Form titles
-    characterInfo: 'Character Information Editor',
+    characterInfo: 'Character Editor',
     basicInfo: 'Basic Information',
     personality: 'Personality',
     prompts: 'Prompts',
@@ -125,25 +124,25 @@ const translations = {
     metadata: 'Metadata',
 
     // Field labels
-    name: 'Card Name',
-    nickname: 'Character name',
-    description: 'Character Description',
+    name: 'Character Name',
+    nickname: 'Characters first name',
+    description: 'Character Physical Description',
     personalityDescription: 'Personality',
     scenario: 'Scenario',
     first_mes: 'First Message',
-    mes_example: 'Message Example',
-    creatorNotes: 'Creator Notes',
+    mes_example: 'Example of communication style',
+    creatorNotes: 'Your Notes',
     systemPrompt: 'System Prompt',
     postHistoryInstructions: 'Post History Instructions',
-    creator: 'Creator',
+    creator: 'You',
     characterVersion: 'Character Version',
 
     // Preview
     jsonPreview: 'JSON Preview',
     totalChars: 'Total Characters',
-    totalTokens: 'Total Tokens',
+    totalTokens: 'Token Estimate',
     chars: 'Characters',
-    tokens: 'Tokens',
+    tokens: '~Tokens',
 
     // Messages
     importSuccess: 'Import Successful',
@@ -191,10 +190,10 @@ const translations = {
     // Theme toggle
     lightMode: 'Light Mode',
     darkMode: 'Dark Mode',
-  }
-};
+  },
+}
 
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+const LanguageContext = createContext<LanguageContextType | undefined>(undefined)
 
 /**
  * Provides language context to its children components.
@@ -208,41 +207,33 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
  * @param {React.ReactNode} children - The child components that will have access to the language context.
  */
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [language, setLanguageState] = useState<'zh' | 'en'>('en');
-
-  useEffect(() => {
-    const savedLanguage = localStorage.getItem('language') as 'zh' | 'en';
-    if (savedLanguage) {
-      setLanguageState(savedLanguage);
-    }
-  }, []);
+  const [language, setLanguageState] = useState<'zh' | 'en'>(() => {
+    const savedLanguage = typeof window !== 'undefined' ? localStorage.getItem('language') : null
+    return savedLanguage === 'zh' || savedLanguage === 'en' ? savedLanguage : 'en'
+  })
 
   /**
    * Sets the application language and stores it in local storage.
    */
   const setLanguage = (lang: 'zh' | 'en') => {
-    setLanguageState(lang);
-    localStorage.setItem('language', lang);
-  };
+    setLanguageState(lang)
+    localStorage.setItem('language', lang)
+  }
 
   /**
    * Retrieves the translation for a given key based on the current language.
    */
   const t = (key: string): string => {
-    return translations[language][key as keyof typeof translations['zh']] || key;
-  };
+    return translations[language][key as keyof (typeof translations)['zh']] || key
+  }
 
-  return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
-      {children}
-    </LanguageContext.Provider>
-  );
-};
+  return <LanguageContext.Provider value={{ language, setLanguage, t }}>{children}</LanguageContext.Provider>
+}
 
 export const useLanguage = () => {
-  const context = useContext(LanguageContext);
+  const context = useContext(LanguageContext)
   if (context === undefined) {
-    throw new Error('useLanguage must be used within a LanguageProvider');
+    throw new Error('useLanguage must be used within a LanguageProvider')
   }
-  return context;
-};
+  return context
+}

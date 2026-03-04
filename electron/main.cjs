@@ -1,122 +1,228 @@
-const { app, BrowserWindow, Menu, ipcMain, dialog } = require('electron'); // Added dialog
-const path = require('path');
-const fs = require('fs');
-const isDev = process.env.NODE_ENV === 'development';
+const { app, BrowserWindow, Menu, ipcMain, dialog } = require('electron') // Added dialog
+const path = require('path')
+const fs = require('fs')
+const isDev = process.env.NODE_ENV === 'development'
 
-let mainWindow;
+let mainWindow
 
 // For portable app: determine the correct directory for storing prompts.json
 // This is computed lazily because app.getPath('exe') requires app to be initialized
-let promptsPath = null;
-let userSelectedDir = null; // Cached user selection
+let promptsPath = null
+let userSelectedDir = null // Cached user selection
 
 const getPromptsPath = () => {
-  if (promptsPath) return promptsPath;
+  if (promptsPath) return promptsPath
 
   // Check if we're in a packaged app
-  const isPackaged = app.isPackaged;
+  const { isPackaged } = app
 
   // Debug logging (uncomment for troubleshooting)
-  // console.log('[MAIN] app.isPackaged:', isPackaged);
-  // console.log('[MAIN] __dirname:', __dirname);
-  // console.log('[MAIN] process.execPath:', process.execPath);
-  // console.log('[MAIN] PORTABLE_EXECUTABLE_DIR:', process.env.PORTABLE_EXECUTABLE_DIR);
+  console.log('[MAIN] app.isPackaged:', isPackaged)
+  console.log('[MAIN] __dirname:', __dirname)
+  console.log('[MAIN] process.execPath:', process.execPath)
+  console.log('[MAIN] PORTABLE_EXECUTABLE_DIR:', process.env.PORTABLE_EXECUTABLE_DIR)
 
-  let appDir;
+  let appDir
   if (!isPackaged) {
     // In dev mode, go up from /electron to project root
-    appDir = path.join(__dirname, '..');
-    // console.log('[MAIN] Using dev path:', appDir);
+    appDir = path.join(__dirname, '..')
+    console.log('[MAIN] Using dev path:', appDir)
   } else if (process.env.PORTABLE_EXECUTABLE_DIR) {
     // Portable app: electron-builder sets this to the directory containing the original .exe
-    appDir = process.env.PORTABLE_EXECUTABLE_DIR;
-    // console.log('[MAIN] Using PORTABLE_EXECUTABLE_DIR:', appDir);
+    appDir = process.env.PORTABLE_EXECUTABLE_DIR
+    console.log('[MAIN] Using PORTABLE_EXECUTABLE_DIR:', appDir)
   } else if (userSelectedDir) {
     // Use previously selected directory
-    appDir = userSelectedDir;
-    // console.log('[MAIN] Using cached user selection:', appDir);
+    appDir = userSelectedDir
+    console.log('[MAIN] Using cached user selection:', appDir)
   } else {
     // Fallback: ask user to select a folder for saving prompts
-    // console.log('[MAIN] PORTABLE_EXECUTABLE_DIR not set, prompting user...');
+    console.log('[MAIN] PORTABLE_EXECUTABLE_DIR not set, prompting user...')
     const result = dialog.showOpenDialogSync({
       title: 'Select folder to save prompts.json',
-      message: 'Could not detect app location. Please select the folder where Tavern Card Crafter.exe is located to save your custom prompts.',
+      message:
+        'Could not detect app location. Please select the folder where CharaCardCreator.exe is located to save your custom prompts.',
       properties: ['openDirectory', 'createDirectory'],
-      buttonLabel: 'Use This Folder'
-    });
+      buttonLabel: 'Use This Folder',
+    })
 
     if (result && result.length > 0) {
-      appDir = result[0];
-      userSelectedDir = appDir; // Cache for this session
-      // console.log('[MAIN] User selected directory:', appDir);
+      appDir = result[0]
+      userSelectedDir = appDir // Cache for this session
+      console.log('[MAIN] User selected directory:', appDir)
     } else {
       // User cancelled - fall back to temp (prompts won't persist)
-      appDir = path.dirname(process.execPath);
-      // console.log('[MAIN] User cancelled, using temp path (prompts will not persist):', appDir);
+      appDir = path.dirname(process.execPath)
+      console.log('[MAIN] User cancelled, using temp path (prompts will not persist):', appDir)
       dialog.showMessageBoxSync({
         type: 'warning',
         title: 'Prompts Will Not Persist',
         message: 'No folder selected. Your custom prompts will be lost when the app closes.',
-        buttons: ['OK']
-      });
+        buttons: ['OK'],
+      })
     }
   }
 
-  promptsPath = path.join(appDir, 'prompts.json');
-  // console.log('[MAIN] Final prompts path:', promptsPath);
-  return promptsPath;
-};
+  promptsPath = path.join(appDir, 'prompts.json')
+  console.log('[MAIN] Final prompts path:', promptsPath)
+  return promptsPath
+}
+
+const getConfigPath = () => {
+  const pPath = getPromptsPath()
+  return path.join(path.dirname(pPath), 'config.json')
+}
+
+// Simple obfuscation for API keys
+const XOR_KEY = 'TAVERN_CARD_CRAFTER_SECRET'
+
+function obfuscate(text) {
+  if (!text) return text
+  try {
+    // Prepend 'deenc' to verify successful decryption later
+    const payload = 'deenc' + text
+    const xor = payload.split('').map((c, i) => c.charCodeAt(0) ^ XOR_KEY.charCodeAt(i % XOR_KEY.length))
+    return Buffer.from(xor).toString('base64')
+  } catch (e) {
+    console.error('Obfuscation failed:', e)
+    return text
+  }
+}
+
+function deobfuscate(encoded) {
+  if (!encoded) return encoded
+  try {
+    // Check if it's valid base64
+    if (!/^[A-Za-z0-9+/]*={0,2}$/.test(encoded)) return encoded
+
+    const xor = Buffer.from(encoded, 'base64')
+    const decoded = String.fromCharCode(...xor.map((b, i) => b ^ XOR_KEY.charCodeAt(i % XOR_KEY.length)))
+
+    // Check for the prefix to confirm successful decryption
+    if (decoded.startsWith('deenc')) {
+      return decoded.slice(5)
+    }
+
+    // If prefix not found, assume it's a plain text legacy key
+    return encoded
+  } catch (e) {
+    console.error('Deobfuscation failed:', e)
+    return encoded
+  }
+}
 
 // IPC Handlers for prompts
 ipcMain.handle('load-prompts', async () => {
-  const filePath = getPromptsPath();
+  const filePath = getPromptsPath()
   try {
     if (fs.existsSync(filePath)) {
-      const data = fs.readFileSync(filePath, 'utf-8');
-      return JSON.parse(data);
+      const data = fs.readFileSync(filePath, 'utf-8')
+      return JSON.parse(data)
     }
-    return null; // Return null to indicate use defaults
+    return null // Return null to indicate use defaults
   } catch (error) {
-    console.error('Failed to load prompts:', error);
-    throw error;
+    console.error('Failed to load prompts:', error)
+    throw error
   }
-});
+})
+
+// IPC Handlers for config
+ipcMain.handle('load-config', async () => {
+  const filePath = getConfigPath()
+  try {
+    if (fs.existsSync(filePath)) {
+      const data = fs.readFileSync(filePath, 'utf-8')
+      const config = JSON.parse(data)
+
+      // Deobfuscate API keys in endpoints
+      if (config.endpoints && Array.isArray(config.endpoints)) {
+        config.endpoints = config.endpoints.map((endpoint) => ({ ...endpoint, apiKey: deobfuscate(endpoint.apiKey) }))
+      }
+
+      return config
+    }
+    return null
+  } catch (error) {
+    console.error('Failed to load config:', error)
+    return null
+  }
+})
+
+ipcMain.handle('save-config', async (event, config) => {
+  const filePath = getConfigPath()
+  try {
+    // Deep copy to avoid mutating the original object if it's used elsewhere (though IPC passes by copy usually)
+    const configToSave = JSON.parse(JSON.stringify(config))
+
+    // Obfuscate API keys before saving
+    if (configToSave.endpoints && Array.isArray(configToSave.endpoints)) {
+      configToSave.endpoints = configToSave.endpoints.map((endpoint) => ({
+        ...endpoint,
+        apiKey: obfuscate(endpoint.apiKey),
+      }))
+    }
+
+    fs.writeFileSync(filePath, JSON.stringify(configToSave, null, 2), 'utf-8')
+    return { success: true, path: filePath }
+  } catch (error) {
+    console.error('Failed to save config:', error)
+    if (error.code === 'EACCES' || error.code === 'EPERM' || error.code === 'EROFS') {
+      throw new Error(
+        'PERMISSION DENIED: The application is in a read-only folder. Please move the app to a writable location.',
+      )
+    }
+    throw error
+  }
+})
+
+ipcMain.handle('reset-config', async () => {
+  const filePath = getConfigPath()
+  try {
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath)
+    }
+    return true
+  } catch (error) {
+    console.error('Failed to reset config:', error)
+    throw error
+  }
+})
 // Save prompts with enhanced error handling for permission issues
 ipcMain.handle('save-prompts', async (event, prompts) => {
-  const filePath = getPromptsPath();
-  // console.log('[MAIN] save-prompts IPC called');
-  // console.log('[MAIN] Writing to:', filePath);
+  const filePath = getPromptsPath()
+  console.log('[MAIN] save-prompts IPC called')
+  console.log('[MAIN] Writing to:', filePath)
   try {
-    fs.writeFileSync(filePath, JSON.stringify(prompts, null, 2), 'utf-8');
-    // console.log('[MAIN] Successfully wrote prompts.json');
-    return { success: true, path: filePath };
+    fs.writeFileSync(filePath, JSON.stringify(prompts, null, 2), 'utf-8')
+    console.log('[MAIN] Successfully wrote prompts.json')
+    return { success: true, path: filePath }
   } catch (error) {
-    console.error('Failed to save prompts:', error);
+    console.error('Failed to save prompts:', error)
 
     // Check for specific permission errors
     if (error.code === 'EACCES' || error.code === 'EPERM' || error.code === 'EROFS') {
       throw new Error(
-        'PERMISSION DENIED: The application is in a read-only folder. Please move the app to a writable location (like your Desktop) to save changes.'
-      );
+        'PERMISSION DENIED: The application is in a read-only folder. Please move the app to a writable location (like your Desktop) to save changes.',
+      )
     }
 
     // Re-throw generic errors for other issues (disk full, etc.)
-    throw error;
+    throw error
   }
-});
+})
 
 ipcMain.handle('reset-prompts', async () => {
-  const filePath = getPromptsPath();
+  const filePath = getPromptsPath()
   try {
     if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
+      fs.unlinkSync(filePath)
     }
-    return true;
+    return true
   } catch (error) {
-    console.error('Failed to reset prompts:', error);
-    throw error;
+    console.error('Failed to reset prompts:', error)
+    throw error
   }
-});
+})
 
 function createWindow() {
   /**
@@ -145,74 +251,74 @@ function createWindow() {
       contextIsolation: true,
       enableRemoteModule: false,
       webSecurity: true,
-      preload: path.join(__dirname, 'preload.js')
+      preload: path.join(__dirname, 'preload.js'),
     },
     icon: path.join(__dirname, '../public/favicon.ico'),
-    title: 'Tavern Card Crafter - AI character card creation tool',
+    title: 'CharaCardCreator - AI character card creation tool',
     show: false, // Don't display it first, wait until the load is completed before displaying
     titleBarStyle: 'default',
-    frame: true
-  });
+    frame: true,
+  })
 
   // Loading the app
   if (isDev) {
-    mainWindow.loadURL('http://localhost:6090');
+    mainWindow.loadURL('http://localhost:6090')
     // Open the developer tools in development mode
-    mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools()
   } else {
-    mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
+    mainWindow.loadFile(path.join(__dirname, '../dist/index.html'))
   }
 
   // Displayed after the window is ready
   mainWindow.once('ready-to-show', () => {
-    mainWindow.show();
+    mainWindow.show()
 
     // Focus window
     if (isDev) {
-      mainWindow.focus();
+      mainWindow.focus()
     }
-  });
+  })
 
   // When the window is closed
   mainWindow.on('closed', () => {
-    mainWindow = null;
-  });
+    mainWindow = null
+  })
 
   // Prevent new window from opening
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-    require('electron').shell.openExternal(url);
-    return { action: 'deny' };
-  });
+    require('electron').shell.openExternal(url)
+    return { action: 'deny' }
+  })
 }
 
 // 当 Electron Call this method when you complete initialization and prepare to create a browser window
 app.whenReady().then(() => {
-  createWindow();
+  createWindow()
 
   // macOS Under, when all windows are closed, the application will usually remain active
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
+      createWindow()
     }
-  });
-});
+  })
+})
 
 // Exit the app when all windows are closed (Apart from macOS)
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
-    app.quit();
+    app.quit()
   }
-});
+})
 
 // In development mode, when the main process receives a hot reload signal
 if (isDev) {
   try {
     require('electron-reload')(__dirname, {
       electron: path.join(__dirname, '..', 'node_modules', '.bin', 'electron'),
-      hardResetMethod: 'exit'
-    });
+      hardResetMethod: 'exit',
+    })
   } catch (e) {
-    console.log('electron-reload not available in production');
+    console.log('electron-reload not available in production')
   }
 }
 
@@ -225,32 +331,32 @@ const template = [
         label: 'New Character',
         accelerator: 'CmdOrCtrl+N',
         click: () => {
-          mainWindow.webContents.send('menu-new-character');
-        }
+          mainWindow.webContents.send('menu-new-character')
+        },
       },
       {
         label: 'Import',
         accelerator: 'CmdOrCtrl+O',
         click: () => {
-          mainWindow.webContents.send('menu-import');
-        }
+          mainWindow.webContents.send('menu-import')
+        },
       },
       {
         label: 'Export',
         accelerator: 'CmdOrCtrl+S',
         click: () => {
-          mainWindow.webContents.send('menu-export');
-        }
+          mainWindow.webContents.send('menu-export')
+        },
       },
       { type: 'separator' },
       {
         label: 'Exit',
         accelerator: process.platform === 'darwin' ? 'Cmd+Q' : 'Ctrl+Q',
         click: () => {
-          app.quit();
-        }
-      }
-    ]
+          app.quit()
+        },
+      },
+    ],
   },
   {
     label: 'Edit',
@@ -260,8 +366,8 @@ const template = [
       { type: 'separator' },
       { label: 'Cut', accelerator: 'CmdOrCtrl+X', role: 'cut' },
       { label: 'Copy', accelerator: 'CmdOrCtrl+C', role: 'copy' },
-      { label: 'Paste', accelerator: 'CmdOrCtrl+V', role: 'paste' }
-    ]
+      { label: 'Paste', accelerator: 'CmdOrCtrl+V', role: 'paste' },
+    ],
   },
   {
     label: 'View',
@@ -274,8 +380,8 @@ const template = [
       { label: 'Zoom In', accelerator: 'CmdOrCtrl+Plus', role: 'zoomIn' },
       { label: 'Zoom Out', accelerator: 'CmdOrCtrl+-', role: 'zoomOut' },
       { type: 'separator' },
-      { label: 'Toggle Fullscreen', accelerator: 'F11', role: 'togglefullscreen' }
-    ]
+      { label: 'Toggle Fullscreen', accelerator: 'F11', role: 'togglefullscreen' },
+    ],
   },
   {
     label: 'Help',
@@ -285,15 +391,16 @@ const template = [
         click: () => {
           require('electron').dialog.showMessageBox(mainWindow, {
             type: 'info',
-            title: 'About Tavern Card Crafter',
-            message: 'Tavern Card Crafter',
-            detail: 'AI character card creation tool\n Professional AI character card making tool to help users easily create and edit character cards for chatbots and role-playing'
-          });
-        }
-      }
-    ]
-  }
-];
+            title: 'About CharaCardCreator',
+            message: 'CharaCardCreator',
+            detail:
+              'AI character card creation tool\n Professional AI character card making tool to help users easily create and edit character cards for chatbots and role-playing',
+          })
+        },
+      },
+    ],
+  },
+]
 
-const menu = Menu.buildFromTemplate(template);
-Menu.setApplicationMenu(menu);
+const menu = Menu.buildFromTemplate(template)
+Menu.setApplicationMenu(menu)

@@ -10,6 +10,7 @@ logs/
 .DS_Store
 .vscode/
 .idea/
+.qlty/
 .vs/
 *.suo
 *.ntvs*
@@ -55,8 +56,11 @@ tmp/
 # ─────────────────────────────────────────────
 .github/copilot-instructions.md
 prompts.json
-/.claude
-/docs
+.claude/
 prompts.json
 settings.json
 
+bun.lockb
+config.json
+.mcp.json
+.gemini/

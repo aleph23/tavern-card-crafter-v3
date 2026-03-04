@@ -1,0 +1,683 @@
+/* eslint-disable prefer-const */
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { Button } from '@/components/ui/glass/button'
+import { Input } from '@/components/ui/glass/input'
+import { Label } from '@/components/ui/glass/label'
+import { Drawer, DrawerContent, DrawerTitle, DrawerTrigger, DrawerHeader } from '@/components/ui/glass/drawer'
+import { Loader2, Check, X, RefreshCw, Info, Plus, Trash2, Power } from 'lucide-react'
+import { SettingsIcon, SettingsIconHandle } from '@/components/ui/settings'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { useToast } from '@/hooks/use-toast'
+import { Alert, AlertDescription } from '@/components/ui/glass/alert'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/glass/tabs'
+import { PromptEditor } from './PromptEditor'
+import AppearanceSettings from './AppearanceSettings'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/glass/accordion'
+import { buildApiUrl } from '@/utils/buildApiUrl'
+import { configManager } from '@/utils/configManager'
+import { AppConfig, Endpoint, InferenceSettings } from '@/types/settings'
+import { DEFAULT_SETTINGS, DEFAULT_APP_CONFIG } from '@/config/defaultSettings'
+import { apiProviders } from '@/config/providers'
+
+interface ConfigEditorProps {
+  onSettingsChange: (settings: InferenceSettings) => void
+}
+
+const createDefaultConfig = (): AppConfig => DEFAULT_APP_CONFIG()
+
+/**
+ * Configuration Editor component for managing app and provider settings.
+ *
+ * This component allows users to configure API provider settings, including selecting
+ * a provider, entering an API key, and testing the connection. It intelligently builds
+ * API URLs based on the selected provider and handles fetching available models. The
+ * component also manages state for connection status and error messages, providing
+ * user feedback through toasts.
+ *
+ * @param {function} onSettingsChange - Callback function to handle changes in settings.
+ * @param {ConfigEditorProps} currentSettings - The current settings to initialize the component state.
+ * @returns {JSX.Element} Everything.  The contents of self, file ConfigEditor.tsx.
+ */
+export const ConfigEditor = ({ onSettingsChange }: ConfigEditorProps) => {
+  const { toast } = useToast()
+  const [isOpen, setIsOpen] = useState(false)
+  const [config, setConfig] = useState<AppConfig | null>(null)
+  const [testingEndpointId, setTestingEndpointId] = useState<string | null>(null)
+  const [loadingModelsEndpointId, setLoadingModelsEndpointId] = useState<string | null>(null)
+  const [connectionStatus, setConnectionStatus] = useState<Record<string, 'idle' | 'success' | 'error'>>({})
+  const [lastError, setLastError] = useState<Record<string, string>>({})
+
+  const loadConfig = useCallback(async () => {
+    const loadedConfig = await configManager.loadConfig()
+    if (loadedConfig) {
+      setConfig(loadedConfig)
+    } else {
+      setConfig(createDefaultConfig())
+    }
+  }, [])
+
+  useEffect(() => {
+    let isMounted = true
+    const initiateLoad = async () => {
+      const loadedConfig = await configManager.loadConfig()
+      if (isMounted) {
+        if (loadedConfig) {
+          setConfig(loadedConfig)
+        } else {
+          setConfig(createDefaultConfig())
+        }
+      }
+    }
+    initiateLoad()
+    return () => {
+      isMounted = false
+    }
+  }, [isOpen]) // Reload when opened, but also load initially
+
+  /**
+   * Handles changes to the selected API provider.
+   *
+   * This function updates the settings based on the selected provider's value. It searches for the provider in the apiProviders
+   * array and, if found, updates the settings with the provider's URL, model, and API key. Additionally, it sets the available
+   * models based on the selected provider or defaults to a predefined set of models if none are available.
+   *
+   * @param {string} newEndpoints - The value of the selected provider.
+   */
+  const handleEndpointChange = <K extends keyof Endpoint>(index: number, field: K, value: Endpoint[K]) => {
+    if (!config) return
+    const newEndpoints = [...config.endpoints]
+    newEndpoints[index] = { ...newEndpoints[index], [field]: value }
+
+    // Auto-update available models if provider changes
+    if (field === 'provider') {
+      const provider = apiProviders.find((p) => p.value === value)
+      if (provider) {
+        newEndpoints[index].apiUrl = provider.url
+        newEndpoints[index].availableModels = provider.models
+        newEndpoints[index].model = provider.models[0] || ''
+      }
+    }
+
+    setConfig({ ...config, endpoints: newEndpoints })
+  }
+
+  const handleAddEndpoint = () => {
+    if (!config) return
+    if (config.endpoints.length >= 6) {
+      toast({ title: 'Limit reached', description: 'You can only have up to 6 endpoints.', variant: 'destructive' })
+      return
+    }
+
+    const newEndpoint: Endpoint = {
+      id: crypto.randomUUID(),
+      name: `New Endpoint ${config.endpoints.length + 1}`,
+      provider: DEFAULT_SETTINGS.endpoint?.provider || '',
+      apiKey: DEFAULT_SETTINGS.endpoint?.apiKey || '',
+      apiUrl: DEFAULT_SETTINGS.endpoint?.apiUrl || '',
+      model: DEFAULT_SETTINGS.endpoint?.model || '',
+      type: 'text',
+      availableModels: [DEFAULT_SETTINGS.endpoint?.model || ''],
+    }
+
+    setConfig({ ...config, endpoints: [...config.endpoints, newEndpoint] })
+  }
+
+  const handleDeleteEndpoint = (index: number) => {
+    if (!config) return
+    if (config.endpoints.length <= 1) {
+      toast({ title: 'Cannot delete', description: 'You must have at least one endpoint.', variant: 'destructive' })
+      return
+    }
+
+    const endpointToDelete = config.endpoints[index]
+    const newEndpoints = config.endpoints.filter((_, i) => i !== index)
+
+    // If active endpoint is deleted, switch to the first one
+    let newActiveId = config.activeChatEndpointId
+    if (endpointToDelete.id === config.activeChatEndpointId) {
+      newActiveId = newEndpoints[0].id
+    }
+
+    setConfig({ ...config, endpoints: newEndpoints, activeChatEndpointId: newActiveId })
+  }
+
+  const handleSetActive = (id: string) => {
+    if (!config) return
+    setConfig({ ...config, activeChatEndpointId: id })
+  }
+
+  /**
+   * Build a models URL based on the provided base URL and provider.
+   *
+   * The function first checks if the baseUrl is valid. It then cleans the URL by removing trailing slashes.
+   * Depending on the provider, it applies specific rules for constructing the final URL, particularly for 'ollama'
+   * and other providers, ensuring the correct endpoint structure is returned.
+   *
+   * @param baseUrl - The base URL to be processed.
+   * @param provider - The provider to determine specific URL formatting (defaults to settings.provider).
+   * @returns The constructed models URL based on the input parameters.
+   */
+  const buildModelsUrl = (baseUrl: string, provider: string): string => {
+    if (!baseUrl) return ''
+    const cleanUrl = baseUrl.replace(/\/+$/, '')
+    if (provider === 'ollama') {
+      return baseUrl.includes('/api/tags') ? cleanUrl : `${cleanUrl}/api/tags`
+    }
+    if (baseUrl.includes('/models')) return cleanUrl
+    return cleanUrl.includes('/v1') ? `${cleanUrl}/models` : `${cleanUrl}/v1/models`
+  }
+
+  /**
+   * Parse and return a user-friendly error message from an API error.
+   *
+   * The function checks the type of the error and matches it against known error patterns to provide specific messages.
+   * If the error is an object, it attempts to extract the message from the error's structure.
+   * In case of unexpected formats or exceptions, a generic error message is returned.
+   *
+   * @param error - The error object or message received from the API.
+   * @param response - An optional Response object that may provide additional context.
+   * @returns A user-friendly error message based on the provided error.
+   */
+  const parseApiError = (error: unknown): string => {
+    try {
+      if (typeof error === 'string') {
+        if (error.includes('model')) return 'The model does not exist or is invalid.'
+        if (error.includes('Unauthorized') || error.includes('401')) return 'Invalid API Key.'
+        if (error.includes('No channels available') || error.includes('no available channels')) {
+          return 'There is no available channel for the current API grouping. Please check the API configuration or contact the service provider.'
+        }
+        if (error.includes('User location is not supported') || error.includes('location')) {
+          return 'This API service is not supported in the current region, and it may be necessary to use a proxy or replace the API provider.'
+        }
+        if (error.includes('rate limit') || error.includes('429')) {
+          return 'API call frequency exceeds the limit, please try again later'
+        }
+        if (error.includes('quota') || error.includes('insufficient')) {
+          return 'The API limit is insufficient, please check the account balance'
+        }
+        if (error.includes('CORS')) {
+          return 'Cross-domain requests are blocked, please check the CORS configuration of the API service'
+        }
+        if (error.includes('Failed to fetch')) return 'Network connection failed. Check URL and server status.'
+        return error
+      }
+      // Cast to 'any' to safely probe for common API error structures
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const errObj = error as any
+      return errObj?.error?.message || errObj?.message || JSON.stringify(error)
+    } catch {
+      return 'Failed to parse error message'
+    }
+  }
+
+  /**
+   * Tests the connection to the specified API provider and model.
+   *
+   * The function first verifies the configuration settings, including the API key and URL.
+   * It then constructs the API request and handles the response, providing feedback through toast notifications
+   * based on the success or failure of the connection attempt. Error handling is implemented for various scenarios,
+   * including network issues and invalid configurations.
+   *
+   * @param {Object} endpoint - The configuration settings for the API connection.
+   * @param {string} endpoint.provider - The API provider to connect to.
+   * @param {string} endpoint.apiKey - The API key for authentication, if required.
+   * @param {string} endpoint.apiUrl - The URL of the API to connect to.
+   * @param {string} endpoint.model - The model to be used for the connection.
+   * @param {Array} availableModels - The list of models available for the selected provider.
+   * @returns {Promise<void>} A promise that resolves when the connection test is complete.
+   * @throws {Error} Throws an error if the connection test fails due to network issues or invalid configurations.
+   */
+  const testConnection = async (endpoint: Endpoint) => {
+    const currentProvider = apiProviders.find((p) => p.value === endpoint.provider)
+
+    if (currentProvider?.requiresKey && !endpoint.apiKey) {
+      toast({ title: 'Missing API Key', description: 'Please enter an API key.', variant: 'destructive' })
+      return
+    }
+
+    if (!endpoint.apiUrl) {
+      toast({
+        title: 'Configuration missing',
+        description: 'Please fill in the API address first',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    setTestingEndpointId(endpoint.id)
+    setConnectionStatus((prev) => ({ ...prev, [endpoint.id]: 'idle' }))
+    setLastError((prev) => ({ ...prev, [endpoint.id]: '' }))
+
+    try {
+      const apiUrl = buildApiUrl(endpoint.apiUrl, endpoint.provider)
+
+      console.log('Testing connection to:', apiUrl)
+      console.log('Provider:', endpoint.provider)
+      console.log('Model:', endpoint.model)
+
+      // Use a unified Open AI-compatible format
+      let headers: Record<string, string> = { 'Content-Type': 'application/json' }
+      if (endpoint.provider === 'openrouter') {
+        headers['HTTP-Referer'] = 'https://github.com/aleph23/tavern-card-creator-v3'
+        headers['X-Title'] = 'CardCreator'
+      }
+
+      // Validated at the top of the function: block if required but missing.
+      // Now we just send it if it's there (even if not strictly required).
+      if (endpoint.apiKey) {
+        headers['Authorization'] = `Bearer ${endpoint.apiKey}`
+      }
+
+      const requestBody = {
+        model: endpoint.model,
+        messages: [{ role: 'user', content: 'test' }],
+        max_tokens: 10,
+        temperature: 0.1,
+      }
+
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(requestBody),
+        signal: AbortSignal.timeout(30000),
+      })
+
+      if (response.ok) {
+        setConnectionStatus((prev) => ({ ...prev, [endpoint.id]: 'success' }))
+        toast({ title: 'Connection Successful', description: `${endpoint.name} connected successfully.` })
+      } else {
+        const errorText = await response.text()
+        const errorMessage = parseApiError(errorText)
+        setConnectionStatus((prev) => ({ ...prev, [endpoint.id]: 'error' }))
+        setLastError((prev) => ({ ...prev, [endpoint.id]: errorMessage }))
+        toast({ title: 'Connection Failed', description: errorMessage, variant: 'destructive' })
+      }
+    } catch (error: unknown) {
+      const errorMessage = parseApiError(error instanceof Error ? error.message : 'Network error')
+      setConnectionStatus((prev) => ({ ...prev, [endpoint.id]: 'error' }))
+      setLastError((prev) => ({ ...prev, [endpoint.id]: errorMessage }))
+      toast({ title: 'Connection Failed', description: errorMessage, variant: 'destructive' })
+    }
+    setTestingEndpointId(null)
+  }
+
+  /**
+   * Fetch models from the configured API provider.
+   *
+   * This function checks for the necessary API key and URL configuration before attempting to fetch model data from the specified provider. It handles both successful and error responses, updating the available models accordingly and providing user feedback through toast notifications. The function also manages loading states and handles potential errors during the fetch operation.
+   *
+   * @returns {Promise<void>} A promise that resolves when the fetch operation is complete.
+   */
+  const fetchModels = async (index: number) => {
+    if (!config) return
+    const endpoint = config.endpoints[index]
+    const currentProvider = apiProviders.find((p) => p.value === endpoint.provider)
+
+    if (currentProvider && currentProvider.modelsUrl === null) {
+      toast({
+        title: 'Not Supported',
+        description: 'This provider does not support fetching models.',
+        variant: 'default',
+      })
+      return
+    }
+
+    if (currentProvider?.requiresKey && !endpoint.apiKey) {
+      toast({ title: 'Missing API Key', description: 'Please enter an API key.', variant: 'destructive' })
+      return
+    }
+    if (!endpoint.apiUrl) {
+      toast({ title: 'Missing API URL', description: 'Please enter an API URL.', variant: 'destructive' })
+      return
+    }
+
+    setLoadingModelsEndpointId(endpoint.id)
+
+    const modelsUrl = currentProvider?.modelsUrl || buildModelsUrl(endpoint.apiUrl, endpoint.provider)
+
+    try {
+      console.log('Fetching models from:', modelsUrl)
+      console.log('Provider:', endpoint.provider)
+
+      let headers: Record<string, string> = { 'Content-Type': 'application/json' }
+
+      if (endpoint.provider === 'openrouter') {
+        headers['HTTP-Referer'] = 'https://github.com/aleph23/tavern-card-creator-v3'
+        headers['X-Title'] = 'CharaCardCreator'
+      }
+      if (endpoint.apiKey) {
+        headers['Authorization'] = `Bearer ${endpoint.apiKey}`
+      }
+
+      const response = await fetch(modelsUrl, { headers, signal: AbortSignal.timeout(15000) })
+
+      if (response.ok) {
+        const data = await response.json()
+        let modelIds: string[] = []
+
+        if (endpoint.provider === 'ollama' && data.models) {
+          modelIds = data.models
+            .map((model: { name: string }) => model.name)
+            .filter((name: string) => name && name.trim() !== '')
+        } else if (data.data && Array.isArray(data.data)) {
+          modelIds = data.data.map((model: { id: string }) => model.id).filter((id: string) => id && id.trim() !== '')
+        }
+
+        if (modelIds.length > 0) {
+          handleEndpointChange(index, 'availableModels', modelIds)
+          // If current model is not in list, select first one
+          if (!modelIds.includes(endpoint.model)) {
+            handleEndpointChange(index, 'model', modelIds[0])
+          }
+          toast({ title: 'Models Fetched', description: `Found ${modelIds.length} models.` })
+        } else {
+          toast({ title: 'No Models Found', description: 'Using default model list.', variant: 'default' })
+        }
+      } else {
+        toast({ title: 'Fetch Failed', description: 'Could not fetch models.', variant: 'destructive' })
+      }
+    } catch (error) {
+      console.error(error)
+      toast({ title: 'Fetch Failed', description: 'Network error while fetching models.', variant: 'destructive' })
+    }
+    setLoadingModelsEndpointId(null)
+  }
+
+  const handleSave = async () => {
+    if (!config) return
+    try {
+      await configManager.saveConfig(config)
+      onSettingsChange(configManager.getActiveAISettings())
+      setIsOpen(false)
+      toast({ title: 'Settings Saved', description: 'Configuration updated successfully.' })
+    } catch (error) {
+      console.error(error)
+      toast({ title: 'Save Failed', description: 'Could not save configuration.', variant: 'destructive' })
+    }
+  }
+
+  const settingsRef = useRef<SettingsIconHandle>(null)
+
+  return (
+    <Drawer open={isOpen} onOpenChange={setIsOpen} direction='top'>
+      <DrawerTrigger asChild>
+        <Button
+          variant='outline'
+          size='sm'
+          // The Sensor Logic
+          onMouseEnter={() => settingsRef.current?.startAnimation()}
+          onMouseLeave={() => settingsRef.current?.stopAnimation()}
+        >
+          <SettingsIcon
+            ref={settingsRef}
+            /* Note: 'w-4 h-4' is removed to allow your 1.1em SSoT.
+             'mr-2' is kept for layout spacing.
+          */
+            className='mr-2'
+          />
+          Settings
+        </Button>
+      </DrawerTrigger>
+      <DrawerContent
+        direction='top'
+        className='sm:max-w-[1200px] max-h-screen flex flex-col glass-panel-lg p-0 overflow-hidden outline-none mx-auto left-0 right-0'
+        overflow-y-auto
+      >
+        {!config ? (
+          <div className='flex justify-center items-center p-4'>
+            <Loader2 className='h-6 w-6 animate-spin text-primary' />
+          </div>
+        ) : (
+          <>
+            <DrawerHeader>
+              <DrawerTitle>Settings</DrawerTitle>
+            </DrawerHeader>
+            <Tabs defaultValue='connection' className='flex-1 flex flex-col min-h-0'>
+              <TabsList className='grid w-full grid-cols-3 shrink-0'>
+                <TabsTrigger value='connection'>API & Inference Parameters</TabsTrigger>
+                <TabsTrigger value='prompts'>Prompt Templates</TabsTrigger>
+                <TabsTrigger value='appearance'>UI Appearance</TabsTrigger>
+              </TabsList>
+              <TabsContent value='connection' className='space-y-6 py-4 flex-1 overflow-y-auto min-h-0 pr-2'>
+                <div className='space-y-4'>
+                  <div className='flex items-center justify-between'>
+                    <Label className='text-lg font-semibold'>API Providers</Label>
+                    {config.endpoints.length < 6 && (
+                      <Button variant='outline' size='sm' onClick={handleAddEndpoint}>
+                        <Plus className='w-4 h-4 mr-2' />
+                        Add Provider
+                      </Button>
+                    )}
+                  </div>
+                  <Accordion type='single' collapsible className='w-full'>
+                    {config.endpoints.map((endpoint, index) => {
+                      const isActive = endpoint.id === config.activeChatEndpointId
+                      const provider = apiProviders.find((p) => p.value === endpoint.provider)
+
+                      return (
+                        <AccordionItem key={endpoint.id} value={endpoint.id}>
+                          <AccordionTrigger className='hover:no-underline'>
+                            <div className='flex items-center gap-2 w-full pr-4'>
+                              <div
+                                role='button'
+                                tabIndex={0}
+                                className={`flex items-center justify-center p-1 h-6 w-6 rounded-full text-foreground/50 transition-colors ${isActive ? 'bg-success text-primary-foreground hover:bg-success/90' : 'hover:bg-muted'}`}
+                                onClick={(e) => {
+                                  e.preventDefault()
+                                  e.stopPropagation()
+                                  handleSetActive(endpoint.id)
+                                }}
+                                title={isActive ? 'Active Chat Endpoint' : 'Set as Active Chat Endpoint'}
+                              >
+                                <Power className='h-3 w-3' />
+                              </div>
+                              <span className={`flex-1 text-left ${isActive ? 'font-bold text-success' : ''}`}>
+                                {endpoint.name || 'Unnamed Endpoint'}
+                              </span>
+                              {config.endpoints.length > 1 && (
+                                <div
+                                  role='button'
+                                  tabIndex={0}
+                                  className='flex items-center justify-center p-1 h-8 w-8 rounded-md text-destructive hover:text-destructive/90 hover:bg-destructive/10 transition-colors'
+                                  onClick={(e) => {
+                                    e.preventDefault()
+                                    e.stopPropagation()
+                                    handleDeleteEndpoint(index)
+                                  }}
+                                >
+                                  <Trash2 className='h-4 w-4' />
+                                </div>
+                              )}
+                            </div>
+                          </AccordionTrigger>
+                          <AccordionContent className='space-y-4 px-1'>
+                            <div className='grid grid-cols-2 gap-4'>
+                              <div className='space-y-2'>
+                                <Label>Name</Label>
+                                <Input
+                                  value={endpoint.name}
+                                  onChange={(e) => handleEndpointChange(index, 'name', e.target.value)}
+                                  placeholder='My Endpoint'
+                                />
+                              </div>
+                              <div className='space-y-2'>
+                                <Label>Provider</Label>
+                                <Select
+                                  value={endpoint.provider}
+                                  onValueChange={(value) => handleEndpointChange(index, 'provider', value)}
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {apiProviders.map((p) => (
+                                      <SelectItem key={p.value} value={p.value}>
+                                        {p.name}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            </div>
+
+                            <div className='space-y-2'>
+                              <Label>
+                                API Key{' '}
+                                {!provider?.requiresKey && (
+                                  <span className='text-xs font-normal text-muted-foreground ml-2'>(Optional)</span>
+                                )}
+                              </Label>
+                              <Input
+                                type='password'
+                                value={endpoint.apiKey}
+                                onChange={(e) => handleEndpointChange(index, 'apiKey', e.target.value)}
+                                placeholder={
+                                  provider?.requiresKey ? 'sk-...' : 'Optional depending on your implementation'
+                                }
+                              />
+                            </div>
+
+                            <div className='space-y-2'>
+                              <Label>API URL</Label>
+                              <Input
+                                value={endpoint.apiUrl}
+                                onChange={(e) => handleEndpointChange(index, 'apiUrl', e.target.value)}
+                                placeholder='https://api...'
+                              />
+                            </div>
+
+                            <div className='space-y-2'>
+                              <Label>Model</Label>
+                              <div className='flex gap-2'>
+                                <Select
+                                  value={endpoint.model}
+                                  onValueChange={(value) => handleEndpointChange(index, 'model', value)}
+                                >
+                                  <SelectTrigger className='flex-1'>
+                                    <SelectValue placeholder='Select model' />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {(endpoint.availableModels || provider?.models || []).map((m) => (
+                                      <SelectItem key={m} value={m}>
+                                        {m}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                                <Button
+                                  variant='outline'
+                                  size='icon'
+                                  onClick={() => fetchModels(index)}
+                                  disabled={loadingModelsEndpointId === endpoint.id || provider?.modelsUrl === null}
+                                  title={
+                                    provider?.modelsUrl === null
+                                      ? 'Fetching models is not supported for this provider'
+                                      : 'Get Model List'
+                                  }
+                                >
+                                  {loadingModelsEndpointId === endpoint.id ? (
+                                    <Loader2 className='h-4 w-4 animate-spin' />
+                                  ) : (
+                                    <RefreshCw className='h-4 w-4' />
+                                  )}
+                                </Button>
+                              </div>
+                            </div>
+
+                            <div className='flex justify-between items-center pt-2'>
+                              <Button
+                                variant='outline'
+                                size='sm'
+                                onClick={() => testConnection(endpoint)}
+                                disabled={testingEndpointId === endpoint.id}
+                              >
+                                {testingEndpointId === endpoint.id ? (
+                                  <Loader2 className='h-4 w-4 animate-spin mr-2' />
+                                ) : connectionStatus[endpoint.id] === 'success' ? (
+                                  <Check className='h-4 w-4 mr-2 --success' />
+                                ) : connectionStatus[endpoint.id] === 'error' ? (
+                                  <X className='h-4 w-4 mr-2 text-destructive' />
+                                ) : null}
+                                Test Connection
+                              </Button>
+                              {lastError[endpoint.id] && (
+                                <span
+                                  className='text-xs text-destructive max-w-[300px] truncate'
+                                  title={lastError[endpoint.id]}
+                                >
+                                  {lastError[endpoint.id]}
+                                </span>
+                              )}
+                            </div>
+                            {provider?.tips && (
+                              <Alert>
+                                <Info className='h-4 w-4' />
+                                <AlertDescription className='text-xs'>{provider.tips}</AlertDescription>
+                              </Alert>
+                            )}
+                          </AccordionContent>
+                        </AccordionItem>
+                      )
+                    })}
+                  </Accordion>
+                </div>
+                <div className='space-y-4 border-t pt-4'>
+                  <h4 className='font-medium text-lg'>Inference Settings (Global)</h4>
+                  <div className='grid grid-cols-2 gap-4'>
+                    <div className='space-y-2'>
+                      <Label>Max Tokens ({config.inferenceSettings.maxTokens})</Label>
+                      <Input
+                        type='number'
+                        min='1'
+                        max='8192'
+                        value={config.inferenceSettings.maxTokens}
+                        onChange={(e) =>
+                          setConfig({
+                            ...config,
+                            inferenceSettings: { ...config.inferenceSettings, maxTokens: parseInt(e.target.value) },
+                          })
+                        }
+                      />
+                    </div>
+                    <div className='space-y-2'>
+                      <Label>Temperature ({config.inferenceSettings.temp})</Label>
+                      <Input
+                        type='number'
+                        min='0'
+                        max='2'
+                        step='0.05'
+                        value={config.inferenceSettings.temp}
+                        onChange={(e) =>
+                          setConfig({
+                            ...config,
+                            inferenceSettings: { ...config.inferenceSettings, temp: parseFloat(e.target.value) },
+                          })
+                        }
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className='pt-4'>
+                  <Button onClick={handleSave} className='w-full cta-button-gradient'>
+                    Save All Settings
+                  </Button>
+                </div>
+              </TabsContent>
+
+              <TabsContent value='prompts' className='flex-1 overflow-y-auto min-h-0'>
+                <PromptEditor />
+              </TabsContent>
+
+              <TabsContent value='appearance' className='flex-1 overflow-y-auto min-h-0 pr-2 pt-4'>
+                <AppearanceSettings />
+              </TabsContent>
+            </Tabs>
+          </>
+        )}
+      </DrawerContent>
+    </Drawer>
+  )
+}
+
+export default ConfigEditor

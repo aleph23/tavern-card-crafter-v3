@@ -1,24 +1,22 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Toaster } from '@/components/ui/toaster'
+import { Toaster as Sonner } from '@/components/ui/sonner'
+import { TooltipProvider } from '@/components/ui/tooltip'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { BrowserRouter, HashRouter, Routes, Route } from 'react-router-dom'
+import { LanguageProvider } from '@/contexts/LanguageContext'
+import { ThemeProvider } from '@/contexts/ThemeContext'
+import Index from './pages/Index'
+import NotFound from './pages/NotFound'
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, HashRouter, Routes, Route } from "react-router-dom";
-import { LanguageProvider } from "@/contexts/LanguageContext";
-import { ThemeProvider } from "@/contexts/ThemeContext";
-import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
-
-const queryClient = new QueryClient();
+const queryClient = new QueryClient()
 
 /**
  * Renders the main application component with routing and providers.
  */
 const App = () => {
   // Check if it is Electron In the environment
-  const isElectron = typeof window !== 'undefined' && window.location.protocol === 'file:';
-  const Router = isElectron ? HashRouter : BrowserRouter;
+  const isElectron = typeof window !== 'undefined' && window.location.protocol === 'file:'
+  const Router = isElectron ? HashRouter : BrowserRouter
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -29,16 +27,16 @@ const App = () => {
             <Sonner />
             <Router>
               <Routes>
-                <Route path="/" element={<Index />} />
+                <Route path='/' element={<Index />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
+                <Route path='*' element={<NotFound />} />
               </Routes>
             </Router>
           </TooltipProvider>
         </LanguageProvider>
       </ThemeProvider>
     </QueryClientProvider>
-  );
-};
+  )
+}
 
-export default App;
+export default App
