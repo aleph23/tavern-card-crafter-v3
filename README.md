@@ -211,7 +211,7 @@ This project was licensed under the MIT license and I am way too not giving a da
 
 #### New Features
 
-- Editable css - change the appearance of the UI
+- Editable CSS - change the appearance of the UI
 - Settings now saved externally alongside the executable in file config.json.  Deleting this file reverts changes to defaults.
 - Multiple AI endpoints.  You can now save multiple endpoints / providers and select between them in the settings.
 
